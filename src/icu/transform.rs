@@ -2,7 +2,6 @@ use std::error::Error;
 use rust_icu_sys as sys;
 use rust_icu_utrans as utrans;
 use std::mem;
-use std::sync::{Arc, Mutex};
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
 
@@ -34,17 +33,21 @@ impl<'a> TokenStream for ICUTransformTokenStream<'a> {
     }
 }
 
-#[derive(Clone,  Debug)]
+#[derive(Clone, Debug)]
 pub struct ICUTransformTokenFilter {
-    transform: Arc<Mutex<utrans::UTransliterator>>,
+    compound_id: String,
+    rules: Option<String>,
+    direction: sys::UTransDirection,
 }
 
 
 impl ICUTransformTokenFilter {
-    pub fn new(compound_id: &str, rules: Option<&str>, direction: sys::UTransDirection) -> Result<Self, Box<dyn Error>> {
-        let transform = utrans::UTransliterator::new(compound_id, rules, direction)?;
+    pub fn new(compound_id: String, rules: Option<String>, direction: sys::UTransDirection) -> Result<Self, Box<dyn Error>> {
+        let _ = utrans::UTransliterator::new(&compound_id, rules.as_ref().map(|x| &*x).map(|x| &**x), direction)?;
         Ok(ICUTransformTokenFilter {
-            transform: Arc::new(Mutex::new(transform)),
+            compound_id,
+            rules,
+            direction,
         })
     }
 }
@@ -53,9 +56,16 @@ impl ICUTransformTokenFilter {
 impl TokenFilter for ICUTransformTokenFilter {
     fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
         From::from(ICUTransformTokenStream {
-            transform: self.transform.as_ref().clone(),
+            // unwrap work, we checked in new method.
+            transform: utrans::UTransliterator::new(&self.compound_id, self.rules.as_ref().map(|x| &*x).map(|x| &**x), self.direction).unwrap(),
             tail: token_stream,
             temp: String::with_capacity(100),
         })
     }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_token_stream() {}
 }
