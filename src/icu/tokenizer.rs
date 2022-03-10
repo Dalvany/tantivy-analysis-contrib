@@ -1,6 +1,44 @@
+use std::str::Chars;
+use rust_icu::brk::UBreakIterator;
 use tantivy::tokenizer::{BoxTokenStream, Token, Tokenizer, TokenStream};
-use unicode_segmentation as us;
-use unicode_segmentation::{UnicodeSegmentation};
+
+/// Default rules, copy from Lucene's binary rules
+const DEFAULT_RULES: &str = std::include_str!("breaking_rules/Default.rbbi");
+/// Myanmar rules, copy from Lucene's binary rules
+const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");
+
+
+struct ICUBreakingWord<'a> {
+    text: Chars<'a>,
+    default_breaking_iterator: UBreakIterator,
+}
+
+impl<'a> ICUBreakingWord<'a> {
+    fn new(text: &'a str) -> Self {
+        ICUBreakingWord {
+            text: text.chars(),
+            default_breaking_iterator: UBreakIterator::try_new_rules(DEFAULT_RULES, text).unwrap(),
+        }
+    }
+
+    fn next_word(&mut self) -> Option<(String, usize, usize)> {
+        let mut start = self.default_breaking_iterator.current();
+        let mut end = self.default_breaking_iterator.next();
+        if end.is_some() && self.default_breaking_iterator.get_rule_status() == 0 {
+            start = end.unwrap();
+            end = self.default_breaking_iterator.next();
+        }
+
+        match end {
+            None => Option::None,
+            Some(index) => {
+                let substring: String = self.text.clone().take(index as usize).skip(start as usize).collect();
+                Option::Some((substring, start as usize, index as usize))
+            }
+        }
+    }
+}
+
 
 /// ICU [Tokenizer]. It does not (yet ?) work as Lucene's counterpart.
 #[derive(Clone)]
@@ -15,14 +53,14 @@ impl Tokenizer for ICUTokenizer {
 /// ICU [TokenStream], it relies on [us::UnicodeWordIndices]
 /// to do the actual tokenizing.
 pub struct ICUTokenizerTokenStream<'a> {
-    word_iterator: us::UnicodeWordIndices<'a>,
+    breaking_word: ICUBreakingWord<'a>,
     token: Token,
 }
 
 impl<'a> ICUTokenizerTokenStream<'a> {
-    pub fn new(text: &'a str) -> Self {
+    fn new(text: &'a str) -> Self {
         ICUTokenizerTokenStream {
-            word_iterator: text.unicode_word_indices(),
+            breaking_word: ICUBreakingWord::new(text),
             token: Token::default(),
         }
     }
@@ -30,19 +68,15 @@ impl<'a> ICUTokenizerTokenStream<'a> {
 
 impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
     fn advance(&mut self) -> bool {
-        let token: Option<(usize, &str)> = self.word_iterator.next();
+        let token = self.breaking_word.next_word();
         match token {
-            None => {
-                false
-            }
+            None => false,
             Some(token) => {
                 self.token.text.clear();
                 self.token.position = self.token.position.wrapping_add(1);
-                let start = token.0;
-                let end = token.1.len() + start;
-                self.token.offset_from = start;
-                self.token.offset_to = end;
-                self.token.text.push_str(token.1);
+                self.token.offset_from = token.1;
+                self.token.offset_to = token.2;
+                self.token.text.push_str(&token.0);
                 true
             }
         }
@@ -305,7 +339,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_khmer() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("ផ្ទះស្កឹមស្កៃបីបួនខ្នងនេះ");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
@@ -321,7 +354,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_lao() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("ກວ່າດອກ");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
@@ -341,7 +373,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_myanmar() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("သက်ဝင်လှုပ်ရှားစေပြီး");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
@@ -355,7 +386,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_thai() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("การที่ได้ต้องแสดงว่างานดี. แล้วเธอจะไปไหน? ๑๒๓๔");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
