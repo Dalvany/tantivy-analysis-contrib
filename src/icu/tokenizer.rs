@@ -1,27 +1,49 @@
 use std::str::Chars;
 use rust_icu::brk::UBreakIterator;
 use tantivy::tokenizer::{BoxTokenStream, Token, Tokenizer, TokenStream};
+use icu::properties::Script;
 
 /// Default rules, copy from Lucene's binary rules
 const DEFAULT_RULES: &str = std::include_str!("breaking_rules/Default.rbbi");
 /// Myanmar rules, copy from Lucene's binary rules
 const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");
 
+struct ScriptIterator<'a> {
+    text: Chars<'a>,
+    start: usize,
+    end: usize,
+    script_code: Option<Script>,
+}
+
+impl<'a> From<&'a str> for ScriptIterator<'a> {
+    fn from(text: &'a str) -> Self {
+        ScriptIterator {
+            text: text.chars(),
+            start: 0,
+            end: 0,
+            script_code: Option::None,
+        }
+    }
+}
 
 struct ICUBreakingWord<'a> {
     text: Chars<'a>,
     default_breaking_iterator: UBreakIterator,
 }
 
-impl<'a> ICUBreakingWord<'a> {
-    fn new(text: &'a str) -> Self {
+impl<'a> From<&'a str> for ICUBreakingWord<'a> {
+    fn from(text: &'a str) -> Self {
         ICUBreakingWord {
             text: text.chars(),
-            default_breaking_iterator: UBreakIterator::try_new_rules(DEFAULT_RULES, text).unwrap(),
+            default_breaking_iterator: UBreakIterator::try_new_rules(DEFAULT_RULES, text).expect("Can't read default rules."),
         }
     }
+}
 
-    fn next_word(&mut self) -> Option<(String, usize, usize)> {
+impl<'a> Iterator for ICUBreakingWord<'a> {
+    type Item = (String, usize, usize);
+
+    fn next(&mut self) -> Option<Self::Item> {
         let mut start = self.default_breaking_iterator.current();
         let mut end = self.default_breaking_iterator.next();
         if end.is_some() && self.default_breaking_iterator.get_rule_status() == 0 {
@@ -60,7 +82,7 @@ pub struct ICUTokenizerTokenStream<'a> {
 impl<'a> ICUTokenizerTokenStream<'a> {
     fn new(text: &'a str) -> Self {
         ICUTokenizerTokenStream {
-            breaking_word: ICUBreakingWord::new(text),
+            breaking_word: ICUBreakingWord::from(text),
             token: Token::default(),
         }
     }
@@ -68,7 +90,7 @@ impl<'a> ICUTokenizerTokenStream<'a> {
 
 impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
     fn advance(&mut self) -> bool {
-        let token = self.breaking_word.next_word();
+        let token = self.breaking_word.next();
         match token {
             None => false,
             Some(token) => {

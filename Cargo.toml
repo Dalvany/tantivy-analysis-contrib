@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 tantivy = "0.16"
+# Switch to full icu lib when possible
 rust_icu = "2.0"
-unicode-segmentation = "1.9"
+icu = "0.5"
