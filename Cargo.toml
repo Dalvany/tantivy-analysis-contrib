@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 tantivy = "0.16"
-rust_icu_utrans = "2.0"
-rust_icu_sys = "2.0"
+# Switch to full icu lib when possible
+rust_icu = "2.0"
+icu = "0.5"

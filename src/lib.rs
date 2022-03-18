@@ -1,13 +1,3 @@
 mod icu;
 
-pub use icu::transform::ICUTransformTokenFilter as ICUTransformTokenFilter;
-
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
+pub use crate::icu::transform::ICUTransformTokenFilter;
