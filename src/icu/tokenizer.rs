@@ -1,30 +1,12 @@
-use std::str::Chars;
+#![feature(test)]
 use rust_icu::brk::UBreakIterator;
-use tantivy::tokenizer::{BoxTokenStream, Token, Tokenizer, TokenStream};
-use icu::properties::Script;
+use std::str::Chars;
+use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
 
 /// Default rules, copy from Lucene's binary rules
 const DEFAULT_RULES: &str = std::include_str!("breaking_rules/Default.rbbi");
 /// Myanmar rules, copy from Lucene's binary rules
 const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");
-
-struct ScriptIterator<'a> {
-    text: Chars<'a>,
-    start: usize,
-    end: usize,
-    script_code: Option<Script>,
-}
-
-impl<'a> From<&'a str> for ScriptIterator<'a> {
-    fn from(text: &'a str) -> Self {
-        ScriptIterator {
-            text: text.chars(),
-            start: 0,
-            end: 0,
-            script_code: Option::None,
-        }
-    }
-}
 
 struct ICUBreakingWord<'a> {
     text: Chars<'a>,
@@ -35,7 +17,8 @@ impl<'a> From<&'a str> for ICUBreakingWord<'a> {
     fn from(text: &'a str) -> Self {
         ICUBreakingWord {
             text: text.chars(),
-            default_breaking_iterator: UBreakIterator::try_new_rules(DEFAULT_RULES, text).expect("Can't read default rules."),
+            default_breaking_iterator: UBreakIterator::try_new_rules(DEFAULT_RULES, text)
+                .expect("Can't read default rules."),
         }
     }
 }
@@ -44,23 +27,38 @@ impl<'a> Iterator for ICUBreakingWord<'a> {
     type Item = (String, usize, usize);
 
     fn next(&mut self) -> Option<Self::Item> {
+        let mut cont = true;
         let mut start = self.default_breaking_iterator.current();
         let mut end = self.default_breaking_iterator.next();
-        if end.is_some() && self.default_breaking_iterator.get_rule_status() == 0 {
-            start = end.unwrap();
-            end = self.default_breaking_iterator.next();
+        while cont && end.is_some() {
+            if end.is_some() && self.default_breaking_iterator.get_rule_status() == 0 {
+                start = end.unwrap();
+                end = self.default_breaking_iterator.next();
+            }
+            if let Some(index) = end {
+                cont = !self
+                    .text
+                    .clone()
+                    .take(index as usize)
+                    .skip(start as usize)
+                    .any(char::is_alphanumeric);
+            }
         }
 
         match end {
             None => Option::None,
             Some(index) => {
-                let substring: String = self.text.clone().take(index as usize).skip(start as usize).collect();
+                let substring: String = self
+                    .text
+                    .clone()
+                    .take(index as usize)
+                    .skip(start as usize)
+                    .collect();
                 Option::Some((substring, start as usize, index as usize))
             }
         }
     }
 }
-
 
 /// ICU [Tokenizer]. It does not (yet ?) work as Lucene's counterpart.
 #[derive(Clone)]
@@ -113,13 +111,11 @@ impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     /// Same tests as Lucene ICU tokenizer might be enough
     /// TODO non working tests see other unicode library google's rust_icu or icu4x.
     /// TODO run Lucene tests to get offsets so that they can be checked here.
-
     use super::*;
 
     impl<'a> Iterator for ICUTokenizerTokenStream<'a> {
@@ -196,7 +192,9 @@ mod tests {
 
     #[test]
     fn test_amharic() {
-        let tokenizer = &mut ICUTokenizerTokenStream::new("ዊኪፔድያ የባለ ብዙ ቋንቋ የተሟላ ትክክለኛና ነጻ መዝገበ ዕውቀት (ኢንሳይክሎፒዲያ) ነው። ማንኛውም");
+        let tokenizer = &mut ICUTokenizerTokenStream::new(
+            "ዊኪፔድያ የባለ ብዙ ቋንቋ የተሟላ ትክክለኛና ነጻ መዝገበ ዕውቀት (ኢንሳይክሎፒዲያ) ነው። ማንኛውም",
+        );
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
         let expected = vec![
             "ዊኪፔድያ".to_string(),
@@ -379,18 +377,12 @@ mod tests {
     fn test_lao() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("ກວ່າດອກ");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "ກວ່າ".to_string(),
-            "ດອກ".to_string(),
-        ];
+        let expected = vec!["ກວ່າ".to_string(), "ດອກ".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("ພາສາລາວ");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "ພາສາ".to_string(),
-            "ລາວ".to_string(),
-        ];
+        let expected = vec!["ພາສາ".to_string(), "ລາວ".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -409,7 +401,8 @@ mod tests {
 
     #[test]
     fn test_thai() {
-        let tokenizer = &mut ICUTokenizerTokenStream::new("การที่ได้ต้องแสดงว่างานดี. แล้วเธอจะไปไหน? ๑๒๓๔");
+        let tokenizer =
+            &mut ICUTokenizerTokenStream::new("การที่ได้ต้องแสดงว่างานดี. แล้วเธอจะไปไหน? ๑๒๓๔");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
         let expected = vec![
             "การ".to_string(),
@@ -432,7 +425,9 @@ mod tests {
 
     #[test]
     fn test_tibetan() {
-        let tokenizer = &mut ICUTokenizerTokenStream::new("སྣོན་མཛོད་དང་ལས་འདིས་བོད་ཡིག་མི་ཉམས་གོང་འཕེལ་དུ་གཏོང་བར་ཧ་ཅང་དགེ་མཚན་མཆིས་སོ། །");
+        let tokenizer = &mut ICUTokenizerTokenStream::new(
+            "སྣོན་མཛོད་དང་ལས་འདིས་བོད་ཡིག་མི་ཉམས་གོང་འཕེལ་དུ་གཏོང་བར་ཧ་ཅང་དགེ་མཚན་མཆིས་སོ། །",
+        );
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
         let expected = vec![
             "སྣོན".to_string(),
@@ -524,9 +519,7 @@ mod tests {
          */
         let tokenizer = &mut ICUTokenizerTokenStream::new("moͤchte");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "moͤchte".to_string(),
-        ];
+        let expected = vec!["moͤchte".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -534,16 +527,12 @@ mod tests {
     fn test_alphanumeric_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("B2B");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "B2B".to_string(),
-        ];
+        let expected = vec!["B2B".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("2B");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "2B".to_string(),
-        ];
+        let expected = vec!["2B".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -560,19 +549,12 @@ mod tests {
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("dogs,chase,cats");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "dogs".to_string(),
-            "chase".to_string(),
-            "cats".to_string(),
-        ];
+        let expected = vec!["dogs".to_string(), "chase".to_string(), "cats".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("ac/dc");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "ac".to_string(),
-            "dc".to_string(),
-        ];
+        let expected = vec!["ac".to_string(), "dc".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -580,44 +562,32 @@ mod tests {
     fn test_apostrophes_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("O'Reilly");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "O'Reilly".to_string(),
-        ];
+        let expected = vec!["O'Reilly".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("you're");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "you're".to_string(),
-        ];
+        let expected = vec!["you're".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("she's");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "she's".to_string(),
-        ];
+        let expected = vec!["she's".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("Jim's");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "Jim's".to_string(),
-        ];
+        let expected = vec!["Jim's".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("don't");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "don't".to_string(),
-        ];
+        let expected = vec!["don't".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("O'Reilly's");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "O'Reilly's".to_string(),
-        ];
+        let expected = vec!["O'Reilly's".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -625,32 +595,22 @@ mod tests {
     fn test_numeric_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("21.35");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "21.35".to_string(),
-        ];
+        let expected = vec!["21.35".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("R2D2 C3PO");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "R2D2".to_string(),
-            "C3PO".to_string(),
-        ];
+        let expected = vec!["R2D2".to_string(), "C3PO".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("R2D2 C3PO");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "R2D2".to_string(),
-            "C3PO".to_string(),
-        ];
+        let expected = vec!["R2D2".to_string(), "C3PO".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("216.239.63.104");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "216.239.63.104".to_string(),
-        ];
+        let expected = vec!["216.239.63.104".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -701,10 +661,7 @@ mod tests {
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("\"QUOTED\" word");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "QUOTED".to_string(),
-            "word".to_string(),
-        ];
+        let expected = vec!["QUOTED".to_string(), "word".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -712,10 +669,7 @@ mod tests {
     fn test_korean_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("안녕하세요 한글입니다");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "안녕하세요".to_string(),
-            "한글입니다".to_string(),
-        ];
+        let expected = vec!["안녕하세요".to_string(), "한글입니다".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -760,9 +714,7 @@ mod tests {
     fn test_korean() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("훈민정음");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "훈민정음".to_string(),
-        ];
+        let expected = vec!["훈민정음".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -785,11 +737,7 @@ mod tests {
     fn test_emoji() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("💩 💩💩");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "💩".to_string(),
-            "💩".to_string(),
-            "💩".to_string(),
-        ];
+        let expected = vec!["💩".to_string(), "💩".to_string(), "💩".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -798,9 +746,7 @@ mod tests {
     fn test_emoji_sequence() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("👩‍❤️‍👩");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "👩‍❤️‍👩".to_string(),
-        ];
+        let expected = vec!["👩‍❤️‍👩".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -809,9 +755,7 @@ mod tests {
     fn test_emoji_sequence_with_modifier() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("👨🏼‍⚕️");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "👨🏼‍⚕️".to_string(),
-        ];
+        let expected = vec!["👨🏼‍⚕️".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -820,10 +764,7 @@ mod tests {
     fn test_emoji_regional_indicator() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("🇺🇸🇺🇸");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "🇺🇸".to_string(),
-            "🇺🇸".to_string(),
-        ];
+        let expected = vec!["🇺🇸".to_string(), "🇺🇸".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -832,9 +773,7 @@ mod tests {
     fn test_emoji_variation_sequence() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("#️⃣");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "3️⃣".to_string(),
-        ];
+        let expected = vec!["3️⃣".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -843,9 +782,7 @@ mod tests {
     fn test_emoji_tag_sequence() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("🏴󠁧󠁢󠁥󠁮󠁧󠁿");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "🏴󠁧󠁢󠁥󠁮󠁧󠁿".to_string(),
-        ];
+        let expected = vec!["🏴󠁧󠁢󠁥󠁮󠁧󠁿".to_string()];
         assert_eq!(result, expected);
     }
 
@@ -854,11 +791,7 @@ mod tests {
     fn test_emoji_tokenization() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("poo💩poo");
         let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec![
-            "poo".to_string(),
-            "💩".to_string(),
-            "poo".to_string(),
-        ];
+        let expected = vec!["poo".to_string(), "💩".to_string(), "poo".to_string()];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("💩中國💩");
