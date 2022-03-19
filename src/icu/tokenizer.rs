@@ -1,4 +1,3 @@
-#![feature(test)]
 use rust_icu::brk::UBreakIterator;
 use std::str::Chars;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
@@ -6,7 +5,7 @@ use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
 /// Default rules, copy from Lucene's binary rules
 const DEFAULT_RULES: &str = std::include_str!("breaking_rules/Default.rbbi");
 /// Myanmar rules, copy from Lucene's binary rules
-const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");
+/*const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");*/
 
 struct ICUBreakingWord<'a> {
     text: Chars<'a>,
@@ -114,8 +113,6 @@ impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
 #[cfg(test)]
 mod tests {
     /// Same tests as Lucene ICU tokenizer might be enough
-    /// TODO non working tests see other unicode library google's rust_icu or icu4x.
-    /// TODO run Lucene tests to get offsets so that they can be checked here.
     use super::*;
 
     impl<'a> Iterator for ICUTokenizerTokenStream<'a> {
@@ -158,34 +155,190 @@ mod tests {
     #[test]
     fn test_armenian() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("Վիքիպեդիայի 13 միլիոն հոդվածները (4,600` հայերեն վիքիպեդիայում) գրվել են կամավորների կողմից ու համարյա բոլոր հոդվածները կարող է խմբագրել ցանկաց մարդ ով կարող է բացել Վիքիպեդիայի կայքը։");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "Վիքիպեդիայի".to_string(),
-            "13".to_string(),
-            "միլիոն".to_string(),
-            "հոդվածները".to_string(),
-            "4,600".to_string(),
-            "հայերեն".to_string(),
-            "վիքիպեդիայում".to_string(),
-            "գրվել".to_string(),
-            "են".to_string(),
-            "կամավորների".to_string(),
-            "կողմից".to_string(),
-            "ու".to_string(),
-            "համարյա".to_string(),
-            "բոլոր".to_string(),
-            "հոդվածները".to_string(),
-            "կարող".to_string(),
-            "է".to_string(),
-            "խմբագրել".to_string(),
-            "ցանկաց".to_string(),
-            "մարդ".to_string(),
-            "ով".to_string(),
-            "կարող".to_string(),
-            "է".to_string(),
-            "բացել".to_string(),
-            "Վիքիպեդիայի".to_string(),
-            "կայքը".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 11,
+                position: 0,
+                text: "Վիքիպեդիայի".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 12,
+                offset_to: 14,
+                position: 1,
+                text: "13".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 15,
+                offset_to: 21,
+                position: 2,
+                text: "միլիոն".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 22,
+                offset_to: 32,
+                position: 3,
+                text: "հոդվածները".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 34,
+                offset_to: 39,
+                position: 4,
+                text: "4,600".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 41,
+                offset_to: 48,
+                position: 5,
+                text: "հայերեն".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 49,
+                offset_to: 62,
+                position: 6,
+                text: "վիքիպեդիայում".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 64,
+                offset_to: 69,
+                position: 7,
+                text: "գրվել".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 70,
+                offset_to: 72,
+                position: 8,
+                text: "են".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 73,
+                offset_to: 84,
+                position: 9,
+                text: "կամավորների".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 85,
+                offset_to: 91,
+                position: 10,
+                text: "կողմից".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 92,
+                offset_to: 94,
+                position: 11,
+                text: "ու".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 95,
+                offset_to: 102,
+                position: 12,
+                text: "համարյա".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 103,
+                offset_to: 108,
+                position: 13,
+                text: "բոլոր".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 109,
+                offset_to: 119,
+                position: 14,
+                text: "հոդվածները".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 120,
+                offset_to: 125,
+                position: 15,
+                text: "կարող".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 126,
+                offset_to: 127,
+                position: 16,
+                text: "է".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 128,
+                offset_to: 136,
+                position: 17,
+                text: "խմբագրել".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 137,
+                offset_to: 143,
+                position: 18,
+                text: "ցանկաց".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 144,
+                offset_to: 148,
+                position: 19,
+                text: "մարդ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 149,
+                offset_to: 151,
+                position: 20,
+                text: "ով".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 152,
+                offset_to: 157,
+                position: 21,
+                text: "կարող".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 158,
+                offset_to: 159,
+                position: 22,
+                text: "է".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 160,
+                offset_to: 165,
+                position: 23,
+                text: "բացել".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 166,
+                offset_to: 177,
+                position: 24,
+                text: "Վիքիպեդիայի".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 178,
+                offset_to: 183,
+                position: 25,
+                text: "կայքը".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -195,20 +348,92 @@ mod tests {
         let tokenizer = &mut ICUTokenizerTokenStream::new(
             "ዊኪፔድያ የባለ ብዙ ቋንቋ የተሟላ ትክክለኛና ነጻ መዝገበ ዕውቀት (ኢንሳይክሎፒዲያ) ነው። ማንኛውም",
         );
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "ዊኪፔድያ".to_string(),
-            "የባለ".to_string(),
-            "ብዙ".to_string(),
-            "ቋንቋ".to_string(),
-            "የተሟላ".to_string(),
-            "ትክክለኛና".to_string(),
-            "ነጻ".to_string(),
-            "መዝገበ".to_string(),
-            "ዕውቀት".to_string(),
-            "ኢንሳይክሎፒዲያ".to_string(),
-            "ነው".to_string(),
-            "ማንኛውም".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "ዊኪፔድያ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 9,
+                position: 1,
+                text: "የባለ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 10,
+                offset_to: 12,
+                position: 2,
+                text: "ብዙ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 13,
+                offset_to: 16,
+                position: 3,
+                text: "ቋንቋ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 17,
+                offset_to: 21,
+                position: 4,
+                text: "የተሟላ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 22,
+                offset_to: 28,
+                position: 5,
+                text: "ትክክለኛና".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 29,
+                offset_to: 31,
+                position: 6,
+                text: "ነጻ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 32,
+                offset_to: 36,
+                position: 7,
+                text: "መዝገበ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 37,
+                offset_to: 41,
+                position: 8,
+                text: "ዕውቀት".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 43,
+                offset_to: 52,
+                position: 9,
+                text: "ኢንሳይክሎፒዲያ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 54,
+                offset_to: 56,
+                position: 10,
+                text: "ነው".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 58,
+                offset_to: 63,
+                position: 11,
+                text: "ማንኛውም".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -216,29 +441,155 @@ mod tests {
     #[test]
     fn test_arabic() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("الفيلم الوثائقي الأول عن ويكيبيديا يسمى \"الحقيقة بالأرقام: قصة ويكيبيديا\" (بالإنجليزية: Truth in Numbers: The Wikipedia Story)، سيتم إطلاقه في 2008.");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "الفيلم".to_string(),
-            "الوثائقي".to_string(),
-            "الأول".to_string(),
-            "عن".to_string(),
-            "ويكيبيديا".to_string(),
-            "يسمى".to_string(),
-            "الحقيقة".to_string(),
-            "بالأرقام".to_string(),
-            "قصة".to_string(),
-            "ويكيبيديا".to_string(),
-            "بالإنجليزية".to_string(),
-            "Truth".to_string(),
-            "in".to_string(),
-            "Numbers".to_string(),
-            "The".to_string(),
-            "Wikipedia".to_string(),
-            "Story".to_string(),
-            "سيتم".to_string(),
-            "إطلاقه".to_string(),
-            "في".to_string(),
-            "2008".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 6,
+                position: 0,
+                text: "الفيلم".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 7,
+                offset_to: 15,
+                position: 1,
+                text: "الوثائقي".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 16,
+                offset_to: 21,
+                position: 2,
+                text: "الأول".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 22,
+                offset_to: 24,
+                position: 3,
+                text: "عن".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 25,
+                offset_to: 34,
+                position: 4,
+                text: "ويكيبيديا".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 35,
+                offset_to: 39,
+                position: 5,
+                text: "يسمى".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 41,
+                offset_to: 48,
+                position: 6,
+                text: "الحقيقة".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 49,
+                offset_to: 57,
+                position: 7,
+                text: "بالأرقام".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 59,
+                offset_to: 62,
+                position: 8,
+                text: "قصة".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 63,
+                offset_to: 72,
+                position: 9,
+                text: "ويكيبيديا".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 75,
+                offset_to: 86,
+                position: 10,
+                text: "بالإنجليزية".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 88,
+                offset_to: 93,
+                position: 11,
+                text: "Truth".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 94,
+                offset_to: 96,
+                position: 12,
+                text: "in".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 97,
+                offset_to: 104,
+                position: 13,
+                text: "Numbers".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 106,
+                offset_to: 109,
+                position: 14,
+                text: "The".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 110,
+                offset_to: 119,
+                position: 15,
+                text: "Wikipedia".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 120,
+                offset_to: 125,
+                position: 16,
+                text: "Story".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 128,
+                offset_to: 132,
+                position: 17,
+                text: "سيتم".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 133,
+                offset_to: 139,
+                position: 18,
+                text: "إطلاقه".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 140,
+                offset_to: 142,
+                position: 19,
+                text: "في".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 143,
+                offset_to: 147,
+                position: 20,
+                text: "2008".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -246,25 +597,127 @@ mod tests {
     #[test]
     fn test_aramaic() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("ܘܝܩܝܦܕܝܐ (ܐܢܓܠܝܐ: Wikipedia) ܗܘ ܐܝܢܣܩܠܘܦܕܝܐ ܚܐܪܬܐ ܕܐܢܛܪܢܛ ܒܠܫܢ̈ܐ ܣܓܝܐ̈ܐ܂ ܫܡܗ ܐܬܐ ܡܢ ܡ̈ܠܬܐ ܕ\"ܘܝܩܝ\" ܘ\"ܐܝܢܣܩܠܘܦܕܝܐ\"܀");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "ܘܝܩܝܦܕܝܐ".to_string(),
-            "ܐܢܓܠܝܐ".to_string(),
-            "Wikipedia".to_string(),
-            "ܗܘ".to_string(),
-            "ܐܝܢܣܩܠܘܦܕܝܐ".to_string(),
-            "ܚܐܪܬܐ".to_string(),
-            "ܕܐܢܛܪܢܛ".to_string(),
-            "ܒܠܫܢ̈ܐ".to_string(),
-            "ܣܓܝܐ̈ܐ".to_string(),
-            "ܫܡܗ".to_string(),
-            "ܐܬܐ".to_string(),
-            "ܡܢ".to_string(),
-            "ܡ̈ܠܬܐ".to_string(),
-            "ܕ".to_string(),
-            "ܘܝܩܝ".to_string(),
-            "ܘ".to_string(),
-            "ܐܝܢܣܩܠܘܦܕܝܐ".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 8,
+                position: 0,
+                text: "ܘܝܩܝܦܕܝܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 10,
+                offset_to: 16,
+                position: 1,
+                text: "ܐܢܓܠܝܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 18,
+                offset_to: 27,
+                position: 2,
+                text: "Wikipedia".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 29,
+                offset_to: 31,
+                position: 3,
+                text: "ܗܘ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 32,
+                offset_to: 43,
+                position: 4,
+                text: "ܐܝܢܣܩܠܘܦܕܝܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 44,
+                offset_to: 49,
+                position: 5,
+                text: "ܚܐܪܬܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 50,
+                offset_to: 57,
+                position: 6,
+                text: "ܕܐܢܛܪܢܛ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 58,
+                offset_to: 64,
+                position: 7,
+                text: "ܒܠܫܢ̈ܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 65,
+                offset_to: 71,
+                position: 8,
+                text: "ܣܓܝܐ̈ܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 73,
+                offset_to: 76,
+                position: 9,
+                text: "ܫܡܗ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 77,
+                offset_to: 80,
+                position: 10,
+                text: "ܐܬܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 81,
+                offset_to: 83,
+                position: 11,
+                text: "ܡܢ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 84,
+                offset_to: 89,
+                position: 12,
+                text: "ܡ̈ܠܬܐ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 90,
+                offset_to: 91,
+                position: 13,
+                text: "ܕ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 92,
+                offset_to: 96,
+                position: 14,
+                text: "ܘܝܩܝ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 98,
+                offset_to: 99,
+                position: 15,
+                text: "ܘ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 100,
+                offset_to: 111,
+                position: 16,
+                text: "ܐܝܢܣܩܠܘܦܕܝܐ".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -272,30 +725,162 @@ mod tests {
     #[test]
     fn test_bengali() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("এই বিশ্বকোষ পরিচালনা করে উইকিমিডিয়া ফাউন্ডেশন (একটি অলাভজনক সংস্থা)। উইকিপিডিয়ার শুরু ১৫ জানুয়ারি, ২০০১ সালে। এখন পর্যন্ত ২০০টিরও বেশী ভাষায় উইকিপিডিয়া রয়েছে।");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "এই".to_string(),
-            "বিশ্বকোষ".to_string(),
-            "পরিচালনা".to_string(),
-            "করে".to_string(),
-            "উইকিমিডিয়া".to_string(),
-            "ফাউন্ডেশন".to_string(),
-            "একটি".to_string(),
-            "অলাভজনক".to_string(),
-            "সংস্থা".to_string(),
-            "উইকিপিডিয়ার".to_string(),
-            "শুরু".to_string(),
-            "১৫".to_string(),
-            "জানুয়ারি".to_string(),
-            "২০০১".to_string(),
-            "সালে".to_string(),
-            "এখন".to_string(),
-            "পর্যন্ত".to_string(),
-            "২০০টিরও".to_string(),
-            "বেশী".to_string(),
-            "ভাষায়".to_string(),
-            "উইকিপিডিয়া".to_string(),
-            "রয়েছে".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 2,
+                position: 0,
+                text: "এই".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 11,
+                position: 1,
+                text: "বিশ্বকোষ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 12,
+                offset_to: 20,
+                position: 2,
+                text: "পরিচালনা".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 21,
+                offset_to: 24,
+                position: 3,
+                text: "করে".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 25,
+                offset_to: 36,
+                position: 4,
+                text: "উইকিমিডিয়া".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 37,
+                offset_to: 46,
+                position: 5,
+                text: "ফাউন্ডেশন".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 48,
+                offset_to: 52,
+                position: 6,
+                text: "একটি".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 53,
+                offset_to: 60,
+                position: 7,
+                text: "অলাভজনক".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 61,
+                offset_to: 67,
+                position: 8,
+                text: "সংস্থা".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 70,
+                offset_to: 82,
+                position: 9,
+                text: "উইকিপিডিয়ার".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 83,
+                offset_to: 87,
+                position: 10,
+                text: "শুরু".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 88,
+                offset_to: 90,
+                position: 11,
+                text: "১৫".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 91,
+                offset_to: 100,
+                position: 12,
+                text: "জানুয়ারি".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 102,
+                offset_to: 106,
+                position: 13,
+                text: "২০০১".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 107,
+                offset_to: 111,
+                position: 14,
+                text: "সালে".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 113,
+                offset_to: 116,
+                position: 15,
+                text: "এখন".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 117,
+                offset_to: 124,
+                position: 16,
+                text: "পর্যন্ত".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 125,
+                offset_to: 132,
+                position: 17,
+                text: "২০০টিরও".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 133,
+                offset_to: 137,
+                position: 18,
+                text: "বেশী".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 138,
+                offset_to: 144,
+                position: 19,
+                text: "ভাষায়".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 145,
+                offset_to: 156,
+                position: 20,
+                text: "উইকিপিডিয়া".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 157,
+                offset_to: 163,
+                position: 21,
+                text: "রয়েছে".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -303,25 +888,127 @@ mod tests {
     #[test]
     fn test_farsi() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("ویکی پدیای انگلیسی در تاریخ ۲۵ دی ۱۳۷۹ به صورت مکملی برای دانشنامهٔ تخصصی نوپدیا نوشته شد.");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "ویکی".to_string(),
-            "پدیای".to_string(),
-            "انگلیسی".to_string(),
-            "در".to_string(),
-            "تاریخ".to_string(),
-            "۲۵".to_string(),
-            "دی".to_string(),
-            "۱۳۷۹".to_string(),
-            "به".to_string(),
-            "صورت".to_string(),
-            "مکملی".to_string(),
-            "برای".to_string(),
-            "دانشنامهٔ".to_string(),
-            "تخصصی".to_string(),
-            "نوپدیا".to_string(),
-            "نوشته".to_string(),
-            "شد".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "ویکی".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 10,
+                position: 1,
+                text: "پدیای".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 11,
+                offset_to: 18,
+                position: 2,
+                text: "انگلیسی".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 19,
+                offset_to: 21,
+                position: 3,
+                text: "در".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 22,
+                offset_to: 27,
+                position: 4,
+                text: "تاریخ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 28,
+                offset_to: 30,
+                position: 5,
+                text: "۲۵".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 31,
+                offset_to: 33,
+                position: 6,
+                text: "دی".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 34,
+                offset_to: 38,
+                position: 7,
+                text: "۱۳۷۹".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 39,
+                offset_to: 41,
+                position: 8,
+                text: "به".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 42,
+                offset_to: 46,
+                position: 9,
+                text: "صورت".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 47,
+                offset_to: 52,
+                position: 10,
+                text: "مکملی".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 53,
+                offset_to: 57,
+                position: 11,
+                text: "برای".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 58,
+                offset_to: 67,
+                position: 12,
+                text: "دانشنامهٔ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 68,
+                offset_to: 73,
+                position: 13,
+                text: "تخصصی".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 74,
+                offset_to: 80,
+                position: 14,
+                text: "نوپدیا".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 81,
+                offset_to: 86,
+                position: 15,
+                text: "نوشته".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 87,
+                offset_to: 89,
+                position: 16,
+                text: "شد".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -329,31 +1016,169 @@ mod tests {
     #[test]
     fn test_greek() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("Γράφεται σε συνεργασία από εθελοντές με το λογισμικό wiki, κάτι που σημαίνει ότι άρθρα μπορεί να προστεθούν ή να αλλάξουν από τον καθένα.");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "Γράφεται".to_string(),
-            "σε".to_string(),
-            "συνεργασία".to_string(),
-            "από".to_string(),
-            "εθελοντές".to_string(),
-            "με".to_string(),
-            "το".to_string(),
-            "λογισμικό".to_string(),
-            "wiki".to_string(),
-            "κάτι".to_string(),
-            "που".to_string(),
-            "σημαίνει".to_string(),
-            "ότι".to_string(),
-            "άρθρα".to_string(),
-            "μπορεί".to_string(),
-            "να".to_string(),
-            "προστεθούν".to_string(),
-            "ή".to_string(),
-            "να".to_string(),
-            "αλλάξουν".to_string(),
-            "από".to_string(),
-            "τον".to_string(),
-            "καθένα".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 8,
+                position: 0,
+                text: "Γράφεται".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 9,
+                offset_to: 11,
+                position: 1,
+                text: "σε".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 12,
+                offset_to: 22,
+                position: 2,
+                text: "συνεργασία".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 23,
+                offset_to: 26,
+                position: 3,
+                text: "από".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 27,
+                offset_to: 36,
+                position: 4,
+                text: "εθελοντές".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 37,
+                offset_to: 39,
+                position: 5,
+                text: "με".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 40,
+                offset_to: 42,
+                position: 6,
+                text: "το".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 43,
+                offset_to: 52,
+                position: 7,
+                text: "λογισμικό".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 53,
+                offset_to: 57,
+                position: 8,
+                text: "wiki".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 59,
+                offset_to: 63,
+                position: 9,
+                text: "κάτι".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 64,
+                offset_to: 67,
+                position: 10,
+                text: "που".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 68,
+                offset_to: 76,
+                position: 11,
+                text: "σημαίνει".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 77,
+                offset_to: 80,
+                position: 12,
+                text: "ότι".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 81,
+                offset_to: 86,
+                position: 13,
+                text: "άρθρα".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 87,
+                offset_to: 93,
+                position: 14,
+                text: "μπορεί".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 94,
+                offset_to: 96,
+                position: 15,
+                text: "να".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 97,
+                offset_to: 107,
+                position: 16,
+                text: "προστεθούν".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 108,
+                offset_to: 109,
+                position: 17,
+                text: "ή".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 110,
+                offset_to: 112,
+                position: 18,
+                text: "να".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 113,
+                offset_to: 121,
+                position: 19,
+                text: "αλλάξουν".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 122,
+                offset_to: 125,
+                position: 20,
+                text: "από".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 126,
+                offset_to: 129,
+                position: 21,
+                text: "τον".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 130,
+                offset_to: 136,
+                position: 22,
+                text: "καθένα".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -361,14 +1186,50 @@ mod tests {
     #[test]
     fn test_khmer() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("ផ្ទះស្កឹមស្កៃបីបួនខ្នងនេះ");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "ផ្ទះ".to_string(),
-            "ស្កឹមស្កៃ".to_string(),
-            "បី".to_string(),
-            "បួន".to_string(),
-            "ខ្នង".to_string(),
-            "នេះ".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "ផ្ទះ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 4,
+                offset_to: 13,
+                position: 1,
+                text: "ស្កឹមស្កៃ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 13,
+                offset_to: 15,
+                position: 2,
+                text: "បី".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 15,
+                offset_to: 18,
+                position: 3,
+                text: "បួន".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 18,
+                offset_to: 22,
+                position: 4,
+                text: "ខ្នង".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 22,
+                offset_to: 25,
+                position: 5,
+                text: "នេះ".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -376,25 +1237,79 @@ mod tests {
     #[test]
     fn test_lao() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("ກວ່າດອກ");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["ກວ່າ".to_string(), "ດອກ".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "ກວ່າ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 4,
+                offset_to: 7,
+                position: 1,
+                text: "ດອກ".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("ພາສາລາວ");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["ພາສາ".to_string(), "ລາວ".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "ພາສາ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 4,
+                offset_to: 7,
+                position: 1,
+                text: "ລາວ".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_myanmar() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("သက်ဝင်လှုပ်ရှားစေပြီး");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "သက်ဝင်".to_string(),
-            "လှုပ်ရှား".to_string(),
-            "စေ".to_string(),
-            "ပြီး".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 6,
+                position: 0,
+                text: "သက်ဝင်".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 15,
+                position: 1,
+                text: "လှုပ်ရှား".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 15,
+                offset_to: 17,
+                position: 2,
+                text: "စေ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 17,
+                offset_to: 21,
+                position: 3,
+                text: "ပြီး".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -403,22 +1318,106 @@ mod tests {
     fn test_thai() {
         let tokenizer =
             &mut ICUTokenizerTokenStream::new("การที่ได้ต้องแสดงว่างานดี. แล้วเธอจะไปไหน? ๑๒๓๔");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "การ".to_string(),
-            "ที่".to_string(),
-            "ได้".to_string(),
-            "ต้อง".to_string(),
-            "แสดง".to_string(),
-            "ว่า".to_string(),
-            "งาน".to_string(),
-            "ดี".to_string(),
-            "แล้ว".to_string(),
-            "เธอ".to_string(),
-            "จะ".to_string(),
-            "ไป".to_string(),
-            "ไหน".to_string(),
-            "๑๒๓๔".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 3,
+                position: 0,
+                text: "การ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 6,
+                position: 1,
+                text: "ที่".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 9,
+                position: 2,
+                text: "ได้".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 9,
+                offset_to: 13,
+                position: 3,
+                text: "ต้อง".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 13,
+                offset_to: 17,
+                position: 4,
+                text: "แสดง".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 17,
+                offset_to: 20,
+                position: 5,
+                text: "ว่า".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 20,
+                offset_to: 23,
+                position: 6,
+                text: "งาน".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 23,
+                offset_to: 25,
+                position: 7,
+                text: "ดี".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 27,
+                offset_to: 31,
+                position: 8,
+                text: "แล้ว".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 31,
+                offset_to: 34,
+                position: 9,
+                text: "เธอ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 34,
+                offset_to: 36,
+                position: 10,
+                text: "จะ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 36,
+                offset_to: 38,
+                position: 11,
+                text: "ไป".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 38,
+                offset_to: 41,
+                position: 12,
+                text: "ไหน".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 43,
+                offset_to: 47,
+                position: 13,
+                text: "๑๒๓๔".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -428,28 +1427,148 @@ mod tests {
         let tokenizer = &mut ICUTokenizerTokenStream::new(
             "སྣོན་མཛོད་དང་ལས་འདིས་བོད་ཡིག་མི་ཉམས་གོང་འཕེལ་དུ་གཏོང་བར་ཧ་ཅང་དགེ་མཚན་མཆིས་སོ། །",
         );
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "སྣོན".to_string(),
-            "མཛོད".to_string(),
-            "དང".to_string(),
-            "ལས".to_string(),
-            "འདིས".to_string(),
-            "བོད".to_string(),
-            "ཡིག".to_string(),
-            "མི".to_string(),
-            "ཉམས".to_string(),
-            "གོང".to_string(),
-            "འཕེལ".to_string(),
-            "དུ".to_string(),
-            "གཏོང".to_string(),
-            "བར".to_string(),
-            "ཧ".to_string(),
-            "ཅང".to_string(),
-            "དགེ".to_string(),
-            "མཚན".to_string(),
-            "མཆིས".to_string(),
-            "སོ".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "སྣོན".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 9,
+                position: 1,
+                text: "མཛོད".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 10,
+                offset_to: 12,
+                position: 2,
+                text: "དང".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 13,
+                offset_to: 15,
+                position: 3,
+                text: "ལས".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 16,
+                offset_to: 20,
+                position: 4,
+                text: "འདིས".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 21,
+                offset_to: 24,
+                position: 5,
+                text: "བོད".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 25,
+                offset_to: 28,
+                position: 6,
+                text: "ཡིག".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 29,
+                offset_to: 31,
+                position: 7,
+                text: "མི".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 32,
+                offset_to: 35,
+                position: 8,
+                text: "ཉམས".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 36,
+                offset_to: 39,
+                position: 9,
+                text: "གོང".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 40,
+                offset_to: 44,
+                position: 10,
+                text: "འཕེལ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 45,
+                offset_to: 47,
+                position: 11,
+                text: "དུ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 48,
+                offset_to: 52,
+                position: 12,
+                text: "གཏོང".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 53,
+                offset_to: 55,
+                position: 13,
+                text: "བར".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 56,
+                offset_to: 57,
+                position: 14,
+                text: "ཧ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 58,
+                offset_to: 60,
+                position: 15,
+                text: "ཅང".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 61,
+                offset_to: 64,
+                position: 16,
+                text: "དགེ".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 65,
+                offset_to: 68,
+                position: 17,
+                text: "མཚན".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 69,
+                offset_to: 73,
+                position: 18,
+                text: "མཆིས".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 74,
+                offset_to: 76,
+                position: 19,
+                text: "སོ".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -457,15 +1576,57 @@ mod tests {
     #[test]
     fn test_chinese() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("我是中国人。 １２３４ Ｔｅｓｔｓ ");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "我".to_string(),
-            "是".to_string(),
-            "中".to_string(),
-            "国".to_string(),
-            "人".to_string(),
-            "１２３４".to_string(),
-            "Ｔｅｓｔｓ".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 1,
+                position: 0,
+                text: "我".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 1,
+                offset_to: 2,
+                position: 1,
+                text: "是".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 2,
+                offset_to: 3,
+                position: 2,
+                text: "中".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 4,
+                position: 3,
+                text: "国".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 4,
+                offset_to: 5,
+                position: 4,
+                text: "人".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 7,
+                offset_to: 11,
+                position: 5,
+                text: "１２３４".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 12,
+                offset_to: 17,
+                position: 6,
+                text: "Ｔｅｓｔｓ".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -473,40 +1634,88 @@ mod tests {
     #[test]
     fn test_hebrew() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("דנקנר תקף את הדו\"ח");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "דנקנר".to_string(),
-            "תקף".to_string(),
-            "את".to_string(),
-            "הדו\"ח".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "דנקנר".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 9,
+                position: 1,
+                text: "תקף".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 10,
+                offset_to: 12,
+                position: 2,
+                text: "את".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 13,
+                offset_to: 18,
+                position: 3,
+                text: "הדו\"ח".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("חברת בת של מודי'ס");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "חברת".to_string(),
-            "בת".to_string(),
-            "של".to_string(),
-            "מודי'ס".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "חברת".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 7,
+                position: 1,
+                text: "בת".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 8,
+                offset_to: 10,
+                position: 2,
+                text: "של".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 11,
+                offset_to: 17,
+                position: 3,
+                text: "מודי'ס".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_empty() {
-        let expected: Vec<String> = vec![];
+        let expected: Vec<Token> = vec![];
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new(".");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new(" ");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         assert_eq!(result, expected);
     }
 
@@ -518,111 +1727,266 @@ mod tests {
          * Expected result is only on token "moͤchte".
          */
         let tokenizer = &mut ICUTokenizerTokenStream::new("moͤchte");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["moͤchte".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 7,
+            position: 0,
+            text: "moͤchte".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_alphanumeric_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("B2B");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["B2B".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 3,
+            position: 0,
+            text: "B2B".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("2B");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["2B".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 2,
+            position: 0,
+            text: "2B".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_delimiters_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("some-dashed-phrase");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "some".to_string(),
-            "dashed".to_string(),
-            "phrase".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "some".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 11,
+                position: 1,
+                text: "dashed".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 12,
+                offset_to: 18,
+                position: 2,
+                text: "phrase".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("dogs,chase,cats");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["dogs".to_string(), "chase".to_string(), "cats".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "dogs".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 10,
+                position: 1,
+                text: "chase".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 11,
+                offset_to: 15,
+                position: 2,
+                text: "cats".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("ac/dc");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["ac".to_string(), "dc".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 2,
+                position: 0,
+                text: "ac".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 5,
+                position: 1,
+                text: "dc".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_apostrophes_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("O'Reilly");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["O'Reilly".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 8,
+            position: 0,
+            text: "O'Reilly".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("you're");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["you're".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 6,
+            position: 0,
+            text: "you're".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("she's");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["she's".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 5,
+            position: 0,
+            text: "she's".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("Jim's");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["Jim's".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 5,
+            position: 0,
+            text: "Jim's".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("don't");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["don't".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 5,
+            position: 0,
+            text: "don't".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("O'Reilly's");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["O'Reilly's".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 10,
+            position: 0,
+            text: "O'Reilly's".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_numeric_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("21.35");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["21.35".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 5,
+            position: 0,
+            text: "21.35".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("R2D2 C3PO");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["R2D2".to_string(), "C3PO".to_string()];
-        assert_eq!(result, expected);
-
-        let tokenizer = &mut ICUTokenizerTokenStream::new("R2D2 C3PO");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["R2D2".to_string(), "C3PO".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "R2D2".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 9,
+                position: 1,
+                text: "C3PO".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("216.239.63.104");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["216.239.63.104".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 14,
+            position: 0,
+            text: "216.239.63.104".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_text_with_numbers_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("David has 5000 bones");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "David".to_string(),
-            "has".to_string(),
-            "5000".to_string(),
-            "bones".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "David".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 9,
+                position: 1,
+                text: "has".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 10,
+                offset_to: 14,
+                position: 2,
+                text: "5000".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 15,
+                offset_to: 20,
+                position: 3,
+                text: "bones".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -630,46 +1994,148 @@ mod tests {
     #[test]
     fn test_various_text_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("C embedded developers wanted");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "C".to_string(),
-            "embedded".to_string(),
-            "developers".to_string(),
-            "wanted".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 1,
+                position: 0,
+                text: "C".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 2,
+                offset_to: 10,
+                position: 1,
+                text: "embedded".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 11,
+                offset_to: 21,
+                position: 2,
+                text: "developers".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 22,
+                offset_to: 28,
+                position: 3,
+                text: "wanted".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("foo bar FOO BAR");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "foo".to_string(),
-            "bar".to_string(),
-            "FOO".to_string(),
-            "BAR".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 3,
+                position: 0,
+                text: "foo".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 4,
+                offset_to: 7,
+                position: 1,
+                text: "bar".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 8,
+                offset_to: 11,
+                position: 2,
+                text: "FOO".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 12,
+                offset_to: 15,
+                position: 3,
+                text: "BAR".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("foo      bar .  FOO <> BAR");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "foo".to_string(),
-            "bar".to_string(),
-            "FOO".to_string(),
-            "BAR".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 3,
+                position: 0,
+                text: "foo".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 9,
+                offset_to: 12,
+                position: 1,
+                text: "bar".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 16,
+                offset_to: 19,
+                position: 2,
+                text: "FOO".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 23,
+                offset_to: 26,
+                position: 3,
+                text: "BAR".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("\"QUOTED\" word");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["QUOTED".to_string(), "word".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 1,
+                offset_to: 7,
+                position: 0,
+                text: "QUOTED".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 9,
+                offset_to: 13,
+                position: 1,
+                text: "word".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_korean_sa() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("안녕하세요 한글입니다");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["안녕하세요".to_string(), "한글입니다".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "안녕하세요".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 11,
+                position: 1,
+                text: "한글입니다".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
     }
 
@@ -713,21 +2179,57 @@ mod tests {
     #[test]
     fn test_korean() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("훈민정음");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["훈민정음".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 4,
+            position: 0,
+            text: "훈민정음".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_japanese() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("仮名遣い カタカナ");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "仮".to_string(),
-            "名".to_string(),
-            "遣".to_string(),
-            "い".to_string(),
-            "カタカナ".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 1,
+                position: 0,
+                text: "仮".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 1,
+                offset_to: 2,
+                position: 1,
+                text: "名".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 2,
+                offset_to: 3,
+                position: 2,
+                text: "遣".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 4,
+                position: 3,
+                text: "い".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 9,
+                position: 4,
+                text: "カタカナ".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
@@ -736,8 +2238,30 @@ mod tests {
     #[ignore]
     fn test_emoji() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("💩 💩💩");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["💩".to_string(), "💩".to_string(), "💩".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 2,
+                position: 0,
+                text: "💩".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 5,
+                position: 1,
+                text: "💩".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 7,
+                position: 2,
+                text: "💩".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
     }
 
@@ -745,8 +2269,14 @@ mod tests {
     #[ignore]
     fn test_emoji_sequence() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("👩‍❤️‍👩");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["👩‍❤️‍👩".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 8,
+            position: 0,
+            text: "👩‍❤️‍👩".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
@@ -754,8 +2284,14 @@ mod tests {
     #[ignore]
     fn test_emoji_sequence_with_modifier() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("👨🏼‍⚕️");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["👨🏼‍⚕️".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 7,
+            position: 0,
+            text: "👨🏼‍⚕️".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
@@ -763,8 +2299,23 @@ mod tests {
     #[ignore]
     fn test_emoji_regional_indicator() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("🇺🇸🇺🇸");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["🇺🇸".to_string(), "🇺🇸".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "🇺🇸".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 4,
+                offset_to: 8,
+                position: 1,
+                text: "🇺🇸".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
     }
 
@@ -772,8 +2323,14 @@ mod tests {
     #[ignore]
     fn test_emoji_variation_sequence() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("#️⃣");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["3️⃣".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 3,
+            position: 0,
+            text: "3️⃣".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
@@ -781,8 +2338,14 @@ mod tests {
     #[ignore]
     fn test_emoji_tag_sequence() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("🏴󠁧󠁢󠁥󠁮󠁧󠁿");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["🏴󠁧󠁢󠁥󠁮󠁧󠁿".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 14,
+            position: 0,
+            text: "🏴󠁧󠁢󠁥󠁮󠁧󠁿".to_string(),
+            position_length: 1,
+        }];
         assert_eq!(result, expected);
     }
 
@@ -790,17 +2353,63 @@ mod tests {
     #[ignore]
     fn test_emoji_tokenization() {
         let tokenizer = &mut ICUTokenizerTokenStream::new("poo💩poo");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
-        let expected = vec!["poo".to_string(), "💩".to_string(), "poo".to_string()];
+        let result: Vec<Token> = tokenizer.collect();
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 3,
+                position: 0,
+                text: "poo".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 5,
+                position: 1,
+                text: "💩".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 5,
+                offset_to: 8,
+                position: 2,
+                text: "poo".to_string(),
+                position_length: 1,
+            },
+        ];
         assert_eq!(result, expected);
 
         let tokenizer = &mut ICUTokenizerTokenStream::new("💩中國💩");
-        let result: Vec<String> = tokenizer.map(|v| v.text).collect();
+        let result: Vec<Token> = tokenizer.collect();
         let expected = vec![
-            "💩".to_string(),
-            "中".to_string(),
-            "國".to_string(),
-            "💩".to_string(),
+            Token {
+                offset_from: 0,
+                offset_to: 2,
+                position: 0,
+                text: "💩".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 2,
+                offset_to: 3,
+                position: 1,
+                text: "中".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 3,
+                offset_to: 4,
+                position: 2,
+                text: "國".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 4,
+                offset_to: 6,
+                position: 3,
+                text: "💩".to_string(),
+                position_length: 1,
+            },
         ];
         assert_eq!(result, expected);
     }
