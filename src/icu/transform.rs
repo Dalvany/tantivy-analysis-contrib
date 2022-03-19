@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::mem;
 
-use rust_icu::sys as sys;
+use rust_icu::sys;
 use rust_icu::trans as utrans;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
@@ -40,10 +40,17 @@ pub struct ICUTransformTokenFilter {
     direction: sys::UTransDirection,
 }
 
-
 impl ICUTransformTokenFilter {
-    pub fn new(compound_id: String, rules: Option<String>, direction: sys::UTransDirection) -> Result<Self, Box<dyn Error>> {
-        let _ = utrans::UTransliterator::new(compound_id.as_str(), rules.as_ref().map(|x| x.as_str()), direction)?;
+    pub fn new(
+        compound_id: String,
+        rules: Option<String>,
+        direction: sys::UTransDirection,
+    ) -> Result<Self, Box<dyn Error>> {
+        let _ = utrans::UTransliterator::new(
+            compound_id.as_str(),
+            rules.as_ref().map(|x| x.as_str()),
+            direction,
+        )?;
         Ok(ICUTransformTokenFilter {
             compound_id,
             rules,
@@ -52,12 +59,16 @@ impl ICUTransformTokenFilter {
     }
 }
 
-
 impl TokenFilter for ICUTransformTokenFilter {
     fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
         From::from(ICUTransformTokenStream {
             // unwrap work, we checked in new method.
-            transform: utrans::UTransliterator::new(self.compound_id.as_str(), self.rules.as_ref().map(|x| x.as_str()), self.direction).unwrap(),
+            transform: utrans::UTransliterator::new(
+                self.compound_id.as_str(),
+                self.rules.as_ref().map(|x| x.as_str()),
+                self.direction,
+            )
+            .unwrap(),
             tail: token_stream,
             temp: String::with_capacity(100),
         })
@@ -66,13 +77,20 @@ impl TokenFilter for ICUTransformTokenFilter {
 
 #[cfg(test)]
 mod tests {
-    use tantivy::tokenizer::{SimpleTokenizer, TextAnalyzer};
+    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer};
 
     use super::*;
 
-    fn token_stream_helper(text: &str, compound_id: &str, rules: Option<String>, direction: sys::UTransDirection) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(SimpleTokenizer)
-            .filter(ICUTransformTokenFilter::new(String::from(compound_id), rules, direction).unwrap())
+    fn token_stream_helper(
+        text: &str,
+        compound_id: &str,
+        rules: Option<String>,
+        direction: sys::UTransDirection,
+    ) -> Vec<Token> {
+        let mut token_stream = TextAnalyzer::from(RawTokenizer)
+            .filter(
+                ICUTransformTokenFilter::new(String::from(compound_id), rules, direction).unwrap(),
+            )
             .token_stream(text);
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
@@ -83,32 +101,131 @@ mod tests {
     }
 
     #[test]
-    fn test_transform_filter_1() {
-        let tokens = token_stream_helper("Joséphine Baker", "NFD; [:Nonspacing Mark:] Remove; Lower;  NFC", None, sys::UTransDirection::UTRANS_FORWARD);
-        assert_eq!(tokens.len(), 2);
-        assert_eq!(tokens[0].position, 0);
-        assert_eq!(tokens[0].text, "josephine");
-        assert_eq!(tokens[0].offset_from, 0);
-        assert_eq!(tokens[0].offset_to, 10);
+    fn test_basic_functionality() {
+        let tokens = token_stream_helper(
+            "簡化字",
+            "Traditional-Simplified",
+            None,
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 9,
+            position: 0,
+            text: "简化字".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
 
-        assert_eq!(tokens[1].position, 1);
-        assert_eq!(tokens[1].text, "baker");
-        assert_eq!(tokens[1].offset_from, 11);
-        assert_eq!(tokens[1].offset_to, 16);
+        let tokens = token_stream_helper(
+            "ヒラガナ",
+            "Katakana-Hiragana",
+            None,
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 12,
+            position: 0,
+            text: "ひらがな".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
+
+        let tokens = token_stream_helper(
+            "アルアノリウ",
+            "Fullwidth-Halfwidth",
+            None,
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 18,
+            position: 0,
+            text: "ｱﾙｱﾉﾘｳ".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
+
+        let tokens = token_stream_helper(
+            "Αλφαβητικός Κατάλογος",
+            "Any-Latin",
+            None,
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 41,
+            position: 0,
+            text: "Alphabētikós Katálogos".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
+
+        let tokens = token_stream_helper(
+            "Alphabētikós Katálogos",
+            "NFD; [:Nonspacing Mark:] Remove",
+            None,
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 25,
+            position: 0,
+            text: "Alphabetikos Katalogos".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
+
+        let tokens = token_stream_helper(
+            "中国",
+            "Han-Latin",
+            None,
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 6,
+            position: 0,
+            text: "zhōng guó".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
     }
 
     #[test]
-    fn test_transform_filter_2() {
-        let tokens = token_stream_helper("Русский текст", "Any-Latin;", None, sys::UTransDirection::UTRANS_FORWARD);
-        assert_eq!(tokens.len(), 2);
-        assert_eq!(tokens[0].position, 0);
-        assert_eq!(tokens[0].text, "Russkij");
-        assert_eq!(tokens[0].offset_from, 0);
-        assert_eq!(tokens[0].offset_to, 14);
+    pub fn test_custom_functionality() {
+        let tokens = token_stream_helper(
+            "abacadaba",
+            "test",
+            Some("a > b; b > c;".to_string()),
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 9,
+            position: 0,
+            text: "bcbcbdbcb".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
+    }
 
-        assert_eq!(tokens[1].position, 1);
-        assert_eq!(tokens[1].text, "tekst");
-        assert_eq!(tokens[1].offset_from, 15);
-        assert_eq!(tokens[1].offset_to, 25);
+    #[test]
+    pub fn test_custom_functionality_2() {
+        let tokens = token_stream_helper(
+            "caa",
+            "test",
+            Some("c { a > b; a > d;".to_string()),
+            sys::UTransDirection::UTRANS_FORWARD,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 3,
+            position: 0,
+            text: "cbd".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
     }
 }
