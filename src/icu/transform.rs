@@ -195,7 +195,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_custom_functionality() {
+    fn test_custom_functionality() {
         let tokens = token_stream_helper(
             "abacadaba",
             "test",
@@ -213,7 +213,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_custom_functionality_2() {
+    fn test_custom_functionality_2() {
         let tokens = token_stream_helper(
             "caa",
             "test",
@@ -231,7 +231,7 @@ mod tests {
     }
 
     #[test]
-    pub fn test_empty() {
+    fn test_empty() {
         let tokens = token_stream_helper("", "Any-Latin", None, Direction::Forward);
 
         let expected: Vec<Token> = vec![Token {
@@ -243,5 +243,23 @@ mod tests {
         }];
 
         assert_eq!(expected, tokens);
+    }
+
+    #[test]
+    fn test_example_from_doc() {
+        let tokens = token_stream_helper(
+            "中国",
+            "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC",
+            None,
+            Direction::Forward,
+        );
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 6,
+            position: 0,
+            text: "zhong guo".to_string(),
+            position_length: 1,
+        }];
+        assert_eq!(tokens, expected);
     }
 }
