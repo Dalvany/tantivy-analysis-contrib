@@ -1,9 +1,11 @@
-use rust_icu::brk::UBreakIterator;
 use std::str::Chars;
+
+use rust_icu::brk::UBreakIterator;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
 
 /// Default rules, copy from Lucene's binary rules
 const DEFAULT_RULES: &str = std::include_str!("breaking_rules/Default.rbbi");
+
 /// Myanmar rules, copy from Lucene's binary rules
 /*const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");*/
 
@@ -71,7 +73,7 @@ impl Tokenizer for ICUTokenizer {
 
 /// ICU [TokenStream], it relies on [us::UnicodeWordIndices]
 /// to do the actual tokenizing.
-pub struct ICUTokenizerTokenStream<'a> {
+struct ICUTokenizerTokenStream<'a> {
     breaking_word: ICUBreakingWord<'a>,
     token: Token,
 }

@@ -15,7 +15,7 @@ impl<'a> TokenStream for ICUTransformTokenStream<'a> {
     fn advance(&mut self) -> bool {
         let result = self.tail.advance();
         if !result {
-            return result;
+            return false;
         }
         if let Ok(t) = self.transform.transliterate(&self.tail.token().text) {
             self.temp = t;
@@ -35,9 +35,9 @@ impl<'a> TokenStream for ICUTransformTokenStream<'a> {
 
 #[derive(Clone, Debug)]
 pub struct ICUTransformTokenFilter {
-    compound_id: String,
-    rules: Option<String>,
-    direction: sys::UTransDirection,
+    pub compound_id: String,
+    pub rules: Option<String>,
+    pub direction: sys::UTransDirection,
 }
 
 impl ICUTransformTokenFilter {
@@ -227,5 +227,21 @@ mod tests {
             position_length: 1,
         }];
         assert_eq!(tokens, expected);
+    }
+
+    #[test]
+    pub fn test_empty() {
+        let tokens =
+            token_stream_helper("", "Any-Latin", None, sys::UTransDirection::UTRANS_FORWARD);
+
+        let expected: Vec<Token> = vec![Token {
+            offset_from: 0,
+            offset_to: 0,
+            position: 0,
+            text: "".to_string(),
+            position_length: 1,
+        }];
+
+        assert_eq!(expected, tokens);
     }
 }
