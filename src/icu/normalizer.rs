@@ -1,6 +1,6 @@
 use std::mem;
 
-use rust_icu::norm::UNormalizer;
+use rust_icu_unorm2::UNormalizer;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
 impl From<Type> for UNormalizer {

@@ -1,8 +1,8 @@
 use std::error::Error;
 use std::mem;
 
-use rust_icu::sys;
-use rust_icu::trans as utrans;
+use rust_icu_sys as sys;
+use rust_icu_utrans as utrans;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
 #[derive(Clone, Copy, Debug)]

@@ -1,6 +1,6 @@
 use std::str::Chars;
 
-use rust_icu::brk::UBreakIterator;
+use rust_icu_ubrk::UBreakIterator;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
 
 /// Default rules, copy from Lucene's binary rules

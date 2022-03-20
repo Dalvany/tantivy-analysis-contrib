@@ -101,9 +101,14 @@
 //! let expected:Vec<String> = vec!["Another Document".to_string()];
 //! assert_eq!(expected,  result);
 //! ```
+#[cfg(feature = "normalizer")]
 pub use crate::icu::normalizer::ICUNormalizer2TokenFilter;
+#[cfg(feature = "tokenizer")]
 pub use crate::icu::tokenizer::ICUTokenizer;
+#[cfg(feature = "transform")]
 pub use crate::icu::transform::Direction;
+#[cfg(feature = "transform")]
 pub use crate::icu::transform::ICUTransformTokenFilter;
 
+#[cfg(any(feature = "normalizer", feature = "tokenizer", feature = "transform"))]
 mod icu;
