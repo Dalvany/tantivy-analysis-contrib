@@ -5,6 +5,21 @@ use rust_icu::sys;
 use rust_icu::trans as utrans;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
+#[derive(Clone, Copy, Debug)]
+pub enum Direction {
+    Forward,
+    Reverse,
+}
+
+impl Into<sys::UTransDirection> for Direction {
+    fn into(self) -> sys::UTransDirection {
+        match self {
+            Direction::Forward => sys::UTransDirection::UTRANS_FORWARD,
+            Direction::Reverse => sys::UTransDirection::UTRANS_REVERSE,
+        }
+    }
+}
+
 struct ICUTransformTokenStream<'a> {
     transform: utrans::UTransliterator,
     tail: BoxTokenStream<'a>,
@@ -44,17 +59,17 @@ impl ICUTransformTokenFilter {
     pub fn new(
         compound_id: String,
         rules: Option<String>,
-        direction: sys::UTransDirection,
+        direction: Direction,
     ) -> Result<Self, Box<dyn Error>> {
         let _ = utrans::UTransliterator::new(
             compound_id.as_str(),
             rules.as_ref().map(|x| x.as_str()),
-            direction,
+            direction.into(),
         )?;
         Ok(ICUTransformTokenFilter {
             compound_id,
             rules,
-            direction,
+            direction: direction.into(),
         })
     }
 }
@@ -85,7 +100,7 @@ mod tests {
         text: &str,
         compound_id: &str,
         rules: Option<String>,
-        direction: sys::UTransDirection,
+        direction: Direction,
     ) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(RawTokenizer)
             .filter(
@@ -102,12 +117,8 @@ mod tests {
 
     #[test]
     fn test_basic_functionality() {
-        let tokens = token_stream_helper(
-            "簡化字",
-            "Traditional-Simplified",
-            None,
-            sys::UTransDirection::UTRANS_FORWARD,
-        );
+        let tokens =
+            token_stream_helper("簡化字", "Traditional-Simplified", None, Direction::Forward);
         let expected = vec![Token {
             offset_from: 0,
             offset_to: 9,
@@ -117,12 +128,7 @@ mod tests {
         }];
         assert_eq!(tokens, expected);
 
-        let tokens = token_stream_helper(
-            "ヒラガナ",
-            "Katakana-Hiragana",
-            None,
-            sys::UTransDirection::UTRANS_FORWARD,
-        );
+        let tokens = token_stream_helper("ヒラガナ", "Katakana-Hiragana", None, Direction::Forward);
         let expected = vec![Token {
             offset_from: 0,
             offset_to: 12,
@@ -136,7 +142,7 @@ mod tests {
             "アルアノリウ",
             "Fullwidth-Halfwidth",
             None,
-            sys::UTransDirection::UTRANS_FORWARD,
+            Direction::Forward,
         );
         let expected = vec![Token {
             offset_from: 0,
@@ -151,7 +157,7 @@ mod tests {
             "Αλφαβητικός Κατάλογος",
             "Any-Latin",
             None,
-            sys::UTransDirection::UTRANS_FORWARD,
+            Direction::Forward,
         );
         let expected = vec![Token {
             offset_from: 0,
@@ -166,7 +172,7 @@ mod tests {
             "Alphabētikós Katálogos",
             "NFD; [:Nonspacing Mark:] Remove",
             None,
-            sys::UTransDirection::UTRANS_FORWARD,
+            Direction::Forward,
         );
         let expected = vec![Token {
             offset_from: 0,
@@ -177,12 +183,7 @@ mod tests {
         }];
         assert_eq!(tokens, expected);
 
-        let tokens = token_stream_helper(
-            "中国",
-            "Han-Latin",
-            None,
-            sys::UTransDirection::UTRANS_FORWARD,
-        );
+        let tokens = token_stream_helper("中国", "Han-Latin", None, Direction::Forward);
         let expected = vec![Token {
             offset_from: 0,
             offset_to: 6,
@@ -199,7 +200,7 @@ mod tests {
             "abacadaba",
             "test",
             Some("a > b; b > c;".to_string()),
-            sys::UTransDirection::UTRANS_FORWARD,
+            Direction::Forward,
         );
         let expected = vec![Token {
             offset_from: 0,
@@ -217,7 +218,7 @@ mod tests {
             "caa",
             "test",
             Some("c { a > b; a > d;".to_string()),
-            sys::UTransDirection::UTRANS_FORWARD,
+            Direction::Forward,
         );
         let expected = vec![Token {
             offset_from: 0,
@@ -231,8 +232,7 @@ mod tests {
 
     #[test]
     pub fn test_empty() {
-        let tokens =
-            token_stream_helper("", "Any-Latin", None, sys::UTransDirection::UTRANS_FORWARD);
+        let tokens = token_stream_helper("", "Any-Latin", None, Direction::Forward);
 
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
