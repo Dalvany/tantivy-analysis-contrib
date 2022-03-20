@@ -1,11 +1,15 @@
 [package]
 name = "tantivy-analysis-contrib"
+version = "0.1.0"
+edition = "2021"
 authors = ["dalvany"]
 description = "A set of analysis components for Tantivy"
 repository = "https://github.com/Dalvany/tantivy-analysis-contrib"
 homepage = "https://github.com/Dalvany/tantivy-analysis-contrib"
-version = "0.1.0"
-edition = "2021"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+categories = ["internationalization", "localization", "text-processing"]
+keywords = ["icu", "tantivy"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]

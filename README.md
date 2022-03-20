@@ -5,7 +5,7 @@ in [Lucene ICU](https://lucene.apache.org/core/9_0_0/analysis/icu/index.html).
 
 It relies on Google's [Rust ICU](https://crates.io/crates/rust_icu).
 
-Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main/lucene/analysis/icu/src/data/uax29)
+Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main/lucene/analysis/icu/src/data/uax29).
 
 ## Features
 
