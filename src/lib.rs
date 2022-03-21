@@ -102,7 +102,6 @@
 //! let expected:Vec<String> = vec!["Another Document".to_string()];
 //! assert_eq!(expected,  result);
 //! ```
-#![deny(missing_docs)]
 #![cfg_attr(test, deny(warnings))]
 #![warn(
     missing_copy_implementations,

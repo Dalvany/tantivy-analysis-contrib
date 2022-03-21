@@ -6,6 +6,7 @@ authors = ["dalvany"]
 description = "A set of analysis components for Tantivy"
 repository = "https://github.com/Dalvany/tantivy-analysis-contrib"
 homepage = "https://github.com/Dalvany/tantivy-analysis-contrib"
+documentation = "https://docs.rs/tantivy-analysis-contrib"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 categories = ["internationalization", "localization", "text-processing"]
