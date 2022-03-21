@@ -77,7 +77,7 @@ fn main() {
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.text().unwrap()).collect();
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
         for v in values {
             result.push(v.to_string());
         }
@@ -90,7 +90,7 @@ fn main() {
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.text().unwrap()).collect();
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
         for v in values {
             result.push(v.to_string());
         }
@@ -103,7 +103,7 @@ fn main() {
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.text().unwrap()).collect();
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
         for v in values {
             result.push(v.to_string());
         }

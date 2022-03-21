@@ -1,56 +1,8 @@
-//! Module that contains normalization token filter.
-//!
-//! It supports all [Google's unicode normalization](https://docs.rs/rust_icu_unorm2/2.0.0/rust_icu_unorm2/struct.UNormalizer.html) :
-//! * NFC
-//! * NFD
-//! * NFKC
-//! * NFKD
-//! * NFKC casefold
-//!
-//! See Wikipedia's [unicode normalization](https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization) for more information.
-//!
-//! Building an [ICUNormalizer2TokenFilter] is straightforward :
-//! ```rust
-//! use tantivy_analysis_contrib::ICUNormalizer2TokenFilter;
-//! use tantivy_analysis_contrib::Mode;
-//!
-//! let normalizer = ICUNormalizer2TokenFilter {
-//!     mode: Mode::NFD,
-//! };
-//! ```
 use std::mem;
 
-use rust_icu_unorm2::UNormalizer;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
-impl From<Mode> for UNormalizer {
-    fn from(tp: Mode) -> Self {
-        match tp {
-            Mode::NFC => UNormalizer::new_nfc().expect("Can't create NFC normalizer"),
-            Mode::NFD => UNormalizer::new_nfd().expect("Can't create NFD normalizer"),
-            Mode::NFKC => UNormalizer::new_nfkc().expect("Can't create NFKC normalizer"),
-            Mode::NFKD => UNormalizer::new_nfkd().expect("Can't create NFKD normalizer"),
-            Mode::NFKCCasefold => {
-                UNormalizer::new_nfkc_casefold().expect("Can't create NFKC casefold normalizer")
-            }
-        }
-    }
-}
-
-/// Normalization algorithms (see [Wikipedia](https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization)).
-#[derive(Clone, Debug, Copy)]
-pub enum Mode {
-    /// Normalization Form Canonical Composition.
-    NFC,
-    /// Normalization Form Canonical Decomposition.
-    NFD,
-    /// Normalization Form Compatibility Composition.
-    NFKC,
-    /// Normalization Form Compatibility Decomposition.
-    NFKD,
-    /// Normalization Form Compatibility Composition with casefolding.
-    NFKCCasefold,
-}
+use rust_icu_unorm2::UNormalizer;
 
 struct ICUNormalizer2TokenStream<'a> {
     normalizer: UNormalizer,
@@ -81,7 +33,54 @@ impl<'a> TokenStream for ICUNormalizer2TokenStream<'a> {
     }
 }
 
+impl From<Mode> for UNormalizer {
+    fn from(tp: Mode) -> Self {
+        match tp {
+            Mode::NFC => UNormalizer::new_nfc().expect("Can't create NFC normalizer"),
+            Mode::NFD => UNormalizer::new_nfd().expect("Can't create NFD normalizer"),
+            Mode::NFKC => UNormalizer::new_nfkc().expect("Can't create NFKC normalizer"),
+            Mode::NFKD => UNormalizer::new_nfkd().expect("Can't create NFKD normalizer"),
+            Mode::NFKCCasefold => {
+                UNormalizer::new_nfkc_casefold().expect("Can't create NFKC casefold normalizer")
+            }
+        }
+    }
+}
+
+/// Normalization algorithms (see [Wikipedia](https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization)).
+#[derive(Clone, Debug, Copy)]
+pub enum Mode {
+    /// Normalization Form Canonical Composition.
+    NFC,
+    /// Normalization Form Canonical Decomposition.
+    NFD,
+    /// Normalization Form Compatibility Composition.
+    NFKC,
+    /// Normalization Form Compatibility Decomposition.
+    NFKD,
+    /// Normalization Form Compatibility Composition with casefolding.
+    NFKCCasefold,
+}
+
 /// [TokenFilter] that converts text into normal form.
+/// It supports all [Google's unicode normalization](https://docs.rs/rust_icu_unorm2/2.0.0/rust_icu_unorm2/struct.UNormalizer.html) using [Mode]:
+/// * NFC
+/// * NFD
+/// * NFKC
+/// * NFKD
+/// * NFKC casefold
+///
+/// See Wikipedia's [unicode normalization](https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization) for more information.
+///
+/// Building an [ICUNormalizer2TokenFilter] is straightforward :
+/// ```rust
+/// use tantivy_analysis_contrib::icu::ICUNormalizer2TokenFilter;
+/// use tantivy_analysis_contrib::icu::Mode;
+///
+/// let normalizer = ICUNormalizer2TokenFilter {
+///     mode: Mode::NFD,
+/// };
+/// ```
 #[derive(Clone, Copy, Debug)]
 pub struct ICUNormalizer2TokenFilter {
     /// Normalization algorithm.

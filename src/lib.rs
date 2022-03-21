@@ -16,7 +16,7 @@
 //! use tantivy::query::QueryParser;
 //! use tantivy::schema::{IndexRecordOption, SchemaBuilder, TextFieldIndexing, TextOptions};
 //! use tantivy::tokenizer::TextAnalyzer;
-//! use tantivy_analysis_contrib::{Direction, ICUTokenizer, ICUTransformTokenFilter};
+//! use tantivy_analysis_contrib::icu::{Direction, ICUTokenizer, ICUTransformTokenFilter};
 //!
 //! const ANALYSIS_NAME :&str= "test";
 //!
@@ -68,7 +68,7 @@
 //! let mut result:Vec<String> = Vec::new();
 //! for (_, doc_address) in top_docs {
 //!     let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-//!     let values:Vec<&str> = retrieved_doc.get_all(field).map(|v| v.text().unwrap()).collect();
+//!     let values:Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
 //!     for v in values {
 //!         result.push(v.to_string());
 //!     }
@@ -81,7 +81,7 @@
 //! let mut result:Vec<String> = Vec::new();
 //! for (_, doc_address) in top_docs {
 //!     let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-//!     let values:Vec<&str> = retrieved_doc.get_all(field).map(|v| v.text().unwrap()).collect();
+//!     let values:Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
 //!     for v in values {
 //!         result.push(v.to_string());
 //!     }
@@ -94,7 +94,7 @@
 //! let mut result:Vec<String> = Vec::new();
 //! for (_, doc_address) in top_docs {
 //!     let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-//!     let values:Vec<&str> = retrieved_doc.get_all(field).map(|v| v.text().unwrap()).collect();
+//!     let values:Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
 //!     for v in values {
 //!         result.push(v.to_string());
 //!     }
@@ -113,17 +113,6 @@
     unused_import_braces,
     unused_qualifications
 )]
-
-#[cfg(feature = "normalizer")]
-pub use crate::icu::normalizer::ICUNormalizer2TokenFilter;
-#[cfg(feature = "normalizer")]
-pub use crate::icu::normalizer::Mode;
-#[cfg(feature = "tokenizer")]
-pub use crate::icu::tokenizer::ICUTokenizer;
-#[cfg(feature = "transform")]
-pub use crate::icu::transform::Direction;
-#[cfg(feature = "transform")]
-pub use crate::icu::transform::ICUTransformTokenFilter;
 
 #[cfg(any(feature = "normalizer", feature = "tokenizer", feature = "transform"))]
 pub mod icu;

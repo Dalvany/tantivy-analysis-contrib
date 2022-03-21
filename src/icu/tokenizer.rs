@@ -1,15 +1,11 @@
 //! This module provides a tokenizer that use the same rules to break string into words.
 //!
-//! Getting a tokenizer is simple :
-//! ```rust
-//! use tantivy_analysis_contrib::ICUTokenizer;
-//!
-//! let tokenizer = ICUTokenizer;
-//! ```
+
 use std::str::Chars;
 
-use rust_icu_ubrk::UBreakIterator;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
+
+use rust_icu_ubrk::UBreakIterator;
 
 /// Default rules, copy from Lucene's binary rules
 const DEFAULT_RULES: &str = std::include_str!("breaking_rules/Default.rbbi");
@@ -69,18 +65,6 @@ impl<'a> Iterator for ICUBreakingWord<'a> {
     }
 }
 
-/// ICU [Tokenizer]. It does not (yet ?) work as Lucene's counterpart.
-#[derive(Clone, Copy, Debug)]
-pub struct ICUTokenizer;
-
-impl Tokenizer for ICUTokenizer {
-    fn token_stream<'a>(&self, text: &'a str) -> BoxTokenStream<'a> {
-        BoxTokenStream::from(ICUTokenizerTokenStream::new(text))
-    }
-}
-
-/// ICU [TokenStream], it relies on [us::UnicodeWordIndices]
-/// to do the actual tokenizing.
 struct ICUTokenizerTokenStream<'a> {
     breaking_word: ICUBreakingWord<'a>,
     token: Token,
@@ -117,6 +101,22 @@ impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
 
     fn token_mut(&mut self) -> &mut Token {
         &mut self.token
+    }
+}
+
+/// ICU [Tokenizer]. It does not (yet ?) work as Lucene's counterpart.
+/// Getting a tokenizer is simple :
+/// ```rust
+/// use tantivy_analysis_contrib::icu::ICUTokenizer;
+///
+/// let tokenizer = ICUTokenizer;
+/// ```
+#[derive(Clone, Copy, Debug)]
+pub struct ICUTokenizer;
+
+impl Tokenizer for ICUTokenizer {
+    fn token_stream<'a>(&self, text: &'a str) -> BoxTokenStream<'a> {
+        BoxTokenStream::from(ICUTokenizerTokenStream::new(text))
     }
 }
 

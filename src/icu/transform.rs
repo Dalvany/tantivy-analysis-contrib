@@ -1,36 +1,8 @@
-//! This module contains a [TokenFilter] that allow to transform text.
-//! It's mostly useful to transliterate tokens.
-//! ```rust
-//! use tantivy_analysis_contrib::{Direction, ICUTransformTokenFilter};
-//! let token_filter = ICUTransformTokenFilter {
-//!     compound_id: "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
-//!     rules: None,
-//!     direction: Direction::Forward
-//! };
-//! ```
 use std::mem;
 
 use rust_icu_sys as sys;
 use rust_icu_utrans as utrans;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
-
-/// Direction
-#[derive(Clone, Copy, Debug)]
-pub enum Direction {
-    /// Forward
-    Forward,
-    /// Reverse
-    Reverse,
-}
-
-impl Into<sys::UTransDirection> for Direction {
-    fn into(self) -> sys::UTransDirection {
-        match self {
-            Direction::Forward => sys::UTransDirection::UTRANS_FORWARD,
-            Direction::Reverse => sys::UTransDirection::UTRANS_REVERSE,
-        }
-    }
-}
 
 struct ICUTransformTokenStream<'a> {
     transform: utrans::UTransliterator,
@@ -60,9 +32,35 @@ impl<'a> TokenStream for ICUTransformTokenStream<'a> {
     }
 }
 
+/// Direction
+#[derive(Clone, Copy, Debug)]
+pub enum Direction {
+    /// Forward
+    Forward,
+    /// Reverse
+    Reverse,
+}
+
+impl Into<sys::UTransDirection> for Direction {
+    fn into(self) -> sys::UTransDirection {
+        match self {
+            Direction::Forward => sys::UTransDirection::UTRANS_FORWARD,
+            Direction::Reverse => sys::UTransDirection::UTRANS_REVERSE,
+        }
+    }
+}
+
 /// This [TokenFilter] allow to transform text into another
 /// for example to performe transliteration.
 /// See [ICU documentation](https://unicode-org.github.io/icu/userguide/transforms/general/)
+/// ```rust
+/// use tantivy_analysis_contrib::icu::{Direction, ICUTransformTokenFilter};
+/// let token_filter = ICUTransformTokenFilter {
+///     compound_id: "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
+///     rules: None,
+///     direction: Direction::Forward
+/// };
+/// ```
 #[derive(Clone, Debug)]
 pub struct ICUTransformTokenFilter {
     /// [Compound transform](https://unicode-org.github.io/icu/userguide/transforms/general/#compound-ids)
