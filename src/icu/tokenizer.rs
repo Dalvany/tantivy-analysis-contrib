@@ -1,3 +1,11 @@
+//! This module provides a tokenizer that use the same rules to break string into words.
+//!
+//! Getting a tokenizer is simple :
+//! ```rust
+//! use tantivy_analysis_contrib::ICUTokenizer;
+//!
+//! let tokenizer = ICUTokenizer;
+//! ```
 use std::str::Chars;
 
 use rust_icu_ubrk::UBreakIterator;
@@ -47,7 +55,7 @@ impl<'a> Iterator for ICUBreakingWord<'a> {
         }
 
         match end {
-            None => Option::None,
+            None => None,
             Some(index) => {
                 let substring: String = self
                     .text
@@ -55,14 +63,14 @@ impl<'a> Iterator for ICUBreakingWord<'a> {
                     .take(index as usize)
                     .skip(start as usize)
                     .collect();
-                Option::Some((substring, start as usize, index as usize))
+                Some((substring, start as usize, index as usize))
             }
         }
     }
 }
 
 /// ICU [Tokenizer]. It does not (yet ?) work as Lucene's counterpart.
-#[derive(Clone)]
+#[derive(Clone, Copy, Debug)]
 pub struct ICUTokenizer;
 
 impl Tokenizer for ICUTokenizer {
@@ -122,10 +130,10 @@ mod tests {
 
         fn next(&mut self) -> Option<Self::Item> {
             if self.advance() {
-                return Option::Some(self.token.clone());
+                return Some(self.token.clone());
             }
 
-            Option::None
+            None
         }
     }
 

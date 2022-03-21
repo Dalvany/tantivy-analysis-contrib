@@ -7,9 +7,9 @@
 //! * a [token filter](ICUNormalizer2TokenFilter) that normalize text. It is an aquivalent of
 //! [Lucene's ICUNormalizer2Filter](https://lucene.apache.org/core/9_0_0/analysis/icu/org/apache/lucene/analysis/icu/ICUNormalizer2Filter.html).
 //! * another [token filter](ICUTransformTokenFilter) wich is an equivalent of
-//! [ICUTransformFilter](https://lucene.apache.org/core/9_0_0/analysis/icu/org/apache/lucene/analysis/icu/ICUNormalizer2Filter.html)
+//! [Lucene's ICUTransformFilter](https://lucene.apache.org/core/9_0_0/analysis/icu/org/apache/lucene/analysis/icu/ICUNormalizer2Filter.html)
 //!
-//! Here is an example of how tokenize using [ICUTokenizer] and do transliteration and lowercase each tokens :
+//! Here is an example of how tokenize using [ICUTokenizer] and do transliteration and lowercase each tokens using [ICUTransformTokenFilter]:
 //! ```rust
 //! use tantivy::{doc, Index, ReloadPolicy};
 //! use tantivy::collector::TopDocs;
@@ -31,10 +31,11 @@
 //! schema.add_text_field("field", options);
 //! let schema = schema.build();
 //!
-//! let transform = ICUTransformTokenFilter::new(
-//!     "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
-//!     None,
-//!     Direction::Forward).expect("Can't create transform");
+//! let transform = ICUTransformTokenFilter {
+//!     compound_id: "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
+//!     rules: None,
+//!     direction: Direction::Forward
+//! };
 //! let icu_analyzer = TextAnalyzer::from(ICUTokenizer).filter(transform);
 //!
 //! let field = schema.get_field("field").unwrap();
@@ -101,8 +102,23 @@
 //! let expected:Vec<String> = vec!["Another Document".to_string()];
 //! assert_eq!(expected,  result);
 //! ```
+#![deny(missing_docs)]
+#![cfg_attr(test, deny(warnings))]
+#![warn(
+    missing_copy_implementations,
+    missing_debug_implementations,
+    missing_docs,
+    trivial_numeric_casts,
+    unsafe_code,
+    unused_extern_crates,
+    unused_import_braces,
+    unused_qualifications
+)]
+
 #[cfg(feature = "normalizer")]
 pub use crate::icu::normalizer::ICUNormalizer2TokenFilter;
+#[cfg(feature = "normalizer")]
+pub use crate::icu::normalizer::Mode;
 #[cfg(feature = "tokenizer")]
 pub use crate::icu::tokenizer::ICUTokenizer;
 #[cfg(feature = "transform")]

@@ -1,13 +1,25 @@
-use std::error::Error;
+//! This module contains a [TokenFilter] that allow to transform text.
+//! It's mostly useful to transliterate tokens.
+//! ```rust
+//! use tantivy_analysis_contrib::{Direction, ICUTransformTokenFilter};
+//! let token_filter = ICUTransformTokenFilter {
+//!     compound_id: "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
+//!     rules: None,
+//!     direction: Direction::Forward
+//! };
+//! ```
 use std::mem;
 
 use rust_icu_sys as sys;
 use rust_icu_utrans as utrans;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
+/// Direction
 #[derive(Clone, Copy, Debug)]
 pub enum Direction {
+    /// Forward
     Forward,
+    /// Reverse
     Reverse,
 }
 
@@ -48,30 +60,17 @@ impl<'a> TokenStream for ICUTransformTokenStream<'a> {
     }
 }
 
+/// This [TokenFilter] allow to transform text into another
+/// for example to performe transliteration.
+/// See [ICU documentation](https://unicode-org.github.io/icu/userguide/transforms/general/)
 #[derive(Clone, Debug)]
 pub struct ICUTransformTokenFilter {
+    /// [Compound transform](https://unicode-org.github.io/icu/userguide/transforms/general/#compound-ids)
     pub compound_id: String,
+    /// Custom transform [rules](https://unicode-org.github.io/icu/userguide/transforms/general/rules.html)
     pub rules: Option<String>,
-    pub direction: sys::UTransDirection,
-}
-
-impl ICUTransformTokenFilter {
-    pub fn new(
-        compound_id: String,
-        rules: Option<String>,
-        direction: Direction,
-    ) -> Result<Self, Box<dyn Error>> {
-        let _ = utrans::UTransliterator::new(
-            compound_id.as_str(),
-            rules.as_ref().map(|x| x.as_str()),
-            direction.into(),
-        )?;
-        Ok(ICUTransformTokenFilter {
-            compound_id,
-            rules,
-            direction: direction.into(),
-        })
-    }
+    /// Direction
+    pub direction: Direction,
 }
 
 impl TokenFilter for ICUTransformTokenFilter {
@@ -81,7 +80,7 @@ impl TokenFilter for ICUTransformTokenFilter {
             transform: utrans::UTransliterator::new(
                 self.compound_id.as_str(),
                 self.rules.as_ref().map(|x| x.as_str()),
-                self.direction,
+                self.direction.into(),
             )
             .unwrap(),
             tail: token_stream,
@@ -103,9 +102,11 @@ mod tests {
         direction: Direction,
     ) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(RawTokenizer)
-            .filter(
-                ICUTransformTokenFilter::new(String::from(compound_id), rules, direction).unwrap(),
-            )
+            .filter(ICUTransformTokenFilter {
+                compound_id: compound_id.to_string(),
+                rules,
+                direction: direction.into(),
+            })
             .token_stream(text);
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {

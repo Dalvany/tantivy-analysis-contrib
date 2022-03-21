@@ -40,9 +40,11 @@ fn main() {
     schema.add_text_field("field", options);
     let schema = schema.build();
 
-    let transform = ICUTransformTokenFilter::new("Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
-                                                 None,
-                                                 Direction::Forward).expect("Can't create transform");
+    let transform = ICUTransformTokenFilter {
+        compound_id: "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
+        rules: None,
+        direction: Direction::Forward
+    };
     let icu_analyzer = TextAnalyzer::from(ICUTokenizer).filter(transform);
 
     let field = schema.get_field("field").unwrap();

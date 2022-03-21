@@ -1,28 +1,54 @@
+//! Module that contains normalization token filter.
+//!
+//! It supports all [Google's unicode normalization](https://docs.rs/rust_icu_unorm2/2.0.0/rust_icu_unorm2/struct.UNormalizer.html) :
+//! * NFC
+//! * NFD
+//! * NFKC
+//! * NFKD
+//! * NFKC casefold
+//!
+//! See Wikipedia's [unicode normalization](https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization) for more information.
+//!
+//! Building an [ICUNormalizer2TokenFilter] is straightforward :
+//! ```rust
+//! use tantivy_analysis_contrib::ICUNormalizer2TokenFilter;
+//! use tantivy_analysis_contrib::Mode;
+//!
+//! let normalizer = ICUNormalizer2TokenFilter {
+//!     mode: Mode::NFD,
+//! };
+//! ```
 use std::mem;
 
 use rust_icu_unorm2::UNormalizer;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
-impl From<Type> for UNormalizer {
-    fn from(tp: Type) -> Self {
+impl From<Mode> for UNormalizer {
+    fn from(tp: Mode) -> Self {
         match tp {
-            Type::NFC => UNormalizer::new_nfc().expect("Can't create NFC normalizer"),
-            Type::NFD => UNormalizer::new_nfd().expect("Can't create NFD normalizer"),
-            Type::NFKC => UNormalizer::new_nfkc().expect("Can't create NFKC normalizer"),
-            Type::NFKD => UNormalizer::new_nfkd().expect("Can't create NFKD normalizer"),
-            Type::NFKCCasefold => {
+            Mode::NFC => UNormalizer::new_nfc().expect("Can't create NFC normalizer"),
+            Mode::NFD => UNormalizer::new_nfd().expect("Can't create NFD normalizer"),
+            Mode::NFKC => UNormalizer::new_nfkc().expect("Can't create NFKC normalizer"),
+            Mode::NFKD => UNormalizer::new_nfkd().expect("Can't create NFKD normalizer"),
+            Mode::NFKCCasefold => {
                 UNormalizer::new_nfkc_casefold().expect("Can't create NFKC casefold normalizer")
             }
         }
     }
 }
 
+/// Normalization algorithms (see [Wikipedia](https://en.wikipedia.org/wiki/Unicode_equivalence#Normalization)).
 #[derive(Clone, Debug, Copy)]
-pub enum Type {
+pub enum Mode {
+    /// Normalization Form Canonical Composition.
     NFC,
+    /// Normalization Form Canonical Decomposition.
     NFD,
+    /// Normalization Form Compatibility Composition.
     NFKC,
+    /// Normalization Form Compatibility Decomposition.
     NFKD,
+    /// Normalization Form Compatibility Composition with casefolding.
     NFKCCasefold,
 }
 
@@ -55,15 +81,17 @@ impl<'a> TokenStream for ICUNormalizer2TokenStream<'a> {
     }
 }
 
+/// [TokenFilter] that converts text into normal form.
 #[derive(Clone, Copy, Debug)]
 pub struct ICUNormalizer2TokenFilter {
-    pub tp: Type,
+    /// Normalization algorithm.
+    pub mode: Mode,
 }
 
 impl TokenFilter for ICUNormalizer2TokenFilter {
     fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
         From::from(ICUNormalizer2TokenStream {
-            normalizer: UNormalizer::from(self.tp),
+            normalizer: UNormalizer::from(self.mode),
             tail: token_stream,
             temp: String::with_capacity(100),
         })
@@ -78,9 +106,9 @@ mod tests {
 
     use super::*;
 
-    fn token_stream_helper(text: &str, tp: Type) -> Vec<Token> {
+    fn token_stream_helper(text: &str, tp: Mode) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-            .filter(ICUNormalizer2TokenFilter { tp })
+            .filter(ICUNormalizer2TokenFilter { mode: tp })
             .token_stream(text);
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
@@ -90,9 +118,9 @@ mod tests {
         tokens
     }
 
-    fn token_stream_helper_raw(text: &str, tp: Type) -> Vec<Token> {
+    fn token_stream_helper_raw(text: &str, tp: Mode) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(RawTokenizer)
-            .filter(ICUNormalizer2TokenFilter { tp })
+            .filter(ICUNormalizer2TokenFilter { mode: tp })
             .token_stream(text);
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
@@ -104,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_default() {
-        let tokens = token_stream_helper("This is a test", Type::NFKCCasefold);
+        let tokens = token_stream_helper("This is a test", Mode::NFKCCasefold);
         let expected: Vec<Token> = vec![
             Token {
                 offset_from: 0,
@@ -137,7 +165,7 @@ mod tests {
         ];
         assert_eq!(expected, tokens);
 
-        let tokens = token_stream_helper("Ruß", Type::NFKCCasefold);
+        let tokens = token_stream_helper("Ruß", Mode::NFKCCasefold);
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
             offset_to: 4,
@@ -147,7 +175,7 @@ mod tests {
         }];
         assert_eq!(expected, tokens);
 
-        let tokens = token_stream_helper("ΜΆΪΟΣ", Type::NFKCCasefold);
+        let tokens = token_stream_helper("ΜΆΪΟΣ", Mode::NFKCCasefold);
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
             offset_to: 10,
@@ -157,7 +185,7 @@ mod tests {
         }];
         assert_eq!(expected, tokens);
 
-        let tokens = token_stream_helper("Μάϊος", Type::NFKCCasefold);
+        let tokens = token_stream_helper("Μάϊος", Mode::NFKCCasefold);
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
             offset_to: 10,
@@ -167,7 +195,7 @@ mod tests {
         }];
         assert_eq!(expected, tokens);
 
-        let tokens = token_stream_helper("𐐖", Type::NFKCCasefold);
+        let tokens = token_stream_helper("𐐖", Mode::NFKCCasefold);
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
             offset_to: 4,
@@ -177,7 +205,7 @@ mod tests {
         }];
         assert_eq!(expected, tokens);
 
-        let tokens = token_stream_helper("ﴳﴺﰧ", Type::NFKCCasefold);
+        let tokens = token_stream_helper("ﴳﴺﰧ", Mode::NFKCCasefold);
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
             offset_to: 9,
@@ -187,7 +215,7 @@ mod tests {
         }];
         assert_eq!(expected, tokens);
 
-        let tokens = token_stream_helper("क्‍ष", Type::NFKCCasefold);
+        let tokens = token_stream_helper("क्‍ष", Mode::NFKCCasefold);
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
             offset_to: 12,
@@ -201,7 +229,7 @@ mod tests {
     #[test]
     fn test_alternate() -> Result<(), Box<dyn Error>> {
         let v = char::from_u32(0x00E9).unwrap().to_string();
-        let tokens = token_stream_helper(&v, Type::NFD);
+        let tokens = token_stream_helper(&v, Mode::NFD);
 
         let v1 = char::from_u32(0x0065).unwrap().to_string();
         let v2 = char::from_u32(0x0301).unwrap().to_string();
@@ -221,7 +249,7 @@ mod tests {
     }
     #[test]
     pub fn test_empty() {
-        let tokens = token_stream_helper_raw("", Type::NFKCCasefold);
+        let tokens = token_stream_helper_raw("", Mode::NFKCCasefold);
 
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,
