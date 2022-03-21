@@ -20,3 +20,6 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+    - uses: taiki-e/install-action@cargo-hack
+    - name: Test features
+      run: cargo hack check --all --each-feature --clean-per-run --no-dev-deps
