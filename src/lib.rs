@@ -126,4 +126,4 @@ pub use crate::icu::transform::Direction;
 pub use crate::icu::transform::ICUTransformTokenFilter;
 
 #[cfg(any(feature = "normalizer", feature = "tokenizer", feature = "transform"))]
-mod icu;
+pub mod icu;
