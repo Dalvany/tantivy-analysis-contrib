@@ -1,2 +1,33 @@
 name: Release
 
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Version released (only version number)'
+        required: true
+
+jobs:
+  rust-workflow:
+    uses: Dalvany/tantivy-analysis-contrib/.github/workflows/rust.yml@main
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install
+        run: cargo install cargo-edit
+      - name: Set version
+        run: cargo set-version ${{ github.event.inputs.release_version }}
+      - name: Create tag
+        run: |
+          git tag v${{ github.event.inputs.release_version }}
+          git push v${{ github.event.inputs.release_version }}
+      - name: Publish
+        run: cargo publish --dry-run
+      - name: Incremente version
+        run: |
+          echo cargo set-version --bump minor
+          git add .
+          git commit -m "Prepare next version"
+          git push
+
