@@ -35,7 +35,7 @@ jobs:
           tag: ${{ github.event.inputs.release_version }}
       - name: Publish
         run: |
-          cargo publish --dry-run
+          cargo publish
       - name: Incremente version
         run: |
           cargo set-version --bump minor
