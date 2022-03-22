@@ -10,9 +10,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    environment:
-      name: Publish
-      url: https://github.com
     steps:
       - uses: actions/checkout@v2
       - name: Build
@@ -37,8 +34,10 @@ jobs:
         with:
           tag: ${{ github.event.inputs.release_version }}
       - name: Publish
-        run: |
-          cargo publish
+        shell: bash
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish
       - name: Incremente version
         run: |
           cargo set-version --bump minor
