@@ -32,6 +32,7 @@ impl<'a> Iterator for ICUBreakingWord<'a> {
     type Item = (String, usize, usize);
 
     fn next(&mut self) -> Option<Self::Item> {
+        // It is a port in Rust of Lucene algorithm
         let mut cont = true;
         let mut start = self.default_breaking_iterator.current();
         let mut end = self.default_breaking_iterator.next();
