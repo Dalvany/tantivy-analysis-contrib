@@ -8,25 +8,37 @@ on:
         required: true
 
 jobs:
-  rust-workflow:
-    uses: Dalvany/tantivy-analysis-contrib/.github/workflows/rust.yml@main
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Build
+        run: cargo build --verbose
+      - name: Run tests
+        run: cargo test --verbose
+      - uses: taiki-e/install-action@cargo-hack
+      - name: Test features
+        run: cargo hack check --all --each-feature --clean-per-run --no-dev-deps
       - name: Install
         run: cargo install cargo-edit
       - name: Set version
         run: cargo set-version ${{ github.event.inputs.release_version }}
-      - name: Create tag
+      - name: Commit new version
         run: |
-          git tag v${{ github.event.inputs.release_version }}
-          git push v${{ github.event.inputs.release_version }}
+          git config user.name "$env.GITHUB_ACTOR"
+          git config user.email "$env.GITHUB_ACTOR@users.noreply.github.com"
+          git add .
+          git commit -m "Prepare v${{ github.event.inputs.release_version }}"
+          git push
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ github.event.inputs.release_version }}
       - name: Publish
-        run: cargo publish --dry-run
+        run: |
+          cargo publish --dry-run
       - name: Incremente version
         run: |
-          echo cargo set-version --bump minor
+          cargo set-version --bump minor
           git add .
           git commit -m "Prepare next version"
           git push
