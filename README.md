@@ -1,3 +1,8 @@
+[![Crate](https://img.shields.io/crates/v/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
+[![Crate](https://img.shields.io/crates/d/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
+[![Crate](https://img.shields.io/crates/l/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
+[![Documentation](https://docs.rs/tantivy-analysis-contrib/badge.svg)](https://docs.rs/tantivy-analysis-contrib/)
+
 # Tantivy analysis
 
 This a collection of `Tokinzer` and `TokenFilters` that aims to replicate features available
