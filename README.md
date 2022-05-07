@@ -5,8 +5,8 @@
 
 # Tantivy analysis
 
-This a collection of `Tokinzer` and `TokenFilters` that aims to replicate features available
-in [Lucene ICU](https://lucene.apache.org/core/9_0_0/analysis/icu/index.html).
+This a collection of `Tokenizer` and `TokenFilters` that aims to replicate features available
+in [Lucene](https://lucene.apache.org/).
 
 It relies on Google's [Rust ICU](https://crates.io/crates/rust_icu).
 
@@ -18,6 +18,8 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
 * `normalizer` : it enables `ICUNormalizer2TokenFilter`.
 * `transform` : it enables `ICUTransformTokenFilter` 
 * `icu` : all above features
+* `commons` : some common token filter 
+  * `LengthTokenFilter`
 
 By default, all features are included.
 

@@ -114,5 +114,7 @@
     unused_qualifications
 )]
 
+#[cfg(feature = "commons")]
+pub mod commons;
 #[cfg(any(feature = "normalizer", feature = "tokenizer", feature = "transform"))]
 pub mod icu;
