@@ -1,7 +1,3 @@
-//! Sets of commons [TokenFilter].
-//!
-//! Currently :
-//! * [LengthTokenFilter] : keep tokens that match length criteria.
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
 struct LengthTokenStream<'a> {
@@ -75,7 +71,7 @@ mod tests {
 
     fn token_stream_helper(text: &str, min: Option<usize>, max: Option<usize>) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-            .filter(LengthTokenFilter { min, max })
+            .filter(LengthTokenFilter::new(min, max))
             .token_stream(text);
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {

@@ -20,6 +20,7 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
 * `icu` : all above features
 * `commons` : some common token filter 
   * `LengthTokenFilter`
+  * `TrimTokenFilter`
 
 By default, all features are included.
 
