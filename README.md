@@ -21,6 +21,7 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
 * `commons` : some common token filter 
   * `LengthTokenFilter`
   * `TrimTokenFilter`
+  * `LimitTokenCountFilter`
 
 By default, all features are included.
 

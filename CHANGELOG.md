@@ -11,3 +11,4 @@
 
 * `LengthTokenFilter`
 * `TrimTokenFilter`
+* `LimitTokenCountFilter`
