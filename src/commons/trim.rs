@@ -1,11 +1,11 @@
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
-struct LengthTokenStream<'a> {
+struct TrimTokenStream<'a> {
     tail: BoxTokenStream<'a>,
     token: Token,
 }
 
-impl<'a> TokenStream for LengthTokenStream<'a> {
+impl<'a> TokenStream for TrimTokenStream<'a> {
     fn advance(&mut self) -> bool {
         if !self.tail.advance() {
             return false;
@@ -66,7 +66,7 @@ pub struct TrimTokenFilter;
 
 impl TokenFilter for TrimTokenFilter {
     fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
-        From::from(LengthTokenStream {
+        From::from(TrimTokenStream {
             tail: token_stream,
             token: Token::default(),
         })
