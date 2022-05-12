@@ -12,3 +12,4 @@
 * `LengthTokenFilter`
 * `TrimTokenFilter`
 * `LimitTokenCountFilter`
+* `PathTokenizer`
