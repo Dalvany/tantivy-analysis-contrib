@@ -1,15 +1,20 @@
 //! This library tries to bring the same ICU support to Tantivy as [Lucene's ICU](https://lucene.apache.org/core/9_0_0/analysis/icu/index.html).
 //!
 //! Currently it contains
-//! * a [tokenizer](ICUTokenizer) that is an equivalent
+//! * a [tokenizer](icu::ICUTokenizer) that is an equivalent
 //! of [Lucene's ICUTokenizer](https://lucene.apache.org/core/9_0_0/analysis/icu/org/apache/lucene/analysis/icu/segmentation/ICUTokenizer.html)
 //! without support of emojis.
-//! * a [token filter](ICUNormalizer2TokenFilter) that normalize text. It is an aquivalent of
+//! * a [token filter](icu::ICUNormalizer2TokenFilter) that normalize text. It is an equivalent of
 //! [Lucene's ICUNormalizer2Filter](https://lucene.apache.org/core/9_0_0/analysis/icu/org/apache/lucene/analysis/icu/ICUNormalizer2Filter.html).
-//! * another [token filter](ICUTransformTokenFilter) wich is an equivalent of
+//! * another [token filter](icu::ICUTransformTokenFilter) which is an equivalent of
 //! [Lucene's ICUTransformFilter](https://lucene.apache.org/core/9_0_0/analysis/icu/org/apache/lucene/analysis/icu/ICUNormalizer2Filter.html)
+//! * a [tokenizer](commons::PathTokenizer) which tokenize a hierarchical path (equivalent of [PathHierarchyTokenizer](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/path/PathHierarchyTokenizer.html))
+//! * a [token filter](commons::LengthTokenFilter) that remove tokens which doesn't are above or below certain limits (see [LengthFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LengthFilter.html))
+//! * another [token filter](commons::TrimTokenFilter) that trims leading and trailing whitespace, this is an equivalent of Lucene's [TrimFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/TrimFilter.html)
+//! * a [token filter](commons::LimitCountTokenFilter) that limits the number of token, see [LimitTokenCountFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LimitTokenCountFilter.html)
 //!
-//! Here is an example of how tokenize using [ICUTokenizer] and do transliteration and lowercase each tokens using [ICUTransformTokenFilter]:
+//!
+//! Here is an example of how tokenize using [icu::ICUTokenizer] and do transliteration and lowercase each tokens using [icu::ICUTransformTokenFilter]:
 //! ```rust
 //! use tantivy::{doc, Index, ReloadPolicy};
 //! use tantivy::collector::TopDocs;

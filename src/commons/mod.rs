@@ -1,4 +1,4 @@
-//! Sets of commons [TokenFilter].
+//! Sets of commons [TokenFilter](tantivy::tokenizer::TokenFilter) and [Tokenizer](tantivy::tokenizer::Tokenizer).
 //!
 //! Currently :
 //! * [LengthTokenFilter] : keep tokens that match length criteria.
