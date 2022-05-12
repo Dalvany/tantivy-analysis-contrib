@@ -125,7 +125,8 @@ fn main() {
 
 ## TODO
 
-* Phonetic ? 
+* Phonetic
+* Reverse
 
 ## License
 
