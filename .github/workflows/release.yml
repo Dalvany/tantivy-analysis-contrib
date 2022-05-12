@@ -40,7 +40,7 @@ jobs:
         run: cargo publish
       - name: Incremente version
         run: |
-          cargo set-version --bump minor
+          cargo set-version --bump minor --metadata SNAPSHOT
           git add .
           git commit -m "Prepare next version"
           git push
