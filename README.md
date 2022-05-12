@@ -22,6 +22,7 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
   * `LengthTokenFilter`
   * `TrimTokenFilter`
   * `LimitTokenCountFilter`
+  * `PathTokenizer`
 
 By default, all features are included.
 
