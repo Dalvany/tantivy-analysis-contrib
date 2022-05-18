@@ -23,6 +23,7 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
   * `TrimTokenFilter`
   * `LimitTokenCountFilter`
   * `PathTokenizer`
+  * `ReverseTokenFilter`
 
 By default, all features are included.
 
