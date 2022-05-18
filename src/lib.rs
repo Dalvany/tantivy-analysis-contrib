@@ -12,7 +12,7 @@
 //! * a [token filter](commons::LengthTokenFilter) that remove tokens which doesn't are above or below certain limits (see [LengthFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LengthFilter.html))
 //! * another [token filter](commons::TrimTokenFilter) that trims leading and trailing whitespace, this is an equivalent of Lucene's [TrimFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/TrimFilter.html)
 //! * a [token filter](commons::LimitTokenCountFilter) that limits the number of token, see [LimitTokenCountFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LimitTokenCountFilter.html)
-//!
+//! * a [token filter](commons::ReverseTokenFilter) that reverse a string see [ReverseStringFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/reverse/ReverseStringFilter.html)
 //!
 //! Here is an example of how tokenize using [icu::ICUTokenizer] and do transliteration and lowercase each tokens using [icu::ICUTransformTokenFilter]:
 //! ```rust

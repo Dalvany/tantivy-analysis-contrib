@@ -1,14 +1,11 @@
 //! This module provides a tokenizer that use the same rules to break string into words.
 //!
-
+use rust_icu_ubrk::UBreakIterator;
 use std::str::Chars;
-
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
 
-use rust_icu_ubrk::UBreakIterator;
-
 /// Default rules, copy from Lucene's binary rules
-const DEFAULT_RULES: &str = std::include_str!("breaking_rules/Default.rbbi");
+const DEFAULT_RULES: &str = include_str!("breaking_rules/Default.rbbi");
 
 /// Myanmar rules, copy from Lucene's binary rules
 /*const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");*/
