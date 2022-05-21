@@ -5,6 +5,7 @@ use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
 
 const DEFAULT_SEPARATOR: char = '/';
 
+#[derive(Debug)]
 struct PathTokenStream<'a> {
     text: Skip<Split<'a, char>>,
     buffer: String,
@@ -178,7 +179,7 @@ impl Tokenizer for PathTokenizer {
 
 #[cfg(test)]
 mod tests {
-    //! Same tests as Lucene except for random string which are not tested here.
+    // Same tests as Lucene except for random string which are not tested here.
     use super::*;
 
     fn tokenize_all(text: &str, tokenizer: PathTokenizer) -> Vec<Token> {
