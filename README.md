@@ -1,7 +1,8 @@
 [![Crate](https://img.shields.io/crates/v/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
+[![Documentation](https://docs.rs/tantivy-analysis-contrib/badge.svg)](https://docs.rs/tantivy-analysis-contrib/)
+[![Build Status](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/rust.yml/badge.svg)](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/rust.yml)
 [![Crate](https://img.shields.io/crates/d/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
 [![Crate](https://img.shields.io/crates/l/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
-[![Documentation](https://docs.rs/tantivy-analysis-contrib/badge.svg)](https://docs.rs/tantivy-analysis-contrib/)
 
 # Tantivy analysis
 
