@@ -4,6 +4,7 @@
 
 * Fix documentation link (I hope)
 * Add a `ReverseTokenFilter` that reverse characters of a token. See Lucene's [ReverseStringFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/reverse/ReverseStringFilter.html)
+* Add an `ElisionTokenFilter` that removes elisions See Lucene's [ElisionFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/util/ElisionFilter.html)
 
 ## 0.2.0
 
