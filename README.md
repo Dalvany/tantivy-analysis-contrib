@@ -2,6 +2,7 @@
 [![Documentation](https://docs.rs/tantivy-analysis-contrib/badge.svg)](https://docs.rs/tantivy-analysis-contrib/)
 [![Build Status](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/rust.yml/badge.svg)](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/rust.yml)
 [![Crate](https://img.shields.io/crates/d/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
+[![dependency status](https://deps.rs/repo/github/Dalvany/tantivy-analysis-contrib/status.svg)](https://deps.rs/repo/github/Dalvany/tantivy-analysis-contrib)
 [![Crate](https://img.shields.io/crates/l/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
 
 # Tantivy analysis
