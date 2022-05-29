@@ -15,7 +15,7 @@ impl<'a> TokenStream for LimitTokenCountStream<'a> {
             return false;
         }
 
-        self.count = self.count - 1;
+        self.count -= 1;
 
         true
     }

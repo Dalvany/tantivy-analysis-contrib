@@ -1,5 +1,10 @@
 # Changelog
 
+## Next
+
+* Add clippy workflow
+* Fix clippy warnings
+
 ## 0.3.0
 
 * Fix documentation link (I hope)

@@ -41,9 +41,9 @@ pub enum Direction {
     Reverse,
 }
 
-impl Into<sys::UTransDirection> for Direction {
-    fn into(self) -> sys::UTransDirection {
-        match self {
+impl From<Direction> for sys::UTransDirection {
+    fn from(direction: Direction) -> Self {
+        match direction {
             Direction::Forward => sys::UTransDirection::UTRANS_FORWARD,
             Direction::Reverse => sys::UTransDirection::UTRANS_REVERSE,
         }
@@ -77,7 +77,7 @@ impl TokenFilter for ICUTransformTokenFilter {
             // unwrap work, we checked in new method.
             transform: utrans::UTransliterator::new(
                 self.compound_id.as_str(),
-                self.rules.as_ref().map(|x| x.as_str()),
+                self.rules.as_deref(),
                 self.direction.into(),
             )
             .unwrap(),
@@ -103,7 +103,7 @@ mod tests {
             .filter(ICUTransformTokenFilter {
                 compound_id: compound_id.to_string(),
                 rules,
-                direction: direction.into(),
+                direction,
             })
             .token_stream(text);
         let mut tokens = vec![];

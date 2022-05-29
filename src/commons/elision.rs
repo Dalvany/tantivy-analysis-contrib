@@ -68,7 +68,7 @@ impl ElisionTokenFilter {
                 if ignore_case {
                     v.to_lowercase()
                 } else {
-                    v.to_string()
+                    v
                 }
             })
             .collect();
@@ -108,7 +108,7 @@ impl TokenFilter for ElisionTokenFilter {
         BoxTokenStream::from(ElisionTokenStream {
             tail: token_stream,
             elisions: self.elisions.clone(),
-            ignore_case: self.ignore_case.clone(),
+            ignore_case: self.ignore_case,
         })
     }
 }
