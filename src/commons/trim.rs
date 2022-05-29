@@ -43,7 +43,7 @@ impl<'a> TokenStream for TrimTokenStream<'a> {
             }
         }
 
-        return true;
+        true
     }
 
     fn token(&self) -> &Token {

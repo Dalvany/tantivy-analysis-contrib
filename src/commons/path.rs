@@ -223,13 +223,13 @@ impl Tokenizer for PathTokenizer {
         while i > 0 {
             if let Some(token) = split.next() {
                 if starts_with {
-                    offset = offset + 1;
+                    offset += 1;
                 } else {
                     starts_with = true;
                 }
-                offset = offset + token.len();
+                offset += token.len();
             }
-            i = i - 1;
+            i -= 1;
         }
 
         if self.reverse {
@@ -566,7 +566,7 @@ mod tests {
     fn test_basic_skip() {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -595,7 +595,7 @@ mod tests {
     fn test_end_of_delimiter_skip() {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -631,7 +631,7 @@ mod tests {
     fn test_start_of_char_skip() {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -660,7 +660,7 @@ mod tests {
     fn test_start_of_char_end_of_delimiter_skip() {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -696,7 +696,7 @@ mod tests {
     fn test_only_delimiter_skip() {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -912,7 +912,7 @@ mod tests {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
             .reverse(true)
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -949,7 +949,7 @@ mod tests {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
             .reverse(true)
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -979,7 +979,7 @@ mod tests {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
             .reverse(true)
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -1009,7 +1009,7 @@ mod tests {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
             .reverse(true)
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -1024,7 +1024,7 @@ mod tests {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
             .reverse(true)
-            .skip(1 as usize)
+            .skip(1_usize)
             .build()
             .unwrap();
 
@@ -1045,7 +1045,7 @@ mod tests {
         #[allow(trivial_numeric_casts)]
         let tokenizer = PathTokenizerBuilder::default()
             .reverse(true)
-            .skip(2 as usize)
+            .skip(2_usize)
             .build()
             .unwrap();
 
