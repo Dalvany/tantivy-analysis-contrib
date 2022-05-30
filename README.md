@@ -7,8 +7,8 @@
 
 # Tantivy analysis
 
-This a collection of `Tokenizer` and `TokenFilters` that aims to replicate features available
-in [Lucene](https://lucene.apache.org/).
+This a collection of `Tokenizer` and `TokenFilters` for [Tantivy](https://github.com/quickwit-oss/tantivy) that aims to
+replicate features available in [Lucene](https://lucene.apache.org/).
 
 It relies on Google's [Rust ICU](https://crates.io/crates/rust_icu).
 
