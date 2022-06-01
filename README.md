@@ -28,6 +28,7 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
   * `PathTokenizer`
   * `ReverseTokenFilter`
   * `ElisionTokenFilter`
+  * `StopTokenFilter`
 
 By default, all features are included.
 
@@ -62,7 +63,7 @@ fn main() {
     };
     let icu_analyzer = TextAnalyzer::from(ICUTokenizer).filter(transform);
 
-    let field = schema.get_field("field").unwrap();
+    let field = schema.get_field("field")?;
 
     let index = Index::create_in_ram(schema);
     index.tokenizers().register(ANALYSIS_NAME, icu_analyzer);
@@ -92,7 +93,7 @@ fn main() {
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text()?).collect();
         for v in values {
             result.push(v.to_string());
         }
@@ -105,7 +106,7 @@ fn main() {
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text()?).collect();
         for v in values {
             result.push(v.to_string());
         }
@@ -118,7 +119,7 @@ fn main() {
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text()?).collect();
         for v in values {
             result.push(v.to_string());
         }

@@ -4,6 +4,7 @@
 
 * Add clippy workflow
 * Fix clippy warnings
+* Add a `StopTokenFilter` to remove stop words ([StopFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/core/StopFilter.html))
 
 ## 0.3.0
 

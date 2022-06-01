@@ -23,6 +23,8 @@
 //! [ReverseStringFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/reverse/ReverseStringFilter.html)
 //!     * [ElisionTokenFilter](crate::commons::ElisionTokenFilter) that remove elisions, see
 //! [ElisionFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/util/ElisionFilter.html)
+//!     * [StopTokenFilter](crate::commons::StopTokenFilter) filters out tokens, see
+//! [StopFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/core/StopFilter.html)
 //!
 //! Here is an example of how tokenize using [icu::ICUTokenizer] and do transliteration and lowercase each tokens using [icu::ICUTransformTokenFilter]:
 //! ```rust
