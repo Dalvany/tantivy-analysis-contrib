@@ -129,11 +129,6 @@ fn main() {
 }
 ```
 
-## TODO
-
-* Phonetic
-* Reverse
-
 ## License
 
 Licensed under either of
