@@ -39,10 +39,56 @@ impl<'a> TokenStream for StopTokenStream<'a> {
 ///     stop_words
 /// };
 /// ```
+///
+/// # Example
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use fst::Set;
+/// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
+/// use tantivy_analysis_contrib::commons::StopTokenFilter;
+///
+/// let mut stop_words = vec!["is", "are", "the", "of", "a", "an"];
+/// stop_words.sort();
+///
+/// let stop_token_filter:StopTokenFilter = Set::from_iter(stop_words)?.into();
+///
+/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
+///             .filter(stop_token_filter)
+///             .token_stream("This is a good test of the english stop analyzer");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "This".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "good".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "test".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "english".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "stop".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "analyzer".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug)]
 pub struct StopTokenFilter {
     /// List of stop words.
     pub stop_words: Set<Vec<u8>>,
+}
+
+impl From<Set<Vec<u8>>> for StopTokenFilter {
+    fn from(stop_words: Set<Vec<u8>>) -> Self {
+        Self { stop_words }
+    }
 }
 
 impl TokenFilter for StopTokenFilter {

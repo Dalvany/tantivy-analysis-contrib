@@ -61,6 +61,30 @@ impl From<Direction> for sys::UTransDirection {
 ///     direction: Direction::Forward
 /// };
 /// ```
+///
+/// # Example
+///
+/// Here is an example of transform that convert into greek letters into latin letters
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token};
+/// use tantivy_analysis_contrib::icu::{Direction, ICUTransformTokenFilter};
+///
+/// let mut token_stream = TextAnalyzer::from(RawTokenizer)
+///             .filter(ICUTransformTokenFilter {
+///                 compound_id: "Greek-Latin".to_string(),
+///                 rules: None,
+///                 direction: Direction::Forward
+///             })
+///             .token_stream("Αλφαβητικός Κατάλογος");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "Alphabētikós Katálogos".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
 #[derive(Clone, Debug)]
 pub struct ICUTransformTokenFilter {
     /// [Compound transform](https://unicode-org.github.io/icu/userguide/transforms/general/#compound-ids)

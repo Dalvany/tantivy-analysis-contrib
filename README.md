@@ -19,16 +19,16 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
 
 * `tokenizer` : it enables `ICUTokenizer`.
 * `normalizer` : it enables `ICUNormalizer2TokenFilter`.
-* `transform` : it enables `ICUTransformTokenFilter` 
+* `transform` : it enables `ICUTransformTokenFilter`
 * `icu` : all above features
-* `commons` : some common token filter 
-  * `LengthTokenFilter`
-  * `TrimTokenFilter`
-  * `LimitTokenCountFilter`
-  * `PathTokenizer`
-  * `ReverseTokenFilter`
-  * `ElisionTokenFilter`
-  * `StopTokenFilter`
+* `commons` : some common token filter
+    * `LengthTokenFilter`
+    * `TrimTokenFilter`
+    * `LimitTokenCountFilter`
+    * `PathTokenizer`
+    * `ReverseTokenFilter`
+    * `ElisionTokenFilter`
+    * `StopTokenFilter`
 
 By default, all features are included.
 
@@ -40,11 +40,11 @@ use tantivy::collector::TopDocs;
 use tantivy::query::QueryParser;
 use tantivy::schema::{IndexRecordOption, SchemaBuilder, TextFieldIndexing, TextOptions};
 use tantivy::tokenizer::TextAnalyzer;
-use tantivy_analysis_contrib::{Direction, ICUTokenizer, ICUTransformTokenFilter};
+use tantivy_analysis_contrib::icu::{Direction, ICUTokenizer, ICUTransformTokenFilter};
 
 const ANALYSIS_NAME: &str = "test";
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let options = TextOptions::default()
         .set_indexing_options(
             TextFieldIndexing::default()
@@ -63,37 +63,37 @@ fn main() {
     };
     let icu_analyzer = TextAnalyzer::from(ICUTokenizer).filter(transform);
 
-    let field = schema.get_field("field")?;
+    let field = schema.get_field("field").expect("Can't get field.");
 
     let index = Index::create_in_ram(schema);
     index.tokenizers().register(ANALYSIS_NAME, icu_analyzer);
 
-    let mut index_writer = index.writer(3_000_000).expect("Error getting index writer");
+    let mut index_writer = index.writer(3_000_000)?;
 
     index_writer.add_document(doc!(
         field => "中国"
-    ));
+    ))?;
     index_writer.add_document(doc!(
         field => "Another Document"
-    ));
+    ))?;
 
-    index_writer.commit();
+    index_writer.commit()?;
 
     let reader = index
         .reader_builder()
         .reload_policy(ReloadPolicy::OnCommit)
-        .try_into().expect("Error getting index reader");
+        .try_into()?;
 
     let searcher = reader.searcher();
 
     let query_parser = QueryParser::for_index(&index, vec![field]);
 
-    let query = query_parser.parse_query("zhong").expect("Can't create query parser.");
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10)).expect("Error running search");
+    let query = query_parser.parse_query("zhong")?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
-        let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text()?).collect();
+        let retrieved_doc = searcher.doc(doc_address)?;
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
         for v in values {
             result.push(v.to_string());
         }
@@ -101,31 +101,31 @@ fn main() {
     let expected: Vec<String> = vec!["中国".to_string()];
     assert_eq!(expected, result);
 
-    let query = query_parser.parse_query("国").expect("Can't create query parser.");
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10)).expect("Error running search");
+    let query = query_parser.parse_query("国")?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
-        let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text()?).collect();
+        let retrieved_doc = searcher.doc(doc_address)?;
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
         for v in values {
             result.push(v.to_string());
         }
     }
     let expected: Vec<String> = vec!["中国".to_string()];
     assert_eq!(expected, result);
-
-    let query = query_parser.parse_query("document").expect("Can't create query parser.");
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10)).expect("Error running search");
+    let query = query_parser.parse_query("document")?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
-        let retrieved_doc = searcher.doc(doc_address).expect("Can't retrieve document");
-        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text()?).collect();
+        let retrieved_doc = searcher.doc(doc_address)?;
+        let values: Vec<&str> = retrieved_doc.get_all(field).map(|v| v.as_text().unwrap()).collect();
         for v in values {
             result.push(v.to_string());
         }
     }
     let expected: Vec<String> = vec!["Another Document".to_string()];
     assert_eq!(expected, result);
+    Ok(())
 }
 ```
 

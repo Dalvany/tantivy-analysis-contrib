@@ -48,6 +48,50 @@ impl<'a> TokenStream for ElisionTokenStream<'a> {
 ///
 /// let filter = ElisionTokenFilter::from_iter_str(vec!["l", "m", "t", "qu", "n", "s", "j", "d", "c", "jusqu", "quoiqu", "lorsqu", "puisqu"], true);
 /// ```
+///
+/// # Example
+///
+/// This example shows produced token by [ElisionTokenFilter].
+///
+/// All starting `l'` and `m'` are removed from tokens whatever the case is.
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
+/// use tantivy_analysis_contrib::commons::ElisionTokenFilter;
+///
+/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
+///             .filter(ElisionTokenFilter::from_iter_str(vec!["L", "M"], true))
+///             .token_stream("Plop, juste pour voir l'embrouille avec O'brian. m'enfin.");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "Plop,".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "juste".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "pour".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "voir".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "embrouille".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "avec".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "O'brian.".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "enfin.".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug)]
 pub struct ElisionTokenFilter {
     /// Set of elisions
@@ -64,13 +108,7 @@ impl ElisionTokenFilter {
     pub fn from_iter_string(elisions: impl IntoIterator<Item = String>, ignore_case: bool) -> Self {
         let elisions: BTreeSet<String> = elisions
             .into_iter()
-            .map(|v| {
-                if ignore_case {
-                    v.to_lowercase()
-                } else {
-                    v
-                }
-            })
+            .map(|v| if ignore_case { v.to_lowercase() } else { v })
             .collect();
         Self {
             elisions,
