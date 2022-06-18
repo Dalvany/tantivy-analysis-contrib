@@ -61,6 +61,25 @@ impl<'a> TokenStream for TrimTokenStream<'a> {
 ///
 /// let length_token_filter = TrimTokenFilter;
 /// ```
+///
+/// # Example
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token, RawTokenizer};
+/// use tantivy_analysis_contrib::commons::TrimTokenFilter;
+///
+/// let mut token_stream = TextAnalyzer::from(RawTokenizer)
+///             .filter(TrimTokenFilter)
+///             .token_stream("\t\n token    \n\n\t\t");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "token".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
+/// ```
 #[derive(Clone, Copy, Debug)]
 pub struct TrimTokenFilter;
 

@@ -80,12 +80,76 @@ impl<'a> TokenStream for PathTokenStream<'a> {
 /// /part1/part2/part3
 /// ```
 ///
-/// Enabling `reverse` will make this tokenizer to behave like Lucene's
+/// Enabling `reverse` will make this tokenizer to behave like Lucene's except that tokens will not be ordered the same way. See
 /// [ReversePathHierarchyTokenizer](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/path/ReversePathHierarchyTokenizer.html)
 ///
 /// # Warning
 /// To construct a new [PathTokenizer] you should use the [PathTokenizerBuilder] or the [Default] implementation as
 /// [From] trait will probably be removed.
+///
+/// # Examples
+///
+/// Here is an example with `reverse` set to `false` and use `\` as character separator. It will also skip the first token.
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use tantivy::tokenizer::{TextAnalyzer, Token};
+/// use tantivy_analysis_contrib::commons::{PathTokenizer, PathTokenizerBuilder};
+///
+/// let path_tokenizer = PathTokenizerBuilder::default()
+///                             .skip(1_usize)
+///                             .delimiter('\\')
+///                             .build()?;
+///
+/// let mut token_stream = TextAnalyzer::from(path_tokenizer)
+///             .token_stream("c:\\a\\b\\c");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "\\a".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "\\a\\b".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "\\a\\b\\c".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
+/// ```
+///
+/// This second example show what tokens are produce if `reverse` is set to `true` and what does `replacement` parameter.
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use tantivy::tokenizer::{TextAnalyzer, Token};
+/// use tantivy_analysis_contrib::commons::{PathTokenizer, PathTokenizerBuilder};
+///
+/// let path_tokenizer = PathTokenizerBuilder::default()
+///                             .delimiter('\\')
+///                             .replacement('/')
+///                             .reverse(true)
+///                             .build()?;
+///
+/// let mut token_stream = TextAnalyzer::from(path_tokenizer)
+///             .token_stream("c:\\a\\b\\c");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "c".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "b/c".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "a/b/c".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "c:/a/b/c".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
+/// ```
 #[derive(Clone, Copy, Debug, Builder)]
 #[builder(setter(into), default)]
 pub struct PathTokenizer {

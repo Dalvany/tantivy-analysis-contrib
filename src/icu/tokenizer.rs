@@ -109,6 +109,42 @@ impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
 ///
 /// let tokenizer = ICUTokenizer;
 /// ```
+///
+/// # Example
+///
+/// Here is an example of a tokenization result
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use tantivy::tokenizer::{TextAnalyzer, Token};
+/// use tantivy_analysis_contrib::icu::ICUTokenizer;
+///
+/// let mut token_stream = TextAnalyzer::from(ICUTokenizer).token_stream("我是中国人。 １２３４ Ｔｅｓｔｓ ");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "我".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "是".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "中".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "国".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "人".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "１２３４".to_string());
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "Ｔｅｓｔｓ".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
 #[derive(Clone, Copy, Debug)]
 pub struct ICUTokenizer;
 

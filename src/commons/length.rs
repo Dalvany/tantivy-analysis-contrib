@@ -31,11 +31,33 @@ impl<'a> TokenStream for LengthTokenStream<'a> {
     }
 }
 
-/// This [TokenFilter] filters tokens that doesn't match a min or a max length.
+/// This [TokenFilter] filters tokens that doesn't match a min or a max length (inclusive).
 /// ```rust
 /// use tantivy_analysis_contrib::commons::LengthTokenFilter;
 ///
 /// let length_token_filter = LengthTokenFilter::new(Some(4), Some(10));
+/// ```
+///
+/// # Example
+///
+/// In this example, tokens `There`, `1` and `token` are filtered out because they are too short or
+/// too long.
+///
+/// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+/// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
+/// use tantivy_analysis_contrib::commons::LengthTokenFilter;
+///
+/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
+///             .filter(LengthTokenFilter::new(Some(2), Some(4)))
+///             .token_stream("There is 1 token");
+///
+/// let token = token_stream.next().expect("A token should be present.");
+/// assert_eq!(token.text, "is".to_string());
+///
+/// assert_eq!(None, token_stream.next());
+/// #     Ok(())
+/// # }
 /// ```
 #[derive(Clone, Copy, Debug)]
 pub struct LengthTokenFilter {
