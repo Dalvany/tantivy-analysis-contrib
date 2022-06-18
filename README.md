@@ -17,11 +17,11 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
 
 ## Features
 
-* `tokenizer` : it enables `ICUTokenizer`.
-* `normalizer` : it enables `ICUNormalizer2TokenFilter`.
-* `transform` : it enables `ICUTransformTokenFilter`
-* `icu` : all above features
-* `commons` : some common token filter
+* `icu` feature includes the following components  (they are also features) :
+    * `ICUTokenizer`
+    * `ICUNormalizer2TokenFilter`
+    * `ICUTransformTokenFilter`
+* `commons` features includes the following components
     * `LengthTokenFilter`
     * `TrimTokenFilter`
     * `LimitTokenCountFilter`
