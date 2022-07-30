@@ -25,6 +25,8 @@
 //! [ElisionFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/util/ElisionFilter.html)
 //!     * [StopTokenFilter](crate::commons::StopTokenFilter) filters out tokens, see
 //! [StopFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/core/StopFilter.html)
+//! * Phonetic :
+//!     * [PhoneticTokenFilter](crate::phonetic::PhoneticTokenFilter) a token filter to apply phonetic algorithm on tokens.
 //!
 //! # Example
 //!
@@ -145,3 +147,5 @@ extern crate derive_builder;
 pub mod commons;
 #[cfg(any(feature = "normalizer", feature = "tokenizer", feature = "transform"))]
 pub mod icu;
+#[cfg(feature = "phonetic")]
+pub mod phonetic;
