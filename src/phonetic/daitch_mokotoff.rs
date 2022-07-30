@@ -6,6 +6,7 @@ pub struct DaitchMokotoffTokenStream<'a> {
     pub encoder: DaitchMokotoffSoundex,
     pub branching: bool,
     pub codes: Vec<String>,
+    pub inject: bool,
 }
 
 impl<'a> TokenStream for DaitchMokotoffTokenStream<'a> {
@@ -15,6 +16,9 @@ impl<'a> TokenStream for DaitchMokotoffTokenStream<'a> {
             if !result {
                 return false;
             }
+            if self.tail.token().text.is_empty() {
+                return true;
+            }
 
             self.codes = self
                 .encoder
@@ -23,6 +27,10 @@ impl<'a> TokenStream for DaitchMokotoffTokenStream<'a> {
                 .filter(|v| !v.is_empty())
                 .cloned()
                 .collect();
+
+            if self.inject {
+                return true;
+            }
         }
 
         let code = self.codes.pop();

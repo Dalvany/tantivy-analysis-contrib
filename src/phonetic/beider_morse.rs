@@ -6,6 +6,7 @@ pub struct BeiderMorseTokenStream<'a> {
     pub encoder: BeiderMorse,
     pub codes: Vec<String>,
     pub languages: Option<LanguageSet>,
+    pub inject: bool,
 }
 
 impl<'a> TokenStream for BeiderMorseTokenStream<'a> {
@@ -13,6 +14,9 @@ impl<'a> TokenStream for BeiderMorseTokenStream<'a> {
         while self.codes.is_empty() {
             if !self.tail.advance() {
                 return false;
+            }
+            if self.tail.token().text.is_empty() {
+                return true;
             }
 
             let encoded = match &self.languages {
@@ -24,7 +28,7 @@ impl<'a> TokenStream for BeiderMorseTokenStream<'a> {
             let mut start_token = 0;
             let mut end_token = 0;
             let mut start = true;
-            // "Simple" parsing of potential nested (...|...|...)-(...|...|...)
+            // "Simple" parsing of potentially nested (...|...|...)-(...|...|...)
             for (index, ch) in encoded.char_indices() {
                 if ch != '(' && ch != ')' && ch != '-' && ch != '|' {
                     if start {
@@ -41,12 +45,19 @@ impl<'a> TokenStream for BeiderMorseTokenStream<'a> {
                     start = true;
                 }
             }
+            if self.inject {
+                return true;
+            }
         }
 
-        // Here self.codes can't be empty because of "early" return
-        // when self.tail.advance() is false.
-        self.tail.token_mut().text = self.codes.pop().unwrap();
-        true
+        let code = self.codes.pop();
+        match code {
+            Some(code) => {
+                self.tail.token_mut().text = code;
+                true
+            }
+            None => false,
+        }
     }
 
     fn token(&self) -> &Token {

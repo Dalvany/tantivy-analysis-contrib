@@ -102,7 +102,9 @@ pub enum PhoneticAlgorithm {
     DaitchMokotoffSoundex(String, bool, bool),
     /// [DoubleMetaphone] algorithm. The integer is maximum length of generated codes.
     /// If `None` is provided, then the default maximum code length will apply.
-    DoubleMetaphone(Option<usize>),
+    ///
+    /// Boolean indicate if we also want to encode alternate value (`true`) or not (`false`).
+    DoubleMetaphone(Option<usize>, bool),
     /// This is the [MatchRatingApproach] algorithm.
     MatchRatingApproach,
     /// [Metaphone] algorithm. The integer is maximum length of generated codes.
@@ -133,7 +135,7 @@ enum EncoderAlgorithm {
     Caverphone2(Caverphone2),
     Cologne(Cologne),
     DaitchMokotoffSoundex(DaitchMokotoffSoundex, bool),
-    DoubleMetaphone(DoubleMetaphone),
+    DoubleMetaphone(DoubleMetaphone, bool),
     MatchRatingApproach(MatchRatingApproach),
     Metaphone(Metaphone),
     Nysiis(Nysiis),
@@ -205,12 +207,26 @@ impl TryFrom<PhoneticAlgorithm> for EncoderAlgorithm {
                     .build()?;
                 Ok(EncoderAlgorithm::DaitchMokotoffSoundex(encoder, branching))
             }
-            PhoneticAlgorithm::DoubleMetaphone(max_code_length) => match max_code_length {
-                None => Ok(EncoderAlgorithm::DoubleMetaphone(DoubleMetaphone::default())),
-                Some(max_code_length) => Ok(EncoderAlgorithm::DoubleMetaphone(
-                    DoubleMetaphone::new(max_code_length),
-                )),
-            },
+            PhoneticAlgorithm::DoubleMetaphone(max_code_length, use_alternate) => {
+                match (max_code_length, use_alternate) {
+                    (None, true) => Ok(EncoderAlgorithm::DoubleMetaphone(
+                        DoubleMetaphone::default(),
+                        use_alternate,
+                    )),
+                    (Some(max_code_length), true) => Ok(EncoderAlgorithm::DoubleMetaphone(
+                        DoubleMetaphone::new(max_code_length),
+                        use_alternate,
+                    )),
+                    (None, false) => Ok(EncoderAlgorithm::DoubleMetaphone(
+                        DoubleMetaphone::default(),
+                        use_alternate,
+                    )),
+                    (Some(max_code_length), false) => Ok(EncoderAlgorithm::DoubleMetaphone(
+                        DoubleMetaphone::new(max_code_length),
+                        use_alternate,
+                    )),
+                }
+            }
             PhoneticAlgorithm::MatchRatingApproach => {
                 Ok(EncoderAlgorithm::MatchRatingApproach(MatchRatingApproach))
             }
@@ -250,6 +266,7 @@ impl TryFrom<PhoneticAlgorithm> for EncoderAlgorithm {
 #[derive(Clone, Debug)]
 pub struct PhoneticTokenFilter {
     algorithm: EncoderAlgorithm,
+    inject: bool,
 }
 
 impl TokenFilter for PhoneticTokenFilter {
@@ -262,6 +279,7 @@ impl TokenFilter for PhoneticTokenFilter {
                     encoder: encoder.clone(),
                     codes: vec![],
                     languages: languages_set.clone(),
+                    inject: self.inject,
                 })
             }
             // Caverphone1
@@ -269,6 +287,8 @@ impl TokenFilter for PhoneticTokenFilter {
                 BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
                     encoder: Box::new(*encoder),
+                    backup: None,
+                    inject: self.inject,
                 })
             }
             // Caverphone2
@@ -276,6 +296,8 @@ impl TokenFilter for PhoneticTokenFilter {
                 BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
                     encoder: Box::new(*encoder),
+                    backup: None,
+                    inject: self.inject,
                 })
             }
             // Cologne
@@ -283,6 +305,8 @@ impl TokenFilter for PhoneticTokenFilter {
                 BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
                     encoder: Box::new(*encoder),
+                    backup: None,
+                    inject: self.inject,
                 })
             }
             EncoderAlgorithm::DaitchMokotoffSoundex(encoder, branching) => {
@@ -290,22 +314,32 @@ impl TokenFilter for PhoneticTokenFilter {
                     tail: token_stream,
                     encoder: encoder.clone(),
                     branching: *branching,
-                    codes: Vec::new(),
+                    codes: vec![],
+                    inject: self.inject,
                 })
             }
             // Double Metaphone
-            EncoderAlgorithm::DoubleMetaphone(encoder) => {
-                BoxTokenStream::from(DoubleMetaphoneTokenStream {
+            EncoderAlgorithm::DoubleMetaphone(encoder, use_alternate) => match use_alternate {
+                true => BoxTokenStream::from(DoubleMetaphoneTokenStream {
                     tail: token_stream,
                     encoder: *encoder,
-                    alternate: None,
-                })
-            }
+                    codes: vec![],
+                    inject: self.inject,
+                }),
+                false => BoxTokenStream::from(GenericPhoneticTokenStream {
+                    tail: token_stream,
+                    encoder: Box::new(encoder.clone()),
+                    inject: self.inject,
+                    backup: None,
+                }),
+            },
             // Match Rating Approach
             EncoderAlgorithm::MatchRatingApproach(encoder) => {
                 BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
                     encoder: Box::new(*encoder),
+                    backup: None,
+                    inject: self.inject,
                 })
             }
             // Metaphone
@@ -313,18 +347,24 @@ impl TokenFilter for PhoneticTokenFilter {
                 BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
                     encoder: Box::new(*encoder),
+                    backup: None,
+                    inject: self.inject,
                 })
             }
             // Nysiis
             EncoderAlgorithm::Nysiis(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
                 tail: token_stream,
                 encoder: Box::new(*encoder),
+                backup: None,
+                inject: self.inject,
             }),
             // Refined Soundex
             EncoderAlgorithm::RefinedSoundex(encoder) => {
                 BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
                     encoder: Box::new(*encoder),
+                    backup: None,
+                    inject: self.inject,
                 })
             }
             // Soundex
@@ -332,6 +372,8 @@ impl TokenFilter for PhoneticTokenFilter {
                 BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
                     encoder: Box::new(*encoder),
+                    backup: None,
+                    inject: self.inject,
                 })
             }
         }
@@ -340,11 +382,34 @@ impl TokenFilter for PhoneticTokenFilter {
 
 /// Get the token filter from a [PhoneticAlgorithm]. This will
 /// take care of all the boilerplate.
+///
+/// The boolean indicates if encoded values should be treated as synonyms (`true`), in
+/// this case the original token will be present, or if it should replace (`false`) the
+/// original token.
+impl TryFrom<(PhoneticAlgorithm, bool)> for PhoneticTokenFilter {
+    type Error = Error;
+
+    fn try_from((value, inject): (PhoneticAlgorithm, bool)) -> Result<Self, Self::Error> {
+        let algorithm: EncoderAlgorithm = value.try_into()?;
+        Ok(Self { algorithm, inject })
+    }
+}
+
+/// Get the token filter from a [PhoneticAlgorithm]. This will
+/// take care of all the boilerplate.
+///
+/// Encoded values will be added as synonyms, that means the original
+/// token will be present.
 impl TryFrom<PhoneticAlgorithm> for PhoneticTokenFilter {
     type Error = Error;
 
     fn try_from(value: PhoneticAlgorithm) -> Result<Self, Self::Error> {
         let algorithm: EncoderAlgorithm = value.try_into()?;
-        Ok(Self { algorithm })
+        Ok(Self {
+            algorithm,
+            inject: true,
+        })
     }
 }
+
+// Tests are in the respective token stream tested/
