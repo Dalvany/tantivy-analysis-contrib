@@ -27,7 +27,7 @@ impl<'a> TokenStream for DoubleMetaphoneTokenStream<'a> {
                 if primary.is_empty() && alternate.is_empty() && self.inject {
                     return true;
                 }
-                if !primary.is_empty() && !primary.is_empty() {
+                if !primary.is_empty() && !alternate.is_empty() && primary != alternate {
                     // None of the primary and the alternate are empty, then we set the whole thing.
                     if self.inject {
                         self.codes.push(primary);
@@ -69,5 +69,210 @@ impl<'a> TokenStream for DoubleMetaphoneTokenStream<'a> {
 
     fn token_mut(&mut self) -> &mut Token {
         self.tail.token_mut()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use tantivy::tokenizer::Token;
+
+    use crate::phonetic::tests::{token_stream_helper, token_stream_helper_raw};
+    use crate::phonetic::{Error, PhoneticAlgorithm, PhoneticTokenFilter};
+
+    #[test]
+    fn test_size_4_not_inject() -> Result<(), Error> {
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(4), true);
+        let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
+
+        let result = token_stream_helper("international", token_filter);
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 13,
+            position: 0,
+            text: "ANTR".to_string(),
+            position_length: 1,
+        }];
+
+        assert_eq!(result, expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_size_4_inject() -> Result<(), Error> {
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(4), true);
+        let token_filter: PhoneticTokenFilter = (algorithm, true).try_into()?;
+
+        let result = token_stream_helper("international", token_filter);
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 13,
+                position: 0,
+                text: "international".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 13,
+                position: 0,
+                text: "ANTR".to_string(),
+                position_length: 1,
+            },
+        ];
+
+        assert_eq!(result, expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_alternate_not_inject_false() -> Result<(), Error> {
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(4), true);
+        let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
+
+        let result = token_stream_helper("Kuczewski", token_filter);
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 9,
+                position: 0,
+                text: "KSSK".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 9,
+                position: 0,
+                text: "KXFS".to_string(),
+                position_length: 1,
+            },
+        ];
+
+        assert_eq!(result, expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_size_8_not_inject() -> Result<(), Error> {
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+        let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
+
+        let result = token_stream_helper("international", token_filter);
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 13,
+            position: 0,
+            text: "ANTRNXNL".to_string(),
+            position_length: 1,
+        }];
+
+        assert_eq!(result, expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_non_convertable_strings_with_inject() -> Result<(), Error> {
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+        let token_filter: PhoneticTokenFilter = (algorithm, true).try_into()?;
+
+        let result = token_stream_helper("12345 #$%@#^%&", token_filter);
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "12345".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 14,
+                position: 1,
+                text: "#$%@#^%&".to_string(),
+                position_length: 1,
+            },
+        ];
+
+        assert_eq!(result, expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_non_convertable_strings_without_inject() -> Result<(), Error> {
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+
+        let token_filter: PhoneticTokenFilter = (&algorithm, false).try_into()?;
+        let result = token_stream_helper("12345 #$%@#^%&", token_filter);
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "12345".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 14,
+                position: 1,
+                text: "#$%@#^%&".to_string(),
+                position_length: 1,
+            },
+        ];
+
+        assert_eq!(result, expected);
+
+        let token_filter: PhoneticTokenFilter = (&algorithm, false).try_into()?;
+        let result = token_stream_helper("12345 #$%@#^%& hello", token_filter);
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "12345".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 6,
+                offset_to: 14,
+                position: 1,
+                text: "#$%@#^%&".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 15,
+                offset_to: 20,
+                position: 2,
+                text: "HL".to_string(),
+                position_length: 1,
+            },
+        ];
+
+        assert_eq!(result, expected);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty_term() -> Result<(), Error> {
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+        let token_filter: PhoneticTokenFilter = (algorithm, true).try_into()?;
+
+        let result = token_stream_helper_raw("", token_filter);
+        let expected = vec![Token {
+            offset_from: 0,
+            offset_to: 0,
+            position: 0,
+            text: "".to_string(),
+            position_length: 1,
+        }];
+
+        assert_eq!(result, expected);
+
+        Ok(())
     }
 }

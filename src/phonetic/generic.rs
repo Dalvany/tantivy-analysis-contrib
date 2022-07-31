@@ -60,22 +60,10 @@ impl<'a> TokenStream for GenericPhoneticTokenStream<'a> {
 
 #[cfg(test)]
 mod tests {
-    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token};
+    use tantivy::tokenizer::Token;
 
-    use crate::phonetic::tests::token_stream_helper;
+    use crate::phonetic::tests::{token_stream_helper, token_stream_helper_raw};
     use crate::phonetic::{Error, PhoneticAlgorithm, PhoneticTokenFilter};
-
-    fn token_stream_helper_raw(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(RawTokenizer)
-            .filter(token_filter)
-            .token_stream(text);
-        let mut tokens = vec![];
-        let mut add_token = |token: &Token| {
-            tokens.push(token.clone());
-        };
-        token_stream.process(&mut add_token);
-        tokens
-    }
 
     #[test]
     fn test_metaphone_inject() -> Result<(), Error> {

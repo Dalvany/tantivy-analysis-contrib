@@ -476,10 +476,22 @@ impl TryFrom<&PhoneticAlgorithm> for PhoneticTokenFilter {
 #[cfg(test)]
 pub(crate) mod tests {
     use crate::phonetic::PhoneticTokenFilter;
-    use tantivy::tokenizer::{TextAnalyzer, Token, WhitespaceTokenizer};
+    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token, WhitespaceTokenizer};
 
     pub fn token_stream_helper(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
+            .filter(token_filter)
+            .token_stream(text);
+        let mut tokens = vec![];
+        let mut add_token = |token: &Token| {
+            tokens.push(token.clone());
+        };
+        token_stream.process(&mut add_token);
+        tokens
+    }
+
+    pub fn token_stream_helper_raw(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
+        let mut token_stream = TextAnalyzer::from(RawTokenizer)
             .filter(token_filter)
             .token_stream(text);
         let mut tokens = vec![];
