@@ -200,7 +200,7 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
                     None => DaitchMokotoffSoundexBuilder::default()
                         .ascii_folding(*ascii_folding)
                         .build()?,
-                    Some(rules) => DaitchMokotoffSoundexBuilder::with_rules(&rules)
+                    Some(rules) => DaitchMokotoffSoundexBuilder::with_rules(rules)
                         .ascii_folding(*ascii_folding)
                         .build()?,
                 };
@@ -360,7 +360,7 @@ impl TokenFilter for PhoneticTokenFilter {
                 }),
                 false => BoxTokenStream::from(GenericPhoneticTokenStream {
                     tail: token_stream,
-                    encoder: Box::new(encoder.clone()),
+                    encoder: Box::new(*encoder),
                     inject: self.inject,
                     backup: None,
                 }),
