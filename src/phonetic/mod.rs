@@ -10,6 +10,8 @@ use rphonetic::{
 };
 use tantivy::tokenizer::{BoxTokenStream, TokenFilter};
 
+pub use types::*;
+
 use crate::phonetic::beider_morse::BeiderMorseTokenStream;
 use crate::phonetic::daitch_mokotoff::DaitchMokotoffTokenStream;
 use crate::phonetic::double_metaphone::DoubleMetaphoneTokenStream;
@@ -19,6 +21,7 @@ mod beider_morse;
 mod daitch_mokotoff;
 mod double_metaphone;
 mod generic;
+mod types;
 
 /// Errors from encoder.
 #[derive(Debug, Clone, PartialEq)]
@@ -46,6 +49,8 @@ impl std::error::Error for Error {}
 /// These are different algorithms from [rphonetic crate](https://docs.rs/rphonetic/1.0.0/rphonetic/).
 ///
 /// It tries to remove most of the boilerplate of getting an [Encoder].
+///
+/// Parameters are mostly wrapper to make clearer what they means.
 #[derive(Clone, Debug)]
 pub enum PhoneticAlgorithm {
     /// [BeiderMorse] algorithm.
@@ -59,20 +64,14 @@ pub enum PhoneticAlgorithm {
     /// The [RuleType] allolw you to choose between [approx](RuleType::Approx) and [exact](RuleType::Exact).
     /// If none is provided, the default is `approx`.
     ///
-    /// The boolean indicates if multiple tokens should be concatenated using `|`. If none is provided, it
-    /// will default to `true`.
-    ///
-    /// The integer allow to choose the maximum number of phoneme the encoder will generator. If none is
-    /// provided, it will default to 20.
-    ///
-    /// Finally, you have to provide a set of language. They must be supported by your rule files. If the list
+    /// You have to provide a set of language. They must be supported by your rule files. If the list
     /// is empty, the encoder will try to guess languages.
     BeiderMorse(
         &'static ConfigFiles,
         Option<NameType>,
         Option<RuleType>,
-        Option<bool>,
-        Option<usize>,
+        Concat,
+        MaxPhonemeNumber,
         Vec<String>,
     ),
     /// [Caverphone1] algorithm.
@@ -81,47 +80,31 @@ pub enum PhoneticAlgorithm {
     Caverphone2,
     /// [Cologne] algorithm.
     Cologne,
-    #[cfg(feature = "embedded_dm")]
-    /// [DaitchMokotoffSoundex] algorithm. If you want to use non default rules,
-    /// you need to provide the encoder's rules as a string.
-    ///
-    /// The first boolean indicates if encoder should apply any folding rules (if
-    /// there are any).
-    ///
-    /// The second boolean indicates if we allow branching. In this case, multiple code
-    /// can be generated, otherwise, there will be only one.
-    DaitchMokotoffSoundex(Option<String>, bool, bool),
-    #[cfg(not(feature = "embedded_dm"))]
     /// [DaitchMokotoffSoundex] algorithm. You will need to provide the encoder's
     /// rules as a string.
     ///
-    /// The first boolean indicates if encoder should apply any folding rules (if
-    /// there are any).
-    ///
-    /// The second boolean indicates if we allow branching. In this case, multiple code
-    /// can be generated, otherwise, there will be only one.
-    DaitchMokotoffSoundex(String, bool, bool),
+    DaitchMokotoffSoundex(DMRule, Folding, Branching),
     /// [DoubleMetaphone] algorithm. The integer is maximum length of generated codes.
     /// If `None` is provided, then the default maximum code length will apply.
     ///
     /// Boolean indicate if we also want to encode alternate value (`true`) or not (`false`).
-    DoubleMetaphone(Option<usize>, bool),
+    DoubleMetaphone(MaxCodeLength, Alternate),
     /// This is the [MatchRatingApproach] algorithm.
     MatchRatingApproach,
     /// [Metaphone] algorithm. The integer is maximum length of generated codes.
     /// If `None` is provided, then the default maximum code length will apply.
-    Metaphone(Option<usize>),
+    Metaphone(MaxCodeLength),
     /// [Nysiis] algorithm. The boolean indicate if codes will be strict or not.
     /// If `None` it will use the default.
-    Nysiis(Option<bool>),
+    Nysiis(Strict),
     /// [RefinedSoundex] algorithm. If you provide a mapping it will be use, otherwise
     /// [DEFAULT_US_ENGLISH_MAPPING_SOUNDEX] will apply.
-    RefinedSoundex(Option<[char; 26]>),
+    RefinedSoundex(Mapping),
     /// [Soundex] algorithm. If you provide a mapping it will be use, otherwise
     /// [DEFAULT_US_ENGLISH_MAPPING_SOUNDEX] will apply.
     /// the boolean indicates `H` and `W` should be treated as silence. If `None`
     /// is provided, then default to `true`.
-    Soundex(Option<[char; 26]>, Option<bool>),
+    Soundex(Mapping, SpecialHW),
 }
 
 // Indirection for getting the filter.
@@ -186,8 +169,8 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
                     config_files,
                     *name_type,
                     *rule_type,
-                    *concat,
-                    *max_phonames,
+                    concat.0,
+                    max_phonames.0,
                     languages_set,
                 ))
             }
@@ -196,71 +179,70 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
             PhoneticAlgorithm::Cologne => Ok(EncoderAlgorithm::Cologne(Cologne)),
             #[cfg(feature = "embedded_dm")]
             PhoneticAlgorithm::DaitchMokotoffSoundex(rules, ascii_folding, branching) => {
-                let encoder = match rules {
+                let encoder = match &rules.0 {
                     None => DaitchMokotoffSoundexBuilder::default()
-                        .ascii_folding(*ascii_folding)
+                        .ascii_folding(ascii_folding.0)
                         .build()?,
-                    Some(rules) => DaitchMokotoffSoundexBuilder::with_rules(rules)
-                        .ascii_folding(*ascii_folding)
+                    Some(rules) => DaitchMokotoffSoundexBuilder::with_rules(rules.as_str())
+                        .ascii_folding(ascii_folding.0)
                         .build()?,
                 };
-                Ok(EncoderAlgorithm::DaitchMokotoffSoundex(encoder, *branching))
+                Ok(EncoderAlgorithm::DaitchMokotoffSoundex(
+                    encoder,
+                    branching.0,
+                ))
             }
             #[cfg(not(feature = "embedded_dm"))]
             PhoneticAlgorithm::DaitchMokotoffSoundex(rules, ascii_folding, branching) => {
-                let encoder = DaitchMokotoffSoundexBuilder::with_rules(rules)
-                    .ascii_folding(*ascii_folding)
+                let encoder = DaitchMokotoffSoundexBuilder::with_rules(rules.0.as_str())
+                    .ascii_folding(ascii_folding.0)
                     .build()?;
-                Ok(EncoderAlgorithm::DaitchMokotoffSoundex(encoder, *branching))
+                Ok(EncoderAlgorithm::DaitchMokotoffSoundex(
+                    encoder,
+                    branching.0,
+                ))
             }
             PhoneticAlgorithm::DoubleMetaphone(max_code_length, use_alternate) => {
-                match (max_code_length, use_alternate) {
-                    (None, true) => Ok(EncoderAlgorithm::DoubleMetaphone(
+                // alternate : if true use specific token filter, otherwise, use generic
+                match max_code_length.0 {
+                    None => Ok(EncoderAlgorithm::DoubleMetaphone(
                         DoubleMetaphone::default(),
-                        *use_alternate,
+                        use_alternate.0,
                     )),
-                    (Some(max_code_length), true) => Ok(EncoderAlgorithm::DoubleMetaphone(
-                        DoubleMetaphone::new(*max_code_length),
-                        *use_alternate,
-                    )),
-                    (None, false) => Ok(EncoderAlgorithm::DoubleMetaphone(
-                        DoubleMetaphone::default(),
-                        *use_alternate,
-                    )),
-                    (Some(max_code_length), false) => Ok(EncoderAlgorithm::DoubleMetaphone(
-                        DoubleMetaphone::new(*max_code_length),
-                        *use_alternate,
+                    Some(max_code_length) => Ok(EncoderAlgorithm::DoubleMetaphone(
+                        DoubleMetaphone::new(max_code_length),
+                        use_alternate.0,
                     )),
                 }
             }
             PhoneticAlgorithm::MatchRatingApproach => {
                 Ok(EncoderAlgorithm::MatchRatingApproach(MatchRatingApproach))
             }
-            PhoneticAlgorithm::Metaphone(max_code_length) => match max_code_length {
+            PhoneticAlgorithm::Metaphone(max_code_length) => match max_code_length.0 {
                 None => Ok(EncoderAlgorithm::Metaphone(Metaphone::default())),
-                Some(max_code_length) => Ok(EncoderAlgorithm::Metaphone(Metaphone::new(
-                    *max_code_length,
-                ))),
+                Some(max_code_length) => {
+                    Ok(EncoderAlgorithm::Metaphone(Metaphone::new(max_code_length)))
+                }
             },
-            PhoneticAlgorithm::Nysiis(strict) => match strict {
+            PhoneticAlgorithm::Nysiis(strict) => match strict.0 {
                 None => Ok(EncoderAlgorithm::Nysiis(Nysiis::default())),
-                Some(strict) => Ok(EncoderAlgorithm::Nysiis(Nysiis::new(*strict))),
+                Some(strict) => Ok(EncoderAlgorithm::Nysiis(Nysiis::new(strict))),
             },
-            PhoneticAlgorithm::RefinedSoundex(mapping) => match mapping {
+            PhoneticAlgorithm::RefinedSoundex(mapping) => match mapping.0 {
                 None => Ok(EncoderAlgorithm::RefinedSoundex(RefinedSoundex::default())),
                 Some(mapping) => Ok(EncoderAlgorithm::RefinedSoundex(RefinedSoundex::new(
-                    *mapping,
+                    mapping,
                 ))),
             },
-            PhoneticAlgorithm::Soundex(mapping, special_h_w) => match (mapping, special_h_w) {
+            PhoneticAlgorithm::Soundex(mapping, special_h_w) => match (mapping.0, special_h_w.0) {
                 (None, None) => Ok(EncoderAlgorithm::Soundex(Soundex::default())),
-                (Some(mapping), None) => Ok(EncoderAlgorithm::Soundex(Soundex::from(*mapping))),
+                (Some(mapping), None) => Ok(EncoderAlgorithm::Soundex(Soundex::from(mapping))),
                 (None, Some(w_h)) => Ok(EncoderAlgorithm::Soundex(Soundex::new(
                     DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
-                    *w_h,
+                    w_h,
                 ))),
                 (Some(mapping), Some(h_w)) => {
-                    Ok(EncoderAlgorithm::Soundex(Soundex::new(*mapping, *h_w)))
+                    Ok(EncoderAlgorithm::Soundex(Soundex::new(mapping, h_w)))
                 }
             },
         }
@@ -341,6 +323,7 @@ impl TokenFilter for PhoneticTokenFilter {
                     inject: self.inject,
                 })
             }
+            // Daitch Mokotoff
             EncoderAlgorithm::DaitchMokotoffSoundex(encoder, branching) => {
                 BoxTokenStream::from(DaitchMokotoffTokenStream {
                     tail: token_stream,
@@ -352,6 +335,7 @@ impl TokenFilter for PhoneticTokenFilter {
             }
             // Double Metaphone
             EncoderAlgorithm::DoubleMetaphone(encoder, use_alternate) => match use_alternate {
+                // alternate : if true use specific token filter, otherwise, use generic
                 true => BoxTokenStream::from(DoubleMetaphoneTokenStream {
                     tail: token_stream,
                     encoder: *encoder,
@@ -475,8 +459,9 @@ impl TryFrom<&PhoneticAlgorithm> for PhoneticTokenFilter {
 // It contains the helper method...
 #[cfg(test)]
 pub(crate) mod tests {
-    use crate::phonetic::PhoneticTokenFilter;
     use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token, WhitespaceTokenizer};
+
+    use crate::phonetic::PhoneticTokenFilter;
 
     pub fn token_stream_helper(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)

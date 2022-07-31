@@ -59,17 +59,26 @@ mod tests {
     use tantivy::tokenizer::Token;
 
     use crate::phonetic::tests::{token_stream_helper, token_stream_helper_raw};
-    use crate::phonetic::{Error, PhoneticAlgorithm, PhoneticTokenFilter};
+    use crate::phonetic::{
+        Branching, DMRule, Error, Folding, PhoneticAlgorithm, PhoneticTokenFilter,
+    };
 
     const RULES: &str = include_str!("../../test_assets/dm-cc-rules/dmrules.txt");
 
     #[test]
     fn test_algorithms_inject() -> Result<(), Error> {
         #[cfg(feature = "embedded_dm")]
-        let algorithm =
-            PhoneticAlgorithm::DaitchMokotoffSoundex(Some(RULES.to_string()), true, true);
+        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(
+            DMRule(Some(RULES.to_string())),
+            Folding(true),
+            Branching(true),
+        );
         #[cfg(not(feature = "embedded_dm"))]
-        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(RULES.to_string(), true, true);
+        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(
+            DMRule(RULES.to_string()),
+            Folding(true),
+            Branching(true),
+        );
 
         let token_filter: PhoneticTokenFilter = (algorithm, true).try_into()?;
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -175,10 +184,17 @@ mod tests {
     #[test]
     fn test_algorithms_not_inject() -> Result<(), Error> {
         #[cfg(feature = "embedded_dm")]
-        let algorithm =
-            PhoneticAlgorithm::DaitchMokotoffSoundex(Some(RULES.to_string()), true, true);
+        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(
+            DMRule(Some(RULES.to_string())),
+            Folding(true),
+            Branching(true),
+        );
         #[cfg(not(feature = "embedded_dm"))]
-        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(RULES.to_string(), true, true);
+        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(
+            DMRule(RULES.to_string()),
+            Folding(true),
+            Branching(true),
+        );
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -256,10 +272,17 @@ mod tests {
     #[test]
     fn test_empty_term() -> Result<(), Error> {
         #[cfg(feature = "embedded_dm")]
-        let algorithm =
-            PhoneticAlgorithm::DaitchMokotoffSoundex(Some(RULES.to_string()), true, true);
+        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(
+            DMRule(Some(RULES.to_string())),
+            Folding(true),
+            Branching(true),
+        );
         #[cfg(not(feature = "embedded_dm"))]
-        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(RULES.to_string(), true, true);
+        let algorithm = PhoneticAlgorithm::DaitchMokotoffSoundex(
+            DMRule(RULES.to_string()),
+            Folding(true),
+            Branching(true),
+        );
 
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 

@@ -77,11 +77,13 @@ mod tests {
     use tantivy::tokenizer::Token;
 
     use crate::phonetic::tests::{token_stream_helper, token_stream_helper_raw};
-    use crate::phonetic::{Error, PhoneticAlgorithm, PhoneticTokenFilter};
+    use crate::phonetic::{
+        Alternate, Error, MaxCodeLength, PhoneticAlgorithm, PhoneticTokenFilter,
+    };
 
     #[test]
     fn test_size_4_not_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(4), true);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(Some(4)), Alternate(true));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("international", token_filter);
@@ -100,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_size_4_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(4), true);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(Some(4)), Alternate(true));
         let token_filter: PhoneticTokenFilter = (algorithm, true).try_into()?;
 
         let result = token_stream_helper("international", token_filter);
@@ -128,7 +130,7 @@ mod tests {
 
     #[test]
     fn test_alternate_not_inject_false() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(4), true);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(Some(4)), Alternate(true));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("Kuczewski", token_filter);
@@ -156,7 +158,7 @@ mod tests {
 
     #[test]
     fn test_size_8_not_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(Some(8)), Alternate(true));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("international", token_filter);
@@ -175,7 +177,7 @@ mod tests {
 
     #[test]
     fn test_non_convertable_strings_with_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(Some(8)), Alternate(true));
         let token_filter: PhoneticTokenFilter = (algorithm, true).try_into()?;
 
         let result = token_stream_helper("12345 #$%@#^%&", token_filter);
@@ -203,7 +205,7 @@ mod tests {
 
     #[test]
     fn test_non_convertable_strings_without_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(Some(8)), Alternate(true));
 
         let token_filter: PhoneticTokenFilter = (&algorithm, false).try_into()?;
         let result = token_stream_helper("12345 #$%@#^%&", token_filter);
@@ -259,7 +261,7 @@ mod tests {
 
     #[test]
     fn test_empty_term() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(Some(8), true);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(Some(8)), Alternate(true));
         let token_filter: PhoneticTokenFilter = (algorithm, true).try_into()?;
 
         let result = token_stream_helper_raw("", token_filter);

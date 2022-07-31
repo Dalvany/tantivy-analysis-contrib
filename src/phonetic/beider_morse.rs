@@ -1,5 +1,6 @@
-use rphonetic::{BeiderMorse, Encoder, LanguageSet};
 use std::collections::VecDeque;
+
+use rphonetic::{BeiderMorse, Encoder, LanguageSet};
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream};
 
 pub struct BeiderMorseTokenStream<'a> {
@@ -85,7 +86,7 @@ mod tests {
     use rphonetic::{ConfigFiles, RuleType};
 
     use crate::phonetic::tests::token_stream_helper;
-    use crate::phonetic::{Error, PhoneticAlgorithm};
+    use crate::phonetic::{Concat, Error, MaxPhonemeNumber, PhoneticAlgorithm};
 
     use super::*;
 
@@ -100,8 +101,8 @@ mod tests {
             &*CONFIG_FILES,
             None,
             Some(RuleType::Exact),
-            Some(true),
-            None,
+            Concat(Some(true)),
+            MaxPhonemeNumber(None),
             vec![],
         );
 
@@ -266,8 +267,8 @@ mod tests {
             &*CONFIG_FILES,
             None,
             Some(RuleType::Exact),
-            Some(true),
-            None,
+            Concat(Some(true)),
+            MaxPhonemeNumber(None),
             vec![],
         );
 
@@ -418,8 +419,8 @@ mod tests {
             &*CONFIG_FILES,
             None,
             Some(RuleType::Exact),
-            Some(true),
-            None,
+            Concat(Some(true)),
+            MaxPhonemeNumber(None),
             vec![
                 "italian".to_string(),
                 "greek".to_string(),
@@ -463,8 +464,8 @@ mod tests {
             &*CONFIG_FILES,
             None,
             Some(RuleType::Exact),
-            Some(true),
-            None,
+            Concat(Some(true)),
+            MaxPhonemeNumber(None),
             vec![],
         );
 

@@ -63,11 +63,14 @@ mod tests {
     use tantivy::tokenizer::Token;
 
     use crate::phonetic::tests::{token_stream_helper, token_stream_helper_raw};
-    use crate::phonetic::{Error, PhoneticAlgorithm, PhoneticTokenFilter};
+    use crate::phonetic::{
+        Alternate, Error, Mapping, MaxCodeLength, PhoneticAlgorithm, PhoneticTokenFilter,
+        SpecialHW, Strict,
+    };
 
     #[test]
     fn test_metaphone_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::Metaphone(None);
+        let algorithm = PhoneticAlgorithm::Metaphone(MaxCodeLength(None));
         let token_filter: PhoneticTokenFilter = algorithm.try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -138,7 +141,7 @@ mod tests {
 
     #[test]
     fn test_metaphone_not_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::Metaphone(None);
+        let algorithm = PhoneticAlgorithm::Metaphone(MaxCodeLength(None));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -181,7 +184,7 @@ mod tests {
 
     #[test]
     fn test_double_metaphone_no_alternate_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(None, false);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(None), Alternate(false));
         let token_filter: PhoneticTokenFilter = algorithm.try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -252,7 +255,7 @@ mod tests {
 
     #[test]
     fn test_double_metaphone_no_alternate_not_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::DoubleMetaphone(None, false);
+        let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(None), Alternate(false));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -295,7 +298,7 @@ mod tests {
 
     #[test]
     fn test_soundex_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::Soundex(None, None);
+        let algorithm = PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None));
         let token_filter: PhoneticTokenFilter = algorithm.try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -366,7 +369,7 @@ mod tests {
 
     #[test]
     fn test_soundex_not_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::Soundex(None, None);
+        let algorithm = PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -409,7 +412,7 @@ mod tests {
 
     #[test]
     fn test_refined_soundex_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::RefinedSoundex(None);
+        let algorithm = PhoneticAlgorithm::RefinedSoundex(Mapping(None));
         let token_filter: PhoneticTokenFilter = algorithm.try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -480,7 +483,7 @@ mod tests {
 
     #[test]
     fn test_refined_soundex_not_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::RefinedSoundex(None);
+        let algorithm = PhoneticAlgorithm::RefinedSoundex(Mapping(None));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -751,7 +754,7 @@ mod tests {
 
     #[test]
     fn test_nysiis_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::Nysiis(None);
+        let algorithm = PhoneticAlgorithm::Nysiis(Strict(None));
         let token_filter: PhoneticTokenFilter = algorithm.try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -822,7 +825,7 @@ mod tests {
 
     #[test]
     fn test_nysiis_not_inject() -> Result<(), Error> {
-        let algorithm = PhoneticAlgorithm::Nysiis(None);
+        let algorithm = PhoneticAlgorithm::Nysiis(Strict(None));
         let token_filter: PhoneticTokenFilter = (algorithm, false).try_into()?;
 
         let result = token_stream_helper("aaa bbb ccc easgasg", token_filter);
@@ -867,14 +870,23 @@ mod tests {
     fn test_numbers() -> Result<(), Error> {
         // No caverphone 1 & 2 because it will render 111111 & 11111111111
         let algorithms = vec![
-            (PhoneticAlgorithm::Metaphone(None), "Metaphone"),
             (
-                PhoneticAlgorithm::DoubleMetaphone(None, false),
+                PhoneticAlgorithm::Metaphone(MaxCodeLength(None)),
+                "Metaphone",
+            ),
+            (
+                PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(None), Alternate(false)),
                 "Double Metaphone (no alternate)",
             ),
-            (PhoneticAlgorithm::Soundex(None, None), "Soundex"),
-            (PhoneticAlgorithm::RefinedSoundex(None), "Refined Soundex"),
-            (PhoneticAlgorithm::Nysiis(None), "Nyiis"),
+            (
+                PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None)),
+                "Soundex",
+            ),
+            (
+                PhoneticAlgorithm::RefinedSoundex(Mapping(None)),
+                "Refined Soundex",
+            ),
+            (PhoneticAlgorithm::Nysiis(Strict(None)), "Nyiis"),
         ];
 
         for (algorithm, name) in &algorithms {
@@ -899,16 +911,25 @@ mod tests {
     fn test_empty_term() -> Result<(), Error> {
         let inject = vec![true, false];
         let algorithms = vec![
-            (PhoneticAlgorithm::Metaphone(None), "Metaphone"),
             (
-                PhoneticAlgorithm::DoubleMetaphone(None, false),
+                PhoneticAlgorithm::Metaphone(MaxCodeLength(None)),
+                "Metaphone",
+            ),
+            (
+                PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(None), Alternate(false)),
                 "Double Metaphone (no alternate)",
             ),
-            (PhoneticAlgorithm::Soundex(None, None), "Soundex"),
-            (PhoneticAlgorithm::RefinedSoundex(None), "Refined Soundex"),
+            (
+                PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None)),
+                "Soundex",
+            ),
+            (
+                PhoneticAlgorithm::RefinedSoundex(Mapping(None)),
+                "Refined Soundex",
+            ),
             (PhoneticAlgorithm::Caverphone1, "Caverphone 1"),
             (PhoneticAlgorithm::Caverphone2, "Caverphone 2"),
-            (PhoneticAlgorithm::Nysiis(None), "Nyiis"),
+            (PhoneticAlgorithm::Nysiis(Strict(None)), "Nyiis"),
         ];
 
         for inject in inject {
