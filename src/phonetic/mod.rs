@@ -208,7 +208,7 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
             }
             #[cfg(not(feature = "embedded_dm"))]
             PhoneticAlgorithm::DaitchMokotoffSoundex(rules, ascii_folding, branching) => {
-                let encoder = DaitchMokotoffSoundexBuilder::with_rules(&rules)
+                let encoder = DaitchMokotoffSoundexBuilder::with_rules(rules)
                     .ascii_folding(*ascii_folding)
                     .build()?;
                 Ok(EncoderAlgorithm::DaitchMokotoffSoundex(encoder, *branching))
@@ -346,7 +346,7 @@ impl TokenFilter for PhoneticTokenFilter {
                     tail: token_stream,
                     encoder: encoder.clone(),
                     branching: *branching,
-                    codes: vec![],
+                    codes: VecDeque::new(),
                     inject: self.inject,
                 })
             }
