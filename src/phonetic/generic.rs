@@ -24,10 +24,11 @@ impl<'a> TokenStream for GenericPhoneticTokenStream<'a> {
             if !tail_result {
                 return false;
             }
-            if self.tail.token().text.is_empty() {
+            let token = self.encoder.encode(&self.tail.token().text);
+
+            if self.tail.token().text.is_empty() || token.is_empty() {
                 return true;
             }
-            let token = self.encoder.encode(&self.tail.token().text);
 
             if token.is_empty() && self.inject {
                 // We only keep original token
@@ -59,20 +60,10 @@ impl<'a> TokenStream for GenericPhoneticTokenStream<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::phonetic::{Error, PhoneticAlgorithm, PhoneticTokenFilter};
-    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token, WhitespaceTokenizer};
+    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token};
 
-    fn token_stream_helper(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-            .filter(token_filter)
-            .token_stream(text);
-        let mut tokens = vec![];
-        let mut add_token = |token: &Token| {
-            tokens.push(token.clone());
-        };
-        token_stream.process(&mut add_token);
-        tokens
-    }
+    use crate::phonetic::tests::token_stream_helper;
+    use crate::phonetic::{Error, PhoneticAlgorithm, PhoneticTokenFilter};
 
     fn token_stream_helper_raw(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
         let mut token_stream = TextAnalyzer::from(RawTokenizer)
@@ -885,6 +876,38 @@ mod tests {
     }
 
     #[test]
+    fn test_numbers() -> Result<(), Error> {
+        // No caverphone 1 & 2 because it will render 111111 & 11111111111
+        let algorithms = vec![
+            (PhoneticAlgorithm::Metaphone(None), "Metaphone"),
+            (
+                PhoneticAlgorithm::DoubleMetaphone(None, false),
+                "Double Metaphone (no alternate)",
+            ),
+            (PhoneticAlgorithm::Soundex(None, None), "Soundex"),
+            (PhoneticAlgorithm::RefinedSoundex(None), "Refined Soundex"),
+            (PhoneticAlgorithm::Nysiis(None), "Nyiis"),
+        ];
+
+        for (algorithm, name) in &algorithms {
+            let token_filter = (algorithm, false).try_into()?;
+
+            let result = token_stream_helper_raw("1234", token_filter);
+            let expected = vec![Token {
+                offset_from: 0,
+                offset_to: 4,
+                position: 0,
+                text: "1234".to_string(),
+                position_length: 1,
+            }];
+
+            assert_eq!(result, expected, "\n{}", name);
+        }
+
+        Ok(())
+    }
+
+    #[test]
     fn test_empty_term() -> Result<(), Error> {
         let inject = vec![true, false];
         let algorithms = vec![
@@ -895,14 +918,14 @@ mod tests {
             ),
             (PhoneticAlgorithm::Soundex(None, None), "Soundex"),
             (PhoneticAlgorithm::RefinedSoundex(None), "Refined Soundex"),
-            //(PhoneticAlgorithm::Caverphone1, "Caverphone 1"),
+            (PhoneticAlgorithm::Caverphone1, "Caverphone 1"),
             (PhoneticAlgorithm::Caverphone2, "Caverphone 2"),
             (PhoneticAlgorithm::Nysiis(None), "Nyiis"),
         ];
 
         for inject in inject {
             for (algorithm, name) in &algorithms {
-                let token_filter = (algorithm.clone(), inject).try_into()?;
+                let token_filter = (algorithm, inject).try_into()?;
 
                 let result = token_stream_helper_raw("", token_filter);
                 let expected = vec![Token {
