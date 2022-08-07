@@ -47,3 +47,4 @@ either = {version = "1.7", optional = true}
 
 [dev-dependencies]
 lazy_static = "1"
+tempdir = "0"
