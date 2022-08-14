@@ -23,7 +23,7 @@ transform = ["rust_icu_sys", "rust_icu_utrans"]
 commons = ["derive_builder", "either", "fst"]
 
 [dependencies]
-tantivy = "0"
+tantivy = "0.18"
 
 # Switch to full icu lib when possible
 rust_icu_sys = { version = "2", optional = true }
@@ -32,7 +32,7 @@ rust_icu_ubrk = { version = "2", optional = true }
 rust_icu_utrans = { version = "2", optional = true }
 
 # Automaton
-fst = { version = "0", optional = true }
+fst = { version = "0.4", optional = true }
 
 derive_builder = { version = "0", optional = true }
 
