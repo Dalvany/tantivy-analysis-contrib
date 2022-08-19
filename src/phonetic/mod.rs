@@ -22,9 +22,9 @@
 //!     PhoneticTokenFilter,
 //!     SpecialHW
 //! };
-//! let algorithm = PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None));
 //!
-//! let token_filter:PhoneticTokenFilter = algorithm.try_into()?;
+//! let algorithm = PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None));
+//! let token_filter = PhoneticTokenFilter::try_from(algorithm)?;
 //! #   Ok(())
 //! # }
 //! ```
@@ -292,7 +292,7 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
 ///
 /// // Example with Double Metaphone.
 /// let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(None), Alternate(false));
-/// let token_filter = algorithm.try_into()?;
+/// let token_filter = PhoneticTokenFilter::try_from(algorithm)?;
 ///
 /// // Another example with Nysiis
 /// let algorithm = PhoneticAlgorithm::Nysiis(Strict(None));
