@@ -1,6 +1,10 @@
 # Changelog
 
-## Next
+## 0.5.0
+
+* Add phonetic algorithms with a `PhoneticTokenFilter`
+
+## 0.4.0
 
 * Add clippy workflow
 * Fix clippy warnings
