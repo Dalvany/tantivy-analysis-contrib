@@ -1,4 +1,31 @@
 //! This module provide phonetic capabilities through several algorithm.
+//!
+//! It contains the following algorithms :
+//! * Beider-Morse
+//! * Caverphone 1 & 2
+//! * Cologne
+//! * Daitch Mokotoff Soundex
+//! * Double Metaphone
+//! * Match Rating Approach
+//! * Metaphone
+//! * Nysiis
+//! * Refined Soundex
+//! * Soundex
+//!
+//! To get a [PhoneticTokenFilter] you need to use [PhoneticAlgorithm] :
+//!
+//! ```rust
+//! # fn main() -> Result<(), tantivy_analysis_contrib::phonetic::Error> {
+//! use tantivy_analysis_contrib::phonetic::{Mapping, PhoneticAlgorithm, PhoneticTokenFilter, SpecialHW};
+//! let algorithm = PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None));
+//!
+//! let token_filter:PhoneticTokenFilter = algorithm.try_into()?;
+//! #   Ok(())
+//! # }
+//! ```
+//!
+//! Every parameter of [PhoneticAlgorithm]'s variant are typed to try to make it clear what are their purpose. Most of
+//! them are [Option] allowing to use default values.
 use std::collections::VecDeque;
 use std::fmt::{Display, Formatter};
 
