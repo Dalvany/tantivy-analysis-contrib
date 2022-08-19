@@ -16,7 +16,12 @@
 //!
 //! ```rust
 //! # fn main() -> Result<(), tantivy_analysis_contrib::phonetic::Error> {
-//! use tantivy_analysis_contrib::phonetic::{Mapping, PhoneticAlgorithm, PhoneticTokenFilter, SpecialHW};
+//! use tantivy_analysis_contrib::phonetic::{
+//!     Mapping,
+//!     PhoneticAlgorithm,
+//!     PhoneticTokenFilter,
+//!     SpecialHW
+//! };
 //! let algorithm = PhoneticAlgorithm::Soundex(Mapping(None), SpecialHW(None));
 //!
 //! let token_filter:PhoneticTokenFilter = algorithm.try_into()?;
@@ -278,6 +283,24 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
 
 /// This the phonetic token filter. It generates token according
 /// to the algorithm provided.
+///
+/// You should use [PhoneticAlgorithm] to construct a new [PhoneticTokenFilter].
+///
+/// ```rust
+/// # fn main() -> Result<(), tantivy_analysis_contrib::phonetic::Error> {
+/// use tantivy_analysis_contrib::phonetic::{Alternate, MaxCodeLength, PhoneticAlgorithm, PhoneticTokenFilter, Strict};
+///
+/// // Example with Double Metaphone.
+/// let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(None), Alternate(false));
+/// let token_filter = algorithm.try_into()?;
+///
+/// // Another example with Nysiis
+/// let algorithm = PhoneticAlgorithm::Nysiis(Strict(None));
+/// let token_filter = PhoneticTokenFilter::try_from(algorithm)?;
+///
+/// #    Ok(())
+/// # }
+/// ```
 #[derive(Clone, Debug)]
 pub struct PhoneticTokenFilter {
     algorithm: EncoderAlgorithm,
