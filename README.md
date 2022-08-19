@@ -29,8 +29,16 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
     * `ReverseTokenFilter`
     * `ElisionTokenFilter`
     * `StopTokenFilter`
+* `phonetic` feature includes some phonetic algorithm (Beider-Morse, Soundex, Metaphone, ... see 
+[crate documentation](https://docs.rs/tantivy-analysis-contrib/latest/tantivy_analysis_contrib/))
+  * `PhoneticTokenFilter`
+* `embedded` which enables embedded rules of rphonetic crate. This feature is not included by default. It has two 
+sub-features `embedded-bm` that enables only embedded Beider-Morse rules, and `embedded-dm` which enables only
+Daitch-Mokotoff rules.
 
-By default, all features are included.
+Note that phonetic support probably needs improvements.
+
+By default, `icu`, `commons` and `phonetic` are included.
 
 ## Example
 
