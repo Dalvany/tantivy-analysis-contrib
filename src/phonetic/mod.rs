@@ -75,12 +75,12 @@ impl std::error::Error for Error {}
 
 /// These are different algorithms from [rphonetic crate](https://docs.rs/rphonetic/1.0.0/rphonetic/).
 ///
-/// It tries to remove most of the boilerplate of getting an [Encoder].
+/// It tries to remove most of the boilerplate of getting an [Encoder](rphonetic::Encoder).
 ///
-/// Parameters are mostly wrapper to make clearer what they means.
+/// Parameters are mostly wrapper to make clearer what they mean.
 #[derive(Clone, Debug)]
 pub enum PhoneticAlgorithm {
-    /// [BeiderMorse] algorithm.
+    /// [BeiderMorse](rphonetic::BeiderMorse) algorithm.
     ///
     /// You need to provide the [ConfigFiles]. If feature `embedded_bm` is enabled,
     /// you will be able to get one with a minimal set of rules (see rphonetic crate).

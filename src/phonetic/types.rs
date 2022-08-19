@@ -1,4 +1,4 @@
-/// Allow to set the maximum length in [PhoneticAlgorithm].
+/// Allow to set the maximum length in [PhoneticAlgorithm](super::PhoneticAlgorithm).
 ///
 /// If `None` is provided then the phonetic encoder will choose its default.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -11,7 +11,7 @@ pub struct MaxCodeLength(pub Option<usize>);
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Concat(pub Option<bool>);
 
-/// Allow to set the maximum length in [BeiderMorse](PhoneticAlgorithm::BeiderMorse).
+/// Allow to set the maximum length in [BeiderMorse](super::PhoneticAlgorithm::BeiderMorse).
 ///
 /// If `None` it will use 20.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -56,7 +56,7 @@ pub struct Strict(pub Option<bool>);
 /// This is the mapping for each latin letter for Soundex and Refined
 /// Soundex.
 ///
-/// The default is [DEFAULT_US_ENGLISH_MAPPING_SOUNDEX].
+/// The default is [DEFAULT_US_ENGLISH_MAPPING_SOUNDEX](super::DEFAULT_US_ENGLISH_MAPPING_SOUNDEX).
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Mapping(pub Option<[char; 26]>);
 
