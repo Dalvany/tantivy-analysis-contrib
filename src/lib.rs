@@ -23,8 +23,6 @@
 //! [ReverseStringFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/reverse/ReverseStringFilter.html)
 //!     * [ElisionTokenFilter](crate::commons::ElisionTokenFilter) that remove elisions, see
 //! [ElisionFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/util/ElisionFilter.html)
-//!     * [StopTokenFilter](crate::commons::StopTokenFilter) filters out tokens, see
-//! [StopFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/core/StopFilter.html)
 //!     * [EdgeNgramTokenFilter](crate::commons::EdgeNgramTokenFilter) that generate ngram prefixes of tokens, see
 //! [EdgeNGramTokenFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/ngram/EdgeNGramTokenFilter.html)
 //! * Phonetic :

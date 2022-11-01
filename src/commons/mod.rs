@@ -15,6 +15,10 @@ pub use crate::commons::length::LengthTokenFilter;
 pub use crate::commons::limit::LimitTokenCountFilter;
 pub use crate::commons::path::{PathTokenizer, PathTokenizerBuilder};
 pub use crate::commons::reverse::ReverseTokenFilter;
+#[deprecated(
+    since = "0.6.0",
+    note = "Tantivy already provide one. Users should use it instead"
+)]
 pub use crate::commons::stop::StopTokenFilter;
 pub use crate::commons::trim::TrimTokenFilter;
 pub use fst::Set;
