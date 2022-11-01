@@ -3,6 +3,7 @@
 ## 0.6.0
 
 * Add edge ngram filter & tokenizer
+* Deprecate stop word filter. Use [Tantivy's](https://docs.rs/tantivy/0.18.1/tantivy/tokenizer/struct.StopWordFilter.html) instead
 
 ## 0.5.0
 
