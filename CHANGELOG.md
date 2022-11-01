@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+* Add edge ngram filter & tokenizer
+
 ## 0.5.0
 
 * Add phonetic algorithms with a `PhoneticTokenFilter`

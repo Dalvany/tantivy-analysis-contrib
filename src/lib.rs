@@ -25,6 +25,8 @@
 //! [ElisionFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/util/ElisionFilter.html)
 //!     * [StopTokenFilter](crate::commons::StopTokenFilter) filters out tokens, see
 //! [StopFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/core/StopFilter.html)
+//!     * [EdgeNgramTokenFilter](crate::commons::EdgeNgramTokenFilter) that generate ngram prefixes of tokens, see
+//! [EdgeNGramTokenFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/ngram/EdgeNGramTokenFilter.html)
 //! * Phonetic :
 //!     * [PhoneticTokenFilter](crate::phonetic::PhoneticTokenFilter) a token filter to apply phonetic algorithm on tokens.
 //!

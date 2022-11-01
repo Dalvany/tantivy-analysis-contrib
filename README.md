@@ -29,6 +29,7 @@ Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main
     * `ReverseTokenFilter`
     * `ElisionTokenFilter`
     * `StopTokenFilter`
+    * `EdgeNgramTokenFilter`
 * `phonetic` feature includes some phonetic algorithm (Beider-Morse, Soundex, Metaphone, ... see 
 [crate documentation](https://docs.rs/tantivy-analysis-contrib/latest/tantivy_analysis_contrib/))
   * `PhoneticTokenFilter`

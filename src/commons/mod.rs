@@ -8,6 +8,8 @@
 //! * [ReverseTokenFilter] : a filter that reverse the string.
 //! * [ElisionTokenFilter] : a filter that remove elisions.
 //! * [StopTokenFilter] : a token filter that filters out some tokens.
+//! * [EdgeNgramTokenFilter] : a token filter that produce 'edge-ngram'.
+pub use crate::commons::edge_ngram::{EdgeNgramError, EdgeNgramTokenFilter};
 pub use crate::commons::elision::ElisionTokenFilter;
 pub use crate::commons::length::LengthTokenFilter;
 pub use crate::commons::limit::LimitTokenCountFilter;
@@ -17,6 +19,7 @@ pub use crate::commons::stop::StopTokenFilter;
 pub use crate::commons::trim::TrimTokenFilter;
 pub use fst::Set;
 
+mod edge_ngram;
 mod elision;
 mod length;
 mod limit;
