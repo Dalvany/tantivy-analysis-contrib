@@ -541,4 +541,94 @@ mod tests {
 
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn test_no_limit_keep() {
+        let result = token_stream_helper("abcde", NonZeroUsize::new(1).unwrap(), None, true);
+
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "a".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "ab".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "abc".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "abcd".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "abcde".to_string(),
+                position_length: 1,
+            },
+        ];
+
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_no_limit_no_keep() {
+        let result = token_stream_helper("abcde", NonZeroUsize::new(1).unwrap(), None, false);
+
+        let expected = vec![
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "a".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "ab".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "abc".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "abcd".to_string(),
+                position_length: 1,
+            },
+            Token {
+                offset_from: 0,
+                offset_to: 5,
+                position: 0,
+                text: "abcde".to_string(),
+                position_length: 1,
+            },
+        ];
+
+        assert_eq!(result, expected);
+    }
 }
