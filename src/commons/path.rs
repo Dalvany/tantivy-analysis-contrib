@@ -203,66 +203,6 @@ impl Default for PathTokenizer {
     }
 }
 
-// TODO remove
-impl From<char> for PathTokenizer {
-    fn from(delimiter: char) -> Self {
-        PathTokenizer {
-            reverse: false,
-            skip: 0,
-            delimiter,
-            replacement: None,
-        }
-    }
-}
-
-// TODO remove
-impl From<usize> for PathTokenizer {
-    fn from(skip: usize) -> Self {
-        PathTokenizer {
-            reverse: false,
-            skip,
-            delimiter: DEFAULT_SEPARATOR,
-            replacement: None,
-        }
-    }
-}
-
-// TODO remove
-impl From<(char, char)> for PathTokenizer {
-    fn from((delimiter, replacement): (char, char)) -> Self {
-        PathTokenizer {
-            reverse: false,
-            skip: 0,
-            delimiter,
-            replacement: Some(replacement),
-        }
-    }
-}
-
-// TODO remove
-impl From<(usize, char, char)> for PathTokenizer {
-    fn from((skip, delimiter, replacement): (usize, char, char)) -> Self {
-        PathTokenizer {
-            reverse: false,
-            skip,
-            delimiter,
-            replacement: Some(replacement),
-        }
-    }
-}
-
-// TODO remove
-impl From<(usize, char)> for PathTokenizer {
-    fn from((skip, delimiter): (usize, char)) -> Self {
-        PathTokenizer {
-            reverse: false,
-            skip,
-            delimiter,
-            replacement: None,
-        }
-    }
-}
-
 impl Tokenizer for PathTokenizer {
     fn token_stream<'a>(&self, text: &'a str) -> BoxTokenStream<'a> {
         let mut offset = 0;

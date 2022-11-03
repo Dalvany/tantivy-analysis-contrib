@@ -2,8 +2,9 @@
 
 ## 0.6.0
 
-* Add edge ngram filter & tokenizer
+* Add edge ngram filter
 * Deprecate stop word filter. Use [Tantivy's](https://docs.rs/tantivy/0.18.1/tantivy/tokenizer/struct.StopWordFilter.html) instead
+* Remove some  ̀From` impl on PathTokenizer, use builder instead.
 
 ## 0.5.0
 
