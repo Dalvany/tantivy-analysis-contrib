@@ -1,5 +1,7 @@
 use std::fmt::{Display, Formatter};
+use std::iter::{Enumerate, Peekable};
 use std::num::NonZeroUsize;
+use std::str::Chars;
 use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 
 /// Edge ngram errors
@@ -32,88 +34,112 @@ impl Display for EdgeNgramError {
 
 impl std::error::Error for EdgeNgramError {}
 
+struct Buffer<'a> {
+    chars: Peekable<Enumerate<Chars<'a>>>,
+    token: Token,
+    next: Option<(usize, char)>,
+    current_pos: usize,
+}
+
+impl<'a> Buffer<'a> {
+    fn new<'b: 'a>(original_token: &'b Token, min: usize) -> Self {
+        let mut chars = original_token.text.chars().enumerate().peekable();
+        let mut token = Token {
+            offset_from: original_token.offset_from,
+            offset_to: original_token.offset_to,
+            position: original_token.position,
+            text: String::with_capacity(original_token.text.len()),
+            position_length: original_token.position_length,
+        };
+        let mut n = chars.next();
+        let mut count = 0;
+        // Set up the string by pushing all chars up to min (excluded)
+        while n.is_some() && n.unwrap().0 < min {
+            if let Some((i, ch)) = n {
+                token.text.push(ch);
+                n = chars.next();
+                count = i;
+            }
+        }
+
+        Self {
+            chars,
+            token,
+            next: n,
+            current_pos: count,
+        }
+    }
+
+    fn next(&mut self) -> Option<usize> {
+        if let Some((i, ch)) = self.chars.next() {
+            self.token.text.push(ch);
+            self.current_pos = i;
+            Some(self.current_pos)
+        } else {
+            None
+        }
+    }
+
+    fn reach_end_of_word(&mut self) -> bool {
+        self.chars.peek().is_none()
+    }
+
+    fn current_pos(&self) -> usize {
+        self.current_pos
+    }
+}
+
 struct EdgeNgramTokenStreamFilter<'a> {
     tail: BoxTokenStream<'a>,
-    /// Current token to emit
-    token: Token,
-    /// Minimum ngram, must be greater than 0
-    min: usize,
-    /// Maximum ngram, None means no limit
-    max: Option<usize>,
-    /// Which ngram we should emit
-    count: usize,
-    /// Do we have to keep original token
+    // Buffer
+    buffer: Buffer<'a>,
+    // Keep original token
     keep_original_token: bool,
-    /// Avoid doing multiple time self.tail.token().chars().count()
-    current_len: usize,
-    /// Stop at
-    stop_length: usize,
+    // Min ngram
+    min: usize,
+    // Max ngram
+    max: Option<usize>,
 }
 
 impl<'a> TokenStream for EdgeNgramTokenStreamFilter<'a> {
     fn advance(&mut self) -> bool {
         loop {
-            // if count = min then we begin a new token...
-            if self.count == self.min {
+            // If we reach the end of the word, or if reach maximum, and we do not have
+            // to emit original token => advance tail and reset buffer
+            if self.buffer.reach_end_of_word()
+                || self
+                    .max
+                    .map(|v| self.buffer.current_pos() == v - 1 && !self.keep_original_token)
+                    .unwrap_or(false)
+            {
                 if !self.tail.advance() {
                     return false;
                 }
-
-                self.token = self.tail.token().clone();
-                // Reset everything with new token
-                self.current_len = self.tail.token().text.chars().count();
-
-                // If we have to keep original token but its length
-                // is lower than min then we force output it
-                // otherwise it won't be emitted.
-                if self.keep_original_token && self.current_len < self.min {
-                    return true;
-                }
-
-                // We stop if we reach the end of the token or max (if present).
-                self.stop_length =
-                    std::cmp::min(self.max.unwrap_or(self.current_len), self.current_len);
-            }
-
-            if self.count <= self.stop_length {
-                let token_string: String =
-                    self.tail.token().text.chars().take(self.count).collect();
-                self.token.text = token_string;
-
-                // We have reach end of token, so we reset count to min
-                if self.count == self.stop_length {
-                    if self.stop_length == self.current_len
-                        || (self.max.is_some() && !self.keep_original_token)
-                    {
-                        // If we reach the end of token then reset
-                        // Or
-                        // If we have a max, we have reached it, if we
-                        // do not have to keep original token then reset
-                        self.count = self.min;
-                    } else {
-                        self.count += 1;
-                    }
-                } else {
-                    self.count += 1;
-                }
-
+                self.buffer = Buffer::new(self.tail.token(), self.min);
+            } else if !self.buffer.reach_end_of_word()
+                && self
+                    .max
+                    .map(|v| self.buffer.current_pos() == v - 1)
+                    .unwrap_or(false)
+                && self.keep_original_token
+            {
+                // If we do not have reach the end of the token
+                self.buffer.current_pos += 1;
+                self.buffer.token.text = self.tail.token().text.clone();
                 return true;
             } else {
-                self.count = self.min;
-                if self.keep_original_token {
-                    self.token.text = self.tail.token().text.clone();
-                    return true;
-                }
+                self.buffer.next();
+                return true;
             }
         }
     }
 
     fn token(&self) -> &Token {
-        &self.token
+        &self.buffer.token
     }
 
     fn token_mut(&mut self) -> &mut Token {
-        &mut self.token
+        &mut self.buffer.token
     }
 }
 
@@ -212,13 +238,15 @@ impl TokenFilter for EdgeNgramTokenFilter {
     fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
         From::from(EdgeNgramTokenStreamFilter {
             tail: token_stream,
-            token: Default::default(),
             min: self.min.get(),
             max: self.max.map(|v| v.get()),
-            count: self.min.get(),
             keep_original_token: self.keep_original_token,
-            current_len: 0,
-            stop_length: 0,
+            buffer: Buffer {
+                chars: "".chars().enumerate().peekable(),
+                token: Default::default(),
+                next: None,
+                current_pos: 0,
+            },
         })
     }
 }
