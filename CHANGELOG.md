@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+
+* Update rust-icu version to 3.0
+
 ## 0.6.0
 
 * Add edge ngram filter
