@@ -1,5 +1,9 @@
 # Changelog
 
+## NEXT_VERSION
+
+* Update derive builder version
+
 ## 0.6.1
 
 * Update rust-icu version to 3.0
