@@ -36,10 +36,4 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         run: cargo publish
-      - name: Incremente version
-        run: |
-          cargo set-version --bump patch
-          git add .
-          git commit -m "Prepare next version"
-          git push
 
