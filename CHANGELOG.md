@@ -2,7 +2,7 @@
 
 ## NEXT_VERSION
 
-* Update derive builder version
+* Update derive builder version and Tantivy
 
 ## 0.6.1
 
