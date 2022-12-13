@@ -3,6 +3,7 @@
 ## NEXT_VERSION
 
 * Update derive builder version and Tantivy
+* Remove `StopTokenFilter`.
 
 ## 0.6.1
 

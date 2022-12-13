@@ -7,7 +7,6 @@
 //! * [PathTokenizer] : tokenize a path hierarchy.
 //! * [ReverseTokenFilter] : a filter that reverse the string.
 //! * [ElisionTokenFilter] : a filter that remove elisions.
-//! * [StopTokenFilter] : a token filter that filters out some tokens.
 //! * [EdgeNgramTokenFilter] : a token filter that produce 'edge-ngram'.
 pub use crate::commons::edge_ngram::{EdgeNgramError, EdgeNgramTokenFilter};
 pub use crate::commons::elision::ElisionTokenFilter;
@@ -19,7 +18,6 @@ pub use crate::commons::reverse::ReverseTokenFilter;
     since = "0.6.0",
     note = "Tantivy already provide one. Users should use it instead"
 )]
-pub use crate::commons::stop::StopTokenFilter;
 pub use crate::commons::trim::TrimTokenFilter;
 pub use fst::Set;
 
@@ -29,5 +27,4 @@ mod length;
 mod limit;
 mod path;
 mod reverse;
-mod stop;
 mod trim;
