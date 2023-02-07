@@ -254,7 +254,7 @@ mod tests {
 
         let v1 = char::from_u32(0x0065).unwrap().to_string();
         let v2 = char::from_u32(0x0301).unwrap().to_string();
-        let v = format!("{}{}", v1, v2);
+        let v = format!("{v1}{v2}");
 
         let expected: Vec<Token> = vec![Token {
             offset_from: 0,

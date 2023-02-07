@@ -71,7 +71,7 @@ impl From<PhoneticError> for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::AlgorithmError(error) => write!(f, "{}", error),
+            Error::AlgorithmError(error) => write!(f, "{error}"),
         }
     }
 }

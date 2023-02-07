@@ -23,8 +23,7 @@ impl Display for EdgeNgramError {
             Self::InvalidMinimum => write!(f, "Minimum must be greater than 0"),
             Self::MaximumLowerThanMinimum { min, max } => write!(
                 f,
-                "Maximum '{}' must be greater or equals to minimum '{}' or should be 'None'",
-                max, min
+                "Maximum '{max}' must be greater or equals to minimum '{min}' or should be 'None'"
             ),
         }
     }

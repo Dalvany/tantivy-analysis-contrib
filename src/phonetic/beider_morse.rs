@@ -98,7 +98,7 @@ mod tests {
     #[test]
     fn test_basic_usage_inject() -> Result<(), Error> {
         let algorithm = &PhoneticAlgorithm::BeiderMorse(
-            &*CONFIG_FILES,
+            &CONFIG_FILES,
             None,
             Some(RuleType::Exact),
             Concat(Some(true)),
@@ -264,7 +264,7 @@ mod tests {
     #[test]
     fn test_basic_usage_not_inject() -> Result<(), Error> {
         let algorithm = &PhoneticAlgorithm::BeiderMorse(
-            &*CONFIG_FILES,
+            &CONFIG_FILES,
             None,
             Some(RuleType::Exact),
             Concat(Some(true)),
@@ -416,7 +416,7 @@ mod tests {
     #[test]
     fn test_language_set() -> Result<(), Error> {
         let algorithm = &PhoneticAlgorithm::BeiderMorse(
-            &*CONFIG_FILES,
+            &CONFIG_FILES,
             None,
             Some(RuleType::Exact),
             Concat(Some(true)),
@@ -461,7 +461,7 @@ mod tests {
     #[test]
     fn test_numbers() -> Result<(), Error> {
         let algorithm = &PhoneticAlgorithm::BeiderMorse(
-            &*CONFIG_FILES,
+            &CONFIG_FILES,
             None,
             Some(RuleType::Exact),
             Concat(Some(true)),

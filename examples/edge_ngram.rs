@@ -31,7 +31,7 @@ fn get_values(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let index_path = TempDir::new("index")?;
-    println!("Temp dir : {:?}", index_path);
+    println!("Temp dir : {index_path:?}");
 
     // Setup everything to index
     let options = TextOptions::default()

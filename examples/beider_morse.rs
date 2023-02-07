@@ -19,7 +19,7 @@ lazy_static! {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let index_path = TempDir::new("index")?;
-    println!("Temp dir : {:?}", index_path);
+    println!("Temp dir : {index_path:?}");
 
     let options = TextOptions::default()
         .set_indexing_options(

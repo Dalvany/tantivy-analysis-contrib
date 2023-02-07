@@ -901,7 +901,7 @@ mod tests {
                 position_length: 1,
             }];
 
-            assert_eq!(result, expected, "\n{}", name);
+            assert_eq!(result, expected, "\n{name}");
         }
 
         Ok(())
@@ -945,7 +945,7 @@ mod tests {
                     position_length: 1,
                 }];
 
-                assert_eq!(result, expected, "\n{} (inject {})", name, inject);
+                assert_eq!(result, expected, "\n{name} (inject {inject})");
             }
         }
 
