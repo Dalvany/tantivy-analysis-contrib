@@ -1,6 +1,10 @@
 # Changelog
 
-## NEXT_VERSION
+## 0.7.1
+
+* Fix clippy warning
+
+## 0.7.0
 
 * Update derive builder version and Tantivy
 * Remove `StopTokenFilter`.
