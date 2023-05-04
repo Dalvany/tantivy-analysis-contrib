@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+* Bump icu crates from 3.0 to 4.0
+
 ## 0.7.1
 
 * Fix clippy warning
