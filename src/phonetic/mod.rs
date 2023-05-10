@@ -11,6 +11,7 @@
 //! * Nysiis
 //! * Refined Soundex
 //! * Soundex
+//! * Phonex
 //!
 //! To get a [PhoneticTokenFilter] you need to use [PhoneticAlgorithm] :
 //!
@@ -37,7 +38,7 @@ use std::fmt::{Display, Formatter};
 pub use rphonetic::{BMError, LanguageSet, NameType, PhoneticError, RuleType};
 use rphonetic::{
     BeiderMorseBuilder, Caverphone1, Caverphone2, Cologne, ConfigFiles, DaitchMokotoffSoundex,
-    DaitchMokotoffSoundexBuilder, DoubleMetaphone, MatchRatingApproach, Metaphone, Nysiis,
+    DaitchMokotoffSoundexBuilder, DoubleMetaphone, MatchRatingApproach, Metaphone, Nysiis, Phonex,
     RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
 };
 use tantivy::tokenizer::{BoxTokenStream, TokenFilter};
@@ -129,6 +130,8 @@ pub enum PhoneticAlgorithm {
     /// [Nysiis] algorithm. The boolean indicate if codes will be strict or not.
     /// If `None` it will use the default.
     Nysiis(Strict),
+    /// [Phonex] algorithm. The integer is the maximum length of generated codes.
+    Phonex(MaxCodeLength),
     /// [RefinedSoundex] algorithm. If you provide a mapping it will be use, otherwise
     /// [DEFAULT_US_ENGLISH_MAPPING_SOUNDEX] will apply.
     RefinedSoundex(Mapping),
@@ -162,6 +165,7 @@ enum EncoderAlgorithm {
     MatchRatingApproach(MatchRatingApproach),
     Metaphone(Metaphone),
     Nysiis(Nysiis),
+    Phonex(Phonex),
     RefinedSoundex(RefinedSoundex),
     Soundex(Soundex),
 }
@@ -259,6 +263,10 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
             PhoneticAlgorithm::Nysiis(strict) => match strict.0 {
                 None => Ok(EncoderAlgorithm::Nysiis(Nysiis::default())),
                 Some(strict) => Ok(EncoderAlgorithm::Nysiis(Nysiis::new(strict))),
+            },
+            PhoneticAlgorithm::Phonex(max_code_length) => match max_code_length.0 {
+                None => Ok(EncoderAlgorithm::Phonex(Phonex::default())),
+                Some(max_code_length) => Ok(EncoderAlgorithm::Phonex(Phonex::new(max_code_length))),
             },
             PhoneticAlgorithm::RefinedSoundex(mapping) => match mapping.0 {
                 None => Ok(EncoderAlgorithm::RefinedSoundex(RefinedSoundex::default())),
@@ -419,6 +427,13 @@ impl TokenFilter for PhoneticTokenFilter {
             }
             // Nysiis
             EncoderAlgorithm::Nysiis(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
+                tail: token_stream,
+                encoder: Box::new(*encoder),
+                backup: None,
+                inject: self.inject,
+            }),
+            // Phonex
+            EncoderAlgorithm::Phonex(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
                 tail: token_stream,
                 encoder: Box::new(*encoder),
                 backup: None,

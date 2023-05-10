@@ -20,7 +20,7 @@ impl<'a> TokenStream for GenericPhoneticTokenStream<'a> {
         // We while skip empty code
         while !result {
             let tail_result = self.tail.advance();
-            // If end of stream, return false, this will end the loop
+            // If an end of stream, return false, this will end the loop
             if !tail_result {
                 return false;
             }
@@ -31,7 +31,7 @@ impl<'a> TokenStream for GenericPhoneticTokenStream<'a> {
             }
 
             if token.is_empty() && self.inject {
-                // We only keep original token
+                // We only keep the original token
                 result = true;
             } else if !token.is_empty() {
                 // Otherwise, if token isn't empty
@@ -887,17 +887,18 @@ mod tests {
                 "Refined Soundex",
             ),
             (PhoneticAlgorithm::Nysiis(Strict(None)), "Nyiis"),
+            (PhoneticAlgorithm::Phonex(MaxCodeLength(None)), "Phonex"),
         ];
 
         for (algorithm, name) in &algorithms {
             let token_filter = (algorithm, false).try_into()?;
 
-            let result = token_stream_helper_raw("1234", token_filter);
+            let result = token_stream_helper_raw("1234567891011", token_filter);
             let expected = vec![Token {
                 offset_from: 0,
-                offset_to: 4,
+                offset_to: 13,
                 position: 0,
-                text: "1234".to_string(),
+                text: "1234567891011".to_string(),
                 position_length: 1,
             }];
 
@@ -930,6 +931,7 @@ mod tests {
             (PhoneticAlgorithm::Caverphone1, "Caverphone 1"),
             (PhoneticAlgorithm::Caverphone2, "Caverphone 2"),
             (PhoneticAlgorithm::Nysiis(Strict(None)), "Nyiis"),
+            (PhoneticAlgorithm::Phonex(MaxCodeLength(None)), "Phonex"),
         ];
 
         for inject in inject {
