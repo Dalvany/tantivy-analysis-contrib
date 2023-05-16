@@ -1,0 +1,99 @@
+name: Quality
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Check that crate is compiling avoiding running other jobs
+  # if there's an error.
+  # TODO : see to cache crates download to save time
+  build:
+    name: Check crate compilation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@cargo-hack
+      - name: Check compilation
+        run: cargo hack check --all --each-feature --clean-per-run --no-dev-deps
+
+  tests:
+    needs: build
+    name: Test crate with code coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Install components
+        run: rustup component add llvm-tools-preview
+      - uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Code coverage
+        run: cargo llvm-cov --lcov --output-path lcov.info
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: lcov.info
+          fail_ci_if_error: true
+
+  clippy:
+    needs: build
+    name: Lint crate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Install required cargo utilities
+        run: cargo install clippy-sarif sarif-fmt
+      - name: Run clippy
+        run:
+          cargo clippy
+          --all-features
+          --message-format=json | clippy-sarif | tee rust-clippy-results.sarif | sarif-fmt
+      - name: Upload analysis results to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: rust-clippy-results.sarif
+          wait-for-processing: true
+
+  fmt:
+    needs: build
+    name: Check code style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Check code style
+        run: cargo fmt --check
+
+  dependencies:
+    needs: build
+    name: Check unused dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+      - name: Install cargo-machete
+        run: cargo install cargo-machete
+      - name: Check dependencies
+        run: cargo machete
