@@ -50,8 +50,8 @@ impl From<Direction> for sys::UTransDirection {
     }
 }
 
-/// This [TokenFilter] allow to transform text into another
-/// for example to performe transliteration.
+/// This [TokenFilter] allow to transform text into another,
+/// for example, to performe transliteration.
 /// See [ICU documentation](https://unicode-org.github.io/icu/userguide/transforms/general/)
 /// ```rust
 /// use tantivy_analysis_contrib::icu::{Direction, ICUTransformTokenFilter};
@@ -64,7 +64,7 @@ impl From<Direction> for sys::UTransDirection {
 ///
 /// # Example
 ///
-/// Here is an example of transform that convert into greek letters into latin letters
+/// Here is an example of transform that converts greek letters into latin letters
 ///
 /// ```rust
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -21,7 +21,7 @@ impl<'a> TokenStream for PathTokenStream<'a> {
     fn advance(&mut self) -> bool {
         if let Some(part) = self.text.next() {
             if !self.starts_with {
-                // Do not add the separator (or replacement) if doesn't start (or end) with separator
+                // Do not add the separator (or replacement) if it doesn't start (or end) with the separator
                 self.starts_with = true;
             } else if self.reverse {
                 self.buffer.insert(0, self.separator);
@@ -118,7 +118,7 @@ impl<'a> TokenStream for PathTokenStream<'a> {
 /// # }
 /// ```
 ///
-/// This second example show what tokens are produce if `reverse` is set to `true` and what does `replacement` parameter.
+/// This second example shows what tokens are produced if `reverse` is set to `true` and what does `replacement` parameter.
 ///
 /// ```rust
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -165,7 +165,7 @@ pub struct PathTokenizer {
     /// ```
     #[builder(default = "false")]
     pub reverse: bool,
-    /// Number of part to skip.
+    /// Number of parts to skip.
     #[builder(default = "0")]
     pub skip: usize,
     /// Delimiter of path parts
@@ -175,9 +175,9 @@ pub struct PathTokenizer {
     /// ```
     #[builder(default = "DEFAULT_SEPARATOR")]
     pub delimiter: char,
-    /// Character that replace delimiter for generated parts.
+    /// Character that replaces delimiter for generated parts.
     /// If [None] then the same char as delimiter will be used.
-    /// For exemple if delimiter is `/` and replacement is `|`
+    /// For example, if delimiter is `/` and replacement is `|`
     /// ```norust
     /// /part1/part2/part3
     /// ```

@@ -55,7 +55,7 @@ impl<'a> TokenStream for TrimTokenStream<'a> {
     }
 }
 
-/// [TokenFilter] that trims leading and trailing whitespace.
+/// [TokenFilter] that trims leading and trailing space.
 /// ```rust
 /// use tantivy_analysis_contrib::commons::TrimTokenFilter;
 ///

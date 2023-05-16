@@ -1,4 +1,4 @@
-//! This module provides a tokenizer that use the same rules to break string into words.
+//! This module provides a tokenizer that uses the same rules to break string into words.
 //!
 use rust_icu_ubrk::UBreakIterator;
 use std::str::Chars;

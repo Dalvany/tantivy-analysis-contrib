@@ -41,7 +41,8 @@ impl<'a> TokenStream for ElisionTokenStream<'a> {
     }
 }
 
-/// A token filter that removes elision from a token. For exemple the token `l'avion` will
+/// A token filter that removes elision from a token.
+/// For example, the token `l'avion` will
 /// become `avion`.
 /// ```rust
 /// use tantivy_analysis_contrib::commons::ElisionTokenFilter;
@@ -103,8 +104,8 @@ pub struct ElisionTokenFilter {
 impl ElisionTokenFilter {
     /// Construct a new [ElisionTokenFilter] from an iterator over [String] and a [bool].
     /// # Parameters :
-    /// * elisions : list of elision to remove from tokens
-    /// * ignore_case : indicate that elisions are ignore-case
+    /// * `elisions`: list of elision to remove from tokens
+    /// * `ignore_case`: indicate that elisions are case-insensitive
     pub fn from_iter_string(elisions: impl IntoIterator<Item = String>, ignore_case: bool) -> Self {
         let elisions: BTreeSet<String> = elisions
             .into_iter()
@@ -118,8 +119,8 @@ impl ElisionTokenFilter {
 
     /// Construct a new [ElisionTokenFilter] from an iterator over [str] and a [bool].
     /// # Parameters :
-    /// * elisions : list of elision to remove from tokens
-    /// * ignore_case : indicate that elisions are ignore-case
+    /// * `elisions`: list of elision to remove from tokens
+    /// * `ignore_case`: indicate that elisions are case-insensitive
     pub fn from_iter_str<'a>(
         elisions: impl IntoIterator<Item = &'a str>,
         ignore_case: bool,

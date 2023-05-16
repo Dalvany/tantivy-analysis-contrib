@@ -1,4 +1,4 @@
-//! This module contains all ICU related components.
+//! This module contains all ICU-related components.
 #[cfg(feature = "normalizer")]
 mod normalizer;
 #[cfg(feature = "tokenizer")]

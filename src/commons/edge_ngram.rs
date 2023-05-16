@@ -5,10 +5,10 @@ use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
 /// Edge ngram errors
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum EdgeNgramError {
-    /// Error raised when minimum is set to 0.
+    /// Error raised when the minimum is set to 0.
     InvalidMinimum,
-    /// Error raised when maximum is not [None](Option::None) and
-    /// strictly lower than minimum.
+    /// Error raised when the maximum is not [None](None) and
+    /// strictly lower than the minimum.
     MaximumLowerThanMinimum {
         /// Minimum ngram.
         min: NonZeroUsize,
@@ -35,13 +35,13 @@ struct EdgeNgramTokenStreamFilter<'a> {
     tail: BoxTokenStream<'a>,
     /// Current token to emit
     token: Token,
-    /// Minimum ngram, must be greater than 0
+    /// Minimum ngram must be greater than 0
     min: usize,
     /// Maximum ngram, None means no limit
     max: Option<usize>,
     /// Which ngram we should emit
     count: usize,
-    /// Do we have to keep original token
+    /// Do we have to keep the original token?
     keep_original_token: bool,
     /// Avoid doing multiple time self.tail.token().chars().count()
     current_len: usize,
@@ -62,8 +62,8 @@ impl<'a> TokenStream for EdgeNgramTokenStreamFilter<'a> {
                 // Reset everything with new token
                 self.current_len = self.tail.token().text.chars().count();
 
-                // If we have to keep original token but its length
-                // is lower than min then we force output it
+                // If we have to keep the original token but its length
+                // is lower than min, then we force output it
                 // otherwise it won't be emitted.
                 if self.keep_original_token && self.current_len < self.min {
                     return true;
@@ -79,15 +79,15 @@ impl<'a> TokenStream for EdgeNgramTokenStreamFilter<'a> {
                     self.tail.token().text.chars().take(self.count).collect();
                 self.token.text = token_string;
 
-                // We have reach end of token, so we reset count to min
+                // We have reached the end of token, so we reset the count to min
                 if self.count == self.stop_length {
                     if self.stop_length == self.current_len
                         || (self.max.is_some() && !self.keep_original_token)
                     {
                         // If we reach the end of token then reset
                         // Or
-                        // If we have a max, we have reached it, if we
-                        // do not have to keep original token then reset
+                        // If we have a max, we have reached it if we
+                        // do not have to keep the original token then reset
                         self.count = self.min;
                     } else {
                         self.count += 1;
@@ -117,14 +117,17 @@ impl<'a> TokenStream for EdgeNgramTokenStreamFilter<'a> {
 }
 
 /// Token filter that produce [ngram](https://docs.rs/tantivy/0.18.1/tantivy/tokenizer/struct.NgramTokenizer.html)
-/// from the start of the token. For example `Quick` will generate
+/// from the start of the token.
+/// For example, `Quick` will generate
 /// `Q`, `Qu`, `Qui`, `Quic`, ...etc.
 ///
-/// It is configure with two parameters :
-/// * min edge-ngram : the number of maximum characters (e.g. with min=3, `Quick`
-/// will generate `Qui`, `Quic` and `Quick`). It must be greater than 0.
-/// * max edge-ngram : the number of maximum characters (e.g. with max=3, `Quick`
-/// will generate `Q`, `Qu` and `Qui`. It is optional and there is no maximum then
+/// It is configure with two parameters:
+/// * min edge-ngram: the number of maximum characters (e.g. with min=3, `Quick`
+/// will generate `Qui`, `Quic` and `Quick`).
+/// It must be greater than 0.
+/// * max edge-ngram: the number of maximum characters (e.g. with max=3, `Quick`
+/// will generate `Q`, `Qu` and `Qui`.
+/// It is optional, and there is no maximum then
 /// it will generate up to the end of the token.
 ///
 /// # Example
@@ -158,8 +161,9 @@ impl<'a> TokenStream for EdgeNgramTokenStreamFilter<'a> {
 ///
 /// # How to use it
 ///
-/// To use it you should have another pipeline at search time that does not include
-/// the edge-ngram filter. Otherwise, you'll might get irrelevant results.
+/// To use it, you should have another pipeline at search time that does not include
+/// the edge-ngram filter.
+/// Otherwise, you'll get irrelevant results.
 /// Please see the [example](https://github.com/Dalvany/tantivy-analysis-contrib/tree/main/examples/edge_ngram.rs)
 /// in source repository for a way to do it.
 #[derive(Clone, Copy, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -177,8 +181,8 @@ impl EdgeNgramTokenFilter {
     ///
     /// * `min` : minimum edge-ngram.
     /// * `max` : maximum edge-ngram. It must be greater or equals to `min`.
-    /// Provide [None](Option::None) for unlimited.
-    /// * `keep_original_token` : the complete token will also be output if
+    /// Provide [None](None) for unlimited.
+    /// * `keep_original_token`: the complete token will also be output if
     /// the length is greater than `max`.
     pub fn new(
         min: NonZeroUsize,
