@@ -17,6 +17,7 @@ lazy_static! {
         ConfigFiles::new(&PathBuf::from("./test_assets/bm-cc-rules/")).unwrap();
 }
 
+#[allow(clippy::disallowed_macros)]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let index_path = TempDir::new("index")?;
     println!("Temp dir : {index_path:?}");
