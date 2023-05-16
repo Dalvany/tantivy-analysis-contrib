@@ -38,8 +38,8 @@ use std::fmt::{Display, Formatter};
 pub use rphonetic::{BMError, LanguageSet, NameType, PhoneticError, RuleType};
 use rphonetic::{
     BeiderMorseBuilder, Caverphone1, Caverphone2, Cologne, ConfigFiles, DaitchMokotoffSoundex,
-    DaitchMokotoffSoundexBuilder, DoubleMetaphone, MatchRatingApproach, Metaphone, Nysiis, Phonex,
-    RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
+    DaitchMokotoffSoundexBuilder, DoubleMetaphone, Encoder, MatchRatingApproach, Metaphone, Nysiis,
+    Phonex, RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
 };
 use tantivy::tokenizer::{BoxTokenStream, TokenFilter};
 
@@ -81,7 +81,7 @@ impl std::error::Error for Error {}
 
 /// These are different algorithms from [rphonetic crate](https://docs.rs/rphonetic/1.0.0/rphonetic/).
 ///
-/// It tries to remove most of the boilerplate of getting an [Encoder](rphonetic::Encoder).
+/// It tries to remove most of the boilerplate of getting an [Encoder](Encoder).
 ///
 /// Parameters are mostly wrapper to make clearer what they mean.
 #[derive(Clone, Debug)]
@@ -293,6 +293,24 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
     }
 }
 
+/// Phonex wrapper to handle the case only '0'.
+/// This structure implements rphonetic's trait
+/// [Encoder] that delegates call to phonex encoder
+/// and then handle the specific case.
+struct PhonexWrapper(Phonex);
+
+impl Encoder for PhonexWrapper {
+    fn encode(&self, s: &str) -> String {
+        let result = self.0.encode(s);
+        // If only '0' then treat as empty string.
+        if result.bytes().any(|b| b != b'0') {
+            result
+        } else {
+            "".to_owned()
+        }
+    }
+}
+
 /// This the phonetic token filter.
 /// It generates a token according
 /// to the algorithm provided.
@@ -440,7 +458,7 @@ impl TokenFilter for PhoneticTokenFilter {
             // Phonex
             EncoderAlgorithm::Phonex(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
                 tail: token_stream,
-                encoder: Box::new(*encoder),
+                encoder: Box::new(PhonexWrapper(*encoder)),
                 backup: None,
                 inject: self.inject,
             }),
