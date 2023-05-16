@@ -85,6 +85,7 @@ pub struct TrimTokenFilter;
 
 impl TokenFilter for TrimTokenFilter {
     fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
+        println!("Test clippy workflow");
         From::from(TrimTokenStream {
             tail: token_stream,
             token: Token::default(),
