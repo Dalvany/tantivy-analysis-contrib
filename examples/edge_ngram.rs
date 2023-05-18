@@ -29,6 +29,7 @@ fn get_values(
     Ok(result)
 }
 
+#[allow(clippy::disallowed_macros)]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let index_path = TempDir::new("index")?;
     println!("Temp dir : {index_path:?}");

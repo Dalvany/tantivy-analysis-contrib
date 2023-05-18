@@ -1,4 +1,4 @@
-//! This module provide phonetic capabilities through several algorithm.
+//! This module provides phonetic capabilities through several algorithms.
 //!
 //! It contains the following algorithms :
 //! * Beider-Morse
@@ -11,6 +11,7 @@
 //! * Nysiis
 //! * Refined Soundex
 //! * Soundex
+//! * Phonex
 //!
 //! To get a [PhoneticTokenFilter] you need to use [PhoneticAlgorithm] :
 //!
@@ -29,16 +30,16 @@
 //! # }
 //! ```
 //!
-//! Every parameter of [PhoneticAlgorithm]'s variant are typed to try to make it clear what are their purpose. Most of
-//! them are [Option] allowing to use default values.
+//! Every parameter of [PhoneticAlgorithm]'s variant is typed to try to make it clear what is their purpose.
+//! Most of them are [Option] allowing to use default values.
 use std::collections::VecDeque;
 use std::fmt::{Display, Formatter};
 
 pub use rphonetic::{BMError, LanguageSet, NameType, PhoneticError, RuleType};
 use rphonetic::{
     BeiderMorseBuilder, Caverphone1, Caverphone2, Cologne, ConfigFiles, DaitchMokotoffSoundex,
-    DaitchMokotoffSoundexBuilder, DoubleMetaphone, MatchRatingApproach, Metaphone, Nysiis,
-    RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
+    DaitchMokotoffSoundexBuilder, DoubleMetaphone, Encoder, MatchRatingApproach, Metaphone, Nysiis,
+    Phonex, RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
 };
 use tantivy::tokenizer::{BoxTokenStream, TokenFilter};
 
@@ -80,7 +81,7 @@ impl std::error::Error for Error {}
 
 /// These are different algorithms from [rphonetic crate](https://docs.rs/rphonetic/1.0.0/rphonetic/).
 ///
-/// It tries to remove most of the boilerplate of getting an [Encoder](rphonetic::Encoder).
+/// It tries to remove most of the boilerplate of getting an [Encoder](Encoder).
 ///
 /// Parameters are mostly wrapper to make clearer what they mean.
 #[derive(Clone, Debug)]
@@ -90,13 +91,13 @@ pub enum PhoneticAlgorithm {
     /// You need to provide the [ConfigFiles]. If feature `embedded_bm` is enabled,
     /// you will be able to get one with a minimal set of rules (see rphonetic crate).
     ///
-    /// The [NameType] allow you to choose between the supported set type of names. If none
+    /// The [NameType] allows you to choose between the supported set type of names. If none
     /// is provided, it will use [Generic](NameType::Generic).
     ///
-    /// The [RuleType] allolw you to choose between [approx](RuleType::Approx) and [exact](RuleType::Exact).
+    /// The [RuleType] allows you to choose between [approx](RuleType::Approx) and [exact](RuleType::Exact).
     /// If none is provided, the default is `approx`.
     ///
-    /// You have to provide a set of language. They must be supported by your rule files. If the list
+    /// You have to provide a set of languages. They must be supported by your rule files. If the list
     /// is empty, the encoder will try to guess languages.
     BeiderMorse(
         &'static ConfigFiles,
@@ -119,33 +120,39 @@ pub enum PhoneticAlgorithm {
     /// [DoubleMetaphone] algorithm. The integer is maximum length of generated codes.
     /// If `None` is provided, then the default maximum code length will apply.
     ///
-    /// Boolean indicate if we also want to encode alternate value (`true`) or not (`false`).
+    /// Boolean indicates if we also want to encode alternate value (`true`) or not (`false`).
     DoubleMetaphone(MaxCodeLength, Alternate),
     /// This is the [MatchRatingApproach] algorithm.
     MatchRatingApproach,
     /// [Metaphone] algorithm. The integer is maximum length of generated codes.
     /// If `None` is provided, then the default maximum code length will apply.
     Metaphone(MaxCodeLength),
-    /// [Nysiis] algorithm. The boolean indicate if codes will be strict or not.
+    /// [Nysiis] algorithm.
+    /// The boolean indicate if codes are strict or not.
     /// If `None` it will use the default.
     Nysiis(Strict),
-    /// [RefinedSoundex] algorithm. If you provide a mapping it will be use, otherwise
+    /// [Phonex] algorithm. The integer is the maximum length of generated codes.
+    Phonex(MaxCodeLength),
+    /// [RefinedSoundex] algorithm.
+    /// If you provide a mapping it will be used, otherwise
     /// [DEFAULT_US_ENGLISH_MAPPING_SOUNDEX] will apply.
     RefinedSoundex(Mapping),
-    /// [Soundex] algorithm. If you provide a mapping it will be use, otherwise
+    /// [Soundex] algorithm.
+    /// If you provide a mapping it will be used, otherwise
     /// [DEFAULT_US_ENGLISH_MAPPING_SOUNDEX] will apply.
-    /// the boolean indicates `H` and `W` should be treated as silence. If `None`
+    /// The boolean indicates `H` and `W` should be treated as silence.
+    /// If `None`
     /// is provided, then default to `true`.
     Soundex(Mapping, SpecialHW),
 }
 
 // Indirection for getting the filter.
 // This enum maps PhoneticAlgorithm into the
-// proper encoder implem, avoiding to unwrap
+// proper encoder implem, avoiding unwrapping
 // when calling build() on DaitchMokotoffSoundexBuilder.
 #[derive(Clone, Debug)]
 enum EncoderAlgorithm {
-    // We will recreate the BeiderMorse as it has a lifetime and it could be in the phonetic token filter...
+    // We will recreate the BeiderMorse as it has a lifetime, and it could be in the phonetic token filter...
     BeiderMorse(
         &'static ConfigFiles,
         Option<NameType>,
@@ -162,6 +169,7 @@ enum EncoderAlgorithm {
     MatchRatingApproach(MatchRatingApproach),
     Metaphone(Metaphone),
     Nysiis(Nysiis),
+    Phonex(Phonex),
     RefinedSoundex(RefinedSoundex),
     Soundex(Soundex),
 }
@@ -235,7 +243,7 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
                 ))
             }
             PhoneticAlgorithm::DoubleMetaphone(max_code_length, use_alternate) => {
-                // alternate : if true use specific token filter, otherwise, use generic
+                // Alternate: if true, uses specific token filter, otherwise, use generic
                 match max_code_length.0 {
                     None => Ok(EncoderAlgorithm::DoubleMetaphone(
                         DoubleMetaphone::default(),
@@ -260,6 +268,10 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
                 None => Ok(EncoderAlgorithm::Nysiis(Nysiis::default())),
                 Some(strict) => Ok(EncoderAlgorithm::Nysiis(Nysiis::new(strict))),
             },
+            PhoneticAlgorithm::Phonex(max_code_length) => match max_code_length.0 {
+                None => Ok(EncoderAlgorithm::Phonex(Phonex::default())),
+                Some(max_code_length) => Ok(EncoderAlgorithm::Phonex(Phonex::new(max_code_length))),
+            },
             PhoneticAlgorithm::RefinedSoundex(mapping) => match mapping.0 {
                 None => Ok(EncoderAlgorithm::RefinedSoundex(RefinedSoundex::default())),
                 Some(mapping) => Ok(EncoderAlgorithm::RefinedSoundex(RefinedSoundex::new(
@@ -281,7 +293,26 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
     }
 }
 
-/// This the phonetic token filter. It generates token according
+/// Phonex wrapper to handle the case only '0'.
+/// This structure implements rphonetic's trait
+/// [Encoder] that delegates call to phonex encoder
+/// and then handle the specific case.
+struct PhonexWrapper(Phonex);
+
+impl Encoder for PhonexWrapper {
+    fn encode(&self, s: &str) -> String {
+        let result = self.0.encode(s);
+        // If only '0' then treat as empty string.
+        if result.bytes().any(|b| b != b'0') {
+            result
+        } else {
+            "".to_owned()
+        }
+    }
+}
+
+/// This the phonetic token filter.
+/// It generates a token according
 /// to the algorithm provided.
 ///
 /// You should use [PhoneticAlgorithm] to construct a new [PhoneticTokenFilter].
@@ -385,7 +416,7 @@ impl TokenFilter for PhoneticTokenFilter {
             }
             // Double Metaphone
             EncoderAlgorithm::DoubleMetaphone(encoder, use_alternate) => match use_alternate {
-                // alternate : if true use specific token filter, otherwise, use generic
+                // Alternate: if true, use specific token filter, otherwise, use generic
                 true => BoxTokenStream::from(DoubleMetaphoneTokenStream {
                     tail: token_stream,
                     encoder: *encoder,
@@ -421,6 +452,13 @@ impl TokenFilter for PhoneticTokenFilter {
             EncoderAlgorithm::Nysiis(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
                 tail: token_stream,
                 encoder: Box::new(*encoder),
+                backup: None,
+                inject: self.inject,
+            }),
+            // Phonex
+            EncoderAlgorithm::Phonex(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
+                tail: token_stream,
+                encoder: Box::new(PhonexWrapper(*encoder)),
                 backup: None,
                 inject: self.inject,
             }),
@@ -478,7 +516,7 @@ impl TryFrom<(&PhoneticAlgorithm, bool)> for PhoneticTokenFilter {
 /// Get the token filter from a [PhoneticAlgorithm]. This will
 /// take care of all the boilerplate.
 ///
-/// Encoded values will be added as synonyms, that means the original
+/// Encoded values will be added as synonyms; that means the original
 /// token will be present.
 impl TryFrom<PhoneticAlgorithm> for PhoneticTokenFilter {
     type Error = Error;
@@ -491,7 +529,7 @@ impl TryFrom<PhoneticAlgorithm> for PhoneticTokenFilter {
 /// Get the token filter from a [PhoneticAlgorithm]. This will
 /// take care of all the boilerplate.
 ///
-/// Encoded values will be added as synonyms, that means the original
+/// Encoded values will be added as synonyms; that means the original
 /// token will be present.
 impl TryFrom<&PhoneticAlgorithm> for PhoneticTokenFilter {
     type Error = Error;

@@ -1,17 +1,17 @@
-/// Allow to set the maximum length in [PhoneticAlgorithm](super::PhoneticAlgorithm).
+/// Allow setting the maximum length in [PhoneticAlgorithm](super::PhoneticAlgorithm).
 ///
-/// If `None` is provided then the phonetic encoder will choose its default.
+/// If `None` is provided, then the phonetic encoder will choose its default.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct MaxCodeLength(pub Option<usize>);
 
-/// If text contains multiple words they all get encode if `true` otherwise
+/// If a text contains multiple words, they all get encode if `true` otherwise
 /// only the first word will be encoded.
 ///
 /// If `None` is provided, it will be `true`.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Concat(pub Option<bool>);
 
-/// Allow to set the maximum length in [BeiderMorse](super::PhoneticAlgorithm::BeiderMorse).
+/// Allow setting the maximum length in [BeiderMorse](super::PhoneticAlgorithm::BeiderMorse).
 ///
 /// If `None` it will use 20.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
@@ -28,7 +28,7 @@ pub struct DMRule(pub String);
 /// This is Daitch-Mokotoff rules. They will be parsed.
 /// You can find commons-codec's rules [here](https://github.com/apache/commons-codec/blob/rel/commons-codec-1.15/src/main/resources/org/apache/commons/codec/language/dmrules.txt)
 ///
-/// If `None` is provided then the embedded rules will be used.
+/// If `None` is provided, then the embedded rules will be used.
 #[cfg(feature = "embedded_dm")]
 #[derive(Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct DMRule(pub Option<String>);
@@ -42,7 +42,7 @@ pub struct Folding(pub bool);
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Branching(pub bool);
 
-/// This boolean allow to generate alternate code, in double metaphone,
+/// This boolean allows generating alternate code, in double metaphone,
 /// if different from primary.
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct Alternate(pub bool);

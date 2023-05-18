@@ -31,7 +31,7 @@ impl<'a> TokenStream for LengthTokenStream<'a> {
     }
 }
 
-/// This [TokenFilter] filters tokens that doesn't match a min or a max length (inclusive).
+/// This [TokenFilter] filters tokens that don't match a min or a max length (inclusive).
 /// ```rust
 /// use tantivy_analysis_contrib::commons::LengthTokenFilter;
 ///

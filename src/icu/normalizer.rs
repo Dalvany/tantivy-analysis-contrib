@@ -61,7 +61,7 @@ pub enum Mode {
     NFKCCasefold,
 }
 
-/// [TokenFilter] that converts text into normal form.
+/// [TokenFilter] that converts text into a normal form.
 /// It supports all [Google's unicode normalization](https://docs.rs/rust_icu_unorm2/2.0.0/rust_icu_unorm2/struct.UNormalizer.html) using [Mode]:
 /// * NFC
 /// * NFD
