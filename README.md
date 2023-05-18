@@ -1,5 +1,5 @@
 [![Crate](https://img.shields.io/crates/v/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
-[![Build Status](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/rust.yml/badge.svg)](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/rust.yml)
+[![Build Status](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/quality.yml/badge.svg)](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/quality.yml)
 [![codecov](https://codecov.io/gh/Dalvany/tantivy-analysis-contrib/branch/main/graph/badge.svg)](https://codecov.io/gh/Dalvany/tantivy-analysis-contrib)
 [![dependency status](https://deps.rs/repo/github/Dalvany/tantivy-analysis-contrib/status.svg)](https://deps.rs/repo/github/Dalvany/tantivy-analysis-contrib)
 [![Documentation](https://docs.rs/tantivy-analysis-contrib/badge.svg)](https://docs.rs/tantivy-analysis-contrib/)
