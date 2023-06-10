@@ -6,7 +6,7 @@
 * Rework for Tantivy 0.20
 * Remove deprecated trim filter
 * Remove some features
-* Change how to construct a `ICUNormalizer2TokenFilter`
+* Change how to construct ICU's components
 
 ## 0.8.0
 
