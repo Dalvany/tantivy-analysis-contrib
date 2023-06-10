@@ -1,5 +1,5 @@
-use tantivy::tokenizer::{TokenFilter, Tokenizer};
 use super::LimitTokenCountWrapper;
+use tantivy::tokenizer::{TokenFilter, Tokenizer};
 
 /// [TokenFilter] that limit the number of tokens
 ///
@@ -56,11 +56,11 @@ impl From<usize> for LimitTokenCountFilter {
 
 impl TokenFilter for LimitTokenCountFilter {
     type Tokenizer<T: Tokenizer> = LimitTokenCountWrapper<T>;
+
     fn transform<T: Tokenizer>(self, token_stream: T) -> LimitTokenCountWrapper<T> {
         LimitTokenCountWrapper {
             inner: token_stream,
             count: self.max_tokens,
         }
     }
-
 }

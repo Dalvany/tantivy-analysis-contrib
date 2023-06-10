@@ -2,7 +2,7 @@ use std::num::NonZeroUsize;
 
 use tantivy::tokenizer::{TokenFilter, Tokenizer};
 
-use super::{EdgeNgramFilterWrapper, EdgeNgramError};
+use super::{EdgeNgramError, EdgeNgramFilterWrapper};
 
 /// Token filter that produce [ngram](https://docs.rs/tantivy/0.18.1/tantivy/tokenizer/struct.NgramTokenizer.html)
 /// from the start of the token.

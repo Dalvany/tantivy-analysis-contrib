@@ -108,7 +108,7 @@ impl ElisionTokenFilter {
 
 impl TokenFilter for ElisionTokenFilter {
     type Tokenizer<T: Tokenizer> = ElisionFilterWrapper<T>;
-    
+
     fn transform<T: Tokenizer>(self, token_stream: T) -> ElisionFilterWrapper<T> {
         ElisionFilterWrapper {
             elisions: Arc::new(self.elisions),

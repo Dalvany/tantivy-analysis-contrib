@@ -20,7 +20,7 @@ impl<T: Tokenizer> Tokenizer for EdgeNgramFilterWrapper<T> {
     type TokenStream<'a> = EdgeNgramFilterStream<T::TokenStream<'a>>;
 
     fn token_stream<'a>(&'a mut self, text: &'a str) -> Self::TokenStream<'a> {
-        EdgeNgramFilterStream  {
+        EdgeNgramFilterStream {
             tail: self.inner.token_stream(text),
             token: Default::default(),
             min: self.min.get(),

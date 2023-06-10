@@ -1,7 +1,7 @@
 //! Module that contains the [TokenStream] implementation. It's this that
 //! do the real job.
 
-use tantivy::tokenizer::{TokenStream, Token};
+use tantivy::tokenizer::{Token, TokenStream};
 
 #[derive(Clone, Debug)]
 pub(crate) struct LengthTokenStream<T> {

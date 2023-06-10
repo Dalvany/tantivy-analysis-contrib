@@ -1,6 +1,6 @@
+pub use token_filter::LengthTokenFilter;
 use token_stream::LengthTokenStream;
 use wrapper::LengthFilterWrapper;
-pub use token_filter::LengthTokenFilter;
 
 mod token_filter;
 mod token_stream;
@@ -8,22 +8,23 @@ mod wrapper;
 
 #[cfg(test)]
 mod tests {
-    use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer, Token};
+    use tantivy::tokenizer::{TextAnalyzer, Token, WhitespaceTokenizer};
 
     use super::*;
 
     fn token_stream_helper(text: &str, min: Option<usize>, max: Option<usize>) -> Vec<Token> {
         let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())
-            .filter(LengthTokenFilter::new(min, max)).build();
+            .filter(LengthTokenFilter::new(min, max))
+            .build();
 
-            let mut token_stream = a.token_stream(text);
+        let mut token_stream = a.token_stream(text);
 
-            let mut tokens = vec![];
-            let mut add_token = |token: &Token| {
-                tokens.push(token.clone());
-            };
-            token_stream.process(&mut add_token);
-            tokens
+        let mut tokens = vec![];
+        let mut add_token = |token: &Token| {
+            tokens.push(token.clone());
+        };
+        token_stream.process(&mut add_token);
+        tokens
     }
 
     #[test]

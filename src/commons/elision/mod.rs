@@ -1,19 +1,20 @@
+pub use token_filter::ElisionTokenFilter;
 use token_stream::ElisionTokenStream;
 use wrapper::ElisionFilterWrapper;
-pub use token_filter::ElisionTokenFilter;
 
+mod token_filter;
 mod token_stream;
 mod wrapper;
-mod token_filter;
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer, Token};
+    use tantivy::tokenizer::{TextAnalyzer, Token, WhitespaceTokenizer};
 
     fn tokenize_all(text: &str, elision: Vec<&str>, ignore_case: bool) -> Vec<Token> {
         let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())
-            .filter(ElisionTokenFilter::from_iter_str(elision, ignore_case)).build();
+            .filter(ElisionTokenFilter::from_iter_str(elision, ignore_case))
+            .build();
 
         let mut token_stream = a.token_stream(text);
 

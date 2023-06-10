@@ -1,12 +1,12 @@
 use std::num::NonZeroUsize;
 use thiserror::Error;
+pub use token_filter::EdgeNgramTokenFilter;
 use token_stream::EdgeNgramFilterStream;
 use wrapper::EdgeNgramFilterWrapper;
-pub use token_filter::EdgeNgramTokenFilter;
 
+mod token_filter;
 mod token_stream;
 mod wrapper;
-mod token_filter;
 
 /// Edge ngram errors
 #[derive(Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Error)]
@@ -25,7 +25,7 @@ pub enum EdgeNgramError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer, Token};
+    use tantivy::tokenizer::{TextAnalyzer, Token, WhitespaceTokenizer};
 
     fn token_stream_helper(
         text: &str,
@@ -34,8 +34,9 @@ mod tests {
         keep_original: bool,
     ) -> Vec<Token> {
         let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())
-            .filter(EdgeNgramTokenFilter::new(min, max, keep_original).unwrap()).build();
-            
+            .filter(EdgeNgramTokenFilter::new(min, max, keep_original).unwrap())
+            .build();
+
         let mut token_stream = a.token_stream(text);
 
         let mut tokens = vec![];

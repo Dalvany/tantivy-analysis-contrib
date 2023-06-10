@@ -56,5 +56,4 @@ impl TokenFilter for LengthTokenFilter {
             max: self.max,
         }
     }
-
 }
