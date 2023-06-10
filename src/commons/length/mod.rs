@@ -1,106 +1,29 @@
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
+use token_stream::LengthTokenStream;
+use wrapper::LengthFilterWrapper;
+pub use token_filter::LengthTokenFilter;
 
-struct LengthTokenStream<'a> {
-    tail: BoxTokenStream<'a>,
-    min: Option<usize>,
-    max: Option<usize>,
-}
-
-impl<'a> TokenStream for LengthTokenStream<'a> {
-    fn advance(&mut self) -> bool {
-        let mut result = true;
-        let mut length_ok = false;
-        while result && !length_ok {
-            result = self.tail.advance();
-            if result {
-                let size = self.tail.token().text.len();
-                length_ok =
-                    self.min.map_or(true, |v| v <= size) && self.max.map_or(true, |v| size <= v);
-            }
-        }
-
-        result
-    }
-
-    fn token(&self) -> &Token {
-        self.tail.token()
-    }
-
-    fn token_mut(&mut self) -> &mut Token {
-        self.tail.token_mut()
-    }
-}
-
-/// This [TokenFilter] filters tokens that don't match a min or a max length (inclusive).
-/// ```rust
-/// use tantivy_analysis_contrib::commons::LengthTokenFilter;
-///
-/// let length_token_filter = LengthTokenFilter::new(Some(4), Some(10));
-/// ```
-///
-/// # Example
-///
-/// In this example, tokens `There`, `1` and `token` are filtered out because they are too short or
-/// too long.
-///
-/// ```rust
-/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
-/// use tantivy_analysis_contrib::commons::LengthTokenFilter;
-///
-/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-///             .filter(LengthTokenFilter::new(Some(2), Some(4)))
-///             .token_stream("There is 1 token");
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "is".to_string());
-///
-/// assert_eq!(None, token_stream.next());
-/// #     Ok(())
-/// # }
-/// ```
-#[derive(Clone, Copy, Debug)]
-pub struct LengthTokenFilter {
-    min: Option<usize>,
-    max: Option<usize>,
-}
-
-impl LengthTokenFilter {
-    /// Get a new token filter.
-    /// # Parameters :
-    /// * min : minimum length a token should have (inclusive)
-    /// * max : maximum length a token should have (inclusive)
-    pub fn new(min: Option<usize>, max: Option<usize>) -> Self {
-        LengthTokenFilter { min, max }
-    }
-}
-
-impl TokenFilter for LengthTokenFilter {
-    fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
-        From::from(LengthTokenStream {
-            tail: token_stream,
-            min: self.min,
-            max: self.max,
-        })
-    }
-}
+mod token_filter;
+mod token_stream;
+mod wrapper;
 
 #[cfg(test)]
 mod tests {
-    use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer};
+    use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer, Token};
 
     use super::*;
 
     fn token_stream_helper(text: &str, min: Option<usize>, max: Option<usize>) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-            .filter(LengthTokenFilter::new(min, max))
-            .token_stream(text);
-        let mut tokens = vec![];
-        let mut add_token = |token: &Token| {
-            tokens.push(token.clone());
-        };
-        token_stream.process(&mut add_token);
-        tokens
+        let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())
+            .filter(LengthTokenFilter::new(min, max)).build();
+
+            let mut token_stream = a.token_stream(text);
+
+            let mut tokens = vec![];
+            let mut add_token = |token: &Token| {
+                tokens.push(token.clone());
+            };
+            token_stream.process(&mut add_token);
+            tokens
     }
 
     #[test]
