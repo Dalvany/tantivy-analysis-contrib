@@ -142,7 +142,7 @@ impl Default for PathTokenizer {
 impl Tokenizer for PathTokenizer {
     type TokenStream<'a> = PathTokenStream<'a>;
 
-    fn token_stream<'a>(&'a mut self, text: &'a str) -> PathTokenStream<'a> {
+    fn token_stream<'a>(&'a mut self, text: &'a str) -> Self::TokenStream<'a> {
         let mut offset = 0;
         let mut starts_with = if self.reverse {
             text.ends_with(self.delimiter)

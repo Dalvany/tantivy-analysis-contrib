@@ -143,7 +143,7 @@ extern crate derive_builder;
 
 #[cfg(feature = "commons")]
 pub mod commons;
-#[cfg(any(feature = "normalizer", feature = "tokenizer", feature = "transform"))]
+#[cfg(feature = "icu")]
 pub mod icu;
 #[cfg(feature = "phonetic")]
 pub mod phonetic;

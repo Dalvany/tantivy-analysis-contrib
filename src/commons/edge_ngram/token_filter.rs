@@ -102,7 +102,7 @@ impl From<NonZeroUsize> for EdgeNgramTokenFilter {
 impl TokenFilter for EdgeNgramTokenFilter {
     type Tokenizer<T: Tokenizer> = EdgeNgramFilterWrapper<T>;
 
-    fn transform<T: Tokenizer>(self, tokenizer: T) -> EdgeNgramFilterWrapper<T> {
+    fn transform<T: Tokenizer>(self, tokenizer: T) -> Self::Tokenizer<T> {
         EdgeNgramFilterWrapper {
             min: self.min,
             max: self.max,

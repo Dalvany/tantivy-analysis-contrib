@@ -49,7 +49,7 @@ impl LengthTokenFilter {
 impl TokenFilter for LengthTokenFilter {
     type Tokenizer<T: Tokenizer> = LengthFilterWrapper<T>;
 
-    fn transform<T: Tokenizer>(self, token_stream: T) -> LengthFilterWrapper<T> {
+    fn transform<T: Tokenizer>(self, token_stream: T) -> Self::Tokenizer<T> {
         LengthFilterWrapper {
             inner: token_stream,
             min: self.min,

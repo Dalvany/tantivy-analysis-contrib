@@ -1,161 +1,22 @@
 //! This module provides a tokenizer that uses the same rules to break string into words.
-//!
-use rust_icu_ubrk::UBreakIterator;
-use std::str::Chars;
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream, Tokenizer};
+use token_stream::ICUTokenizerTokenStream;
+pub use tokenizer::ICUTokenizer;
+
+mod token_stream;
+mod tokenizer;
 
 /// Default rules, copy from Lucene's binary rules
 const DEFAULT_RULES: &str = include_str!("breaking_rules/Default.rbbi");
 
+/*
 /// Myanmar rules, copy from Lucene's binary rules
-/*const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");*/
-
-struct ICUBreakingWord<'a> {
-    text: Chars<'a>,
-    default_breaking_iterator: UBreakIterator,
-}
-
-impl<'a> From<&'a str> for ICUBreakingWord<'a> {
-    fn from(text: &'a str) -> Self {
-        ICUBreakingWord {
-            text: text.chars(),
-            default_breaking_iterator: UBreakIterator::try_new_rules(DEFAULT_RULES, text)
-                .expect("Can't read default rules."),
-        }
-    }
-}
-
-impl<'a> Iterator for ICUBreakingWord<'a> {
-    type Item = (String, usize, usize);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        // It is a port in Rust of Lucene algorithm
-        let mut cont = true;
-        let mut start = self.default_breaking_iterator.current();
-        let mut end = self.default_breaking_iterator.next();
-        while cont && end.is_some() {
-            if end.is_some() && self.default_breaking_iterator.get_rule_status() == 0 {
-                start = end.unwrap();
-                end = self.default_breaking_iterator.next();
-            }
-            if let Some(index) = end {
-                cont = !self
-                    .text
-                    .clone()
-                    .take(index as usize)
-                    .skip(start as usize)
-                    .any(char::is_alphanumeric);
-            }
-        }
-
-        match end {
-            None => None,
-            Some(index) => {
-                let substring: String = self
-                    .text
-                    .clone()
-                    .take(index as usize)
-                    .skip(start as usize)
-                    .collect();
-                Some((substring, start as usize, index as usize))
-            }
-        }
-    }
-}
-
-struct ICUTokenizerTokenStream<'a> {
-    breaking_word: ICUBreakingWord<'a>,
-    token: Token,
-}
-
-impl<'a> ICUTokenizerTokenStream<'a> {
-    fn new(text: &'a str) -> Self {
-        ICUTokenizerTokenStream {
-            breaking_word: ICUBreakingWord::from(text),
-            token: Token::default(),
-        }
-    }
-}
-
-impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
-    fn advance(&mut self) -> bool {
-        let token = self.breaking_word.next();
-        match token {
-            None => false,
-            Some(token) => {
-                self.token.text.clear();
-                self.token.position = self.token.position.wrapping_add(1);
-                self.token.offset_from = token.1;
-                self.token.offset_to = token.2;
-                self.token.text.push_str(&token.0);
-                true
-            }
-        }
-    }
-
-    fn token(&self) -> &Token {
-        &self.token
-    }
-
-    fn token_mut(&mut self) -> &mut Token {
-        &mut self.token
-    }
-}
-
-/// ICU [Tokenizer]. It does not (yet ?) work as Lucene's counterpart.
-/// Getting a tokenizer is simple :
-/// ```rust
-/// use tantivy_analysis_contrib::icu::ICUTokenizer;
-///
-/// let tokenizer = ICUTokenizer;
-/// ```
-///
-/// # Example
-///
-/// Here is an example of a tokenization result
-///
-/// ```rust
-/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// use tantivy::tokenizer::{TextAnalyzer, Token};
-/// use tantivy_analysis_contrib::icu::ICUTokenizer;
-///
-/// let mut token_stream = TextAnalyzer::from(ICUTokenizer).token_stream("我是中国人。 １２３４ Ｔｅｓｔｓ ");
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "我".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "是".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "中".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "国".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "人".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "１２３４".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "Ｔｅｓｔｓ".to_string());
-///
-/// assert_eq!(None, token_stream.next());
-/// #     Ok(())
-/// # }
-#[derive(Clone, Copy, Debug)]
-pub struct ICUTokenizer;
-
-impl Tokenizer for ICUTokenizer {
-    fn token_stream<'a>(&self, text: &'a str) -> BoxTokenStream<'a> {
-        BoxTokenStream::from(ICUTokenizerTokenStream::new(text))
-    }
-}
+const MYANMAR_SYLLABLE_RULES: &str = std::include_str!("breaking_rules/MyanmarSyllable.rbbi");
+*/
 
 #[cfg(test)]
 mod tests {
+    use tantivy::tokenizer::{Token, TokenStream};
+
     /// Same tests as Lucene ICU tokenizer might be enough
     use super::*;
 
@@ -164,7 +25,7 @@ mod tests {
 
         fn next(&mut self) -> Option<Self::Item> {
             if self.advance() {
-                return Some(self.token.clone());
+                return Some(self.token().clone());
             }
 
             None

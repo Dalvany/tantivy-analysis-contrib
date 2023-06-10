@@ -16,10 +16,7 @@ exclude = ["/.github"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [features]
 default = ["icu", "commons", "phonetic"]
-icu = ["tokenizer", "normalizer", "transform"]
-tokenizer = ["rust_icu_ubrk"]
-normalizer = ["rust_icu_unorm2"]
-transform = ["rust_icu_sys", "rust_icu_utrans"]
+icu = ["rust_icu_ubrk", "rust_icu_unorm2", "rust_icu_sys", "rust_icu_utrans", "rust_icu_common"]
 commons = ["derive_builder", "either", "fst"]
 phonetic = ["rphonetic"]
 embedded = ["embedded_bm", "embedded_dm"]
@@ -34,6 +31,7 @@ rust_icu_sys = { version = "4.0", optional = true }
 rust_icu_unorm2 = { version = "4.0", optional = true }
 rust_icu_ubrk = { version = "4.0", optional = true }
 rust_icu_utrans = { version = "4.0", optional = true }
+rust_icu_common = { version = "4.0", optional = true }
 
 # Phonetic
 rphonetic = { version = "2.1", optional = true }
