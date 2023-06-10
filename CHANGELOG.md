@@ -3,6 +3,8 @@
 ## 0.9.0
 
 * Add phonex algorithm
+* Rework for Tantivy 0.20
+* Remove deprecated trim filter
 
 ## 0.8.0
 

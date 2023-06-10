@@ -15,8 +15,6 @@
 //! [ReversePathHierarchyTokenizer](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/path/ReversePathHierarchyTokenizer.html))
 //!     * [LengthTokenFilter](crate::commons::LengthTokenFilter) that remove tokens which doesn't are above or below certain limits (see
 //! [LengthFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LengthFilter.html))
-//!     * [TrimTokenFilter](crate::commons::TrimTokenFilter) that trims leading and trailing whitespace, this is an equivalent of Lucene's
-//! [TrimFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/TrimFilter.html)
 //!     * [LimitTokenCountFilter](crate::commons::LimitTokenCountFilter) that limits the number of token, see
 //! [LimitTokenCountFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LimitTokenCountFilter.html)
 //!     * [ReverseTokenFilter](crate::commons::ReverseTokenFilter) that reverse a string see

@@ -1,6 +1,6 @@
 pub use token_filter::LimitTokenCountFilter;
 use token_stream::LimitTokenCountStream;
-use wrapper::LimitTokenCountWrapper;
+use wrapper::LimitTokenCountFilterWrapper;
 
 mod token_filter;
 mod token_stream;

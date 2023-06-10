@@ -4,20 +4,18 @@
 
 use tantivy::tokenizer::Tokenizer;
 
-use super::LimitTokenCountStream;
+use super::ReverseTokenStream;
 
 #[derive(Clone, Debug)]
-pub(crate) struct LimitTokenCountFilterWrapper<T> {
-    count: usize,
+pub(crate) struct ReverseFilterWrapper<T> {
     inner: T,
 }
 
-impl<T: Tokenizer> Tokenizer for LimitTokenCountFilterWrapper<T> {
-    type TokenStream<'a> = LimitTokenCountStream<T::TokenStream<'a>>;
+impl<T: Tokenizer> Tokenizer for ReverseFilterWrapper<T> {
+    type TokenStream<'a> = ReverseTokenStream<T::TokenStream<'a>>;
 
     fn token_stream<'a>(&'a mut self, text: &'a str) -> Self::TokenStream<'a> {
-        LimitTokenCountStream {
-            count: self.count,
+        ReverseTokenStream {
             tail: self.inner.token_stream(text),
         }
     }
