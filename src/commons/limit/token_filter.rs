@@ -16,9 +16,10 @@ use tantivy::tokenizer::{TokenFilter, Tokenizer};
 /// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
 /// use tantivy_analysis_contrib::commons::LimitTokenCountFilter;
 ///
-/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-///             .filter(LimitTokenCountFilter::from(3))
-///             .token_stream("There will be 3 tokens in the end");
+/// let mut tmp = TextAnalyzer::builder(WhitespaceTokenizer::default())
+///    .filter(LimitTokenCountFilter::from(3))
+///    .build();
+/// let mut token_stream = tmp.token_stream("There will be 3 tokens in the end");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 /// assert_eq!(token.text, "There".to_string());

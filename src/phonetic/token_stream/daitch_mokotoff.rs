@@ -12,7 +12,12 @@ pub(crate) struct DaitchMokotoffTokenStream<T> {
 }
 
 impl<T> DaitchMokotoffTokenStream<T> {
-    pub(crate) fn new(tail: T, encoder: DaitchMokotoffSoundex, branching: bool, inject:bool) -> Self {
+    pub(crate) fn new(
+        tail: T,
+        encoder: DaitchMokotoffSoundex,
+        branching: bool,
+        inject: bool,
+    ) -> Self {
         Self {
             tail,
             encoder,

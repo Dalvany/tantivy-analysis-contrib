@@ -17,7 +17,12 @@ pub struct EdgeNgramFilterWrapper<T> {
 }
 
 impl<T> EdgeNgramFilterWrapper<T> {
-    pub(crate) fn new(inner: T, min: NonZeroUsize, max: Option<NonZeroUsize>, keep_original_token:bool) -> Self {
+    pub(crate) fn new(
+        inner: T,
+        min: NonZeroUsize,
+        max: Option<NonZeroUsize>,
+        keep_original_token: bool,
+    ) -> Self {
         Self {
             min,
             max,

@@ -14,9 +14,7 @@ pub struct ReverseTokenStream<T> {
 
 impl<T> ReverseTokenStream<T> {
     pub(crate) fn new(tail: T) -> Self {
-        Self {
-            tail,
-        }
+        Self { tail }
     }
 }
 

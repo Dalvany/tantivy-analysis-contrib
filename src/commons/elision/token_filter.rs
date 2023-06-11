@@ -25,9 +25,10 @@ use super::ElisionFilterWrapper;
 /// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
 /// use tantivy_analysis_contrib::commons::ElisionTokenFilter;
 ///
-/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-///             .filter(ElisionTokenFilter::from_iter_str(vec!["L", "M"], true))
-///             .token_stream("Plop, juste pour voir l'embrouille avec O'brian. m'enfin.");
+/// let mut tmp = TextAnalyzer::builder(WhitespaceTokenizer::default())
+///    .filter(ElisionTokenFilter::from_iter_str(vec!["L", "M"], true))
+///    .build();
+/// let mut token_stream = tmp.token_stream("Plop, juste pour voir l'embrouille avec O'brian. m'enfin.");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 /// assert_eq!(token.text, "Plop,".to_string());

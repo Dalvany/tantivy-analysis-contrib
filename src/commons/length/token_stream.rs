@@ -12,11 +12,7 @@ pub struct LengthTokenStream<T> {
 
 impl<T> LengthTokenStream<T> {
     pub(crate) fn new(tail: T, min: Option<usize>, max: Option<usize>) -> Self {
-        Self {
-            tail,
-            min,
-            max,
-        }
+        Self { tail, min, max }
     }
 }
 

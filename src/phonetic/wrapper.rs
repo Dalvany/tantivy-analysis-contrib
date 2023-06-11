@@ -2,7 +2,7 @@
 //! it's mostly here to give to the bottom component of the analysis
 //! stack (which is a [Tokenizer]) the text to parse.
 
-use rphonetic::{BeiderMorseBuilder, Phonex, Encoder};
+use rphonetic::{BeiderMorseBuilder, Encoder, Phonex};
 use tantivy::tokenizer::{TokenStream, Tokenizer};
 
 use super::{
@@ -36,7 +36,7 @@ pub struct PhoneticFilterWrapper<T> {
 }
 
 impl<T> PhoneticFilterWrapper<T> {
-    pub(crate) fn new(inner: T, algorithm:EncoderAlgorithm, inject: bool) -> Self {
+    pub(crate) fn new(inner: T, algorithm: EncoderAlgorithm, inject: bool) -> Self {
         Self {
             algorithm,
             inject,

@@ -19,9 +19,10 @@ use super::LengthFilterWrapper;
 /// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
 /// use tantivy_analysis_contrib::commons::LengthTokenFilter;
 ///
-/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-///             .filter(LengthTokenFilter::new(Some(2), Some(4)))
-///             .token_stream("There is 1 token");
+/// let mut tmp = TextAnalyzer::builder(WhitespaceTokenizer::default())
+///    .filter(LengthTokenFilter::new(Some(2), Some(4)))
+///    .build();
+/// let mut token_stream = tmp.token_stream("There is 1 token");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 /// assert_eq!(token.text, "is".to_string());

@@ -14,7 +14,7 @@ pub struct ICUNormalizer2TokenStream<T> {
 }
 
 impl<T> ICUNormalizer2TokenStream<T> {
-    pub(crate) fn new(tail:T, normalizer:UNormalizer) -> Self {
+    pub(crate) fn new(tail: T, normalizer: UNormalizer) -> Self {
         Self {
             normalizer,
             tail,

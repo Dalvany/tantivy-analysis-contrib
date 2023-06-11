@@ -26,9 +26,10 @@ use super::{EdgeNgramError, EdgeNgramFilterWrapper};
 /// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
 /// use tantivy_analysis_contrib::commons::EdgeNgramTokenFilter;
 ///
-/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-///             .filter(EdgeNgramTokenFilter::new(NonZeroUsize::new(2).unwrap(), NonZeroUsize::new(4), false)?)
-///             .token_stream("Quick");
+/// let mut tmp = TextAnalyzer::builder(WhitespaceTokenizer::default())
+///    .filter(EdgeNgramTokenFilter::new(NonZeroUsize::new(2).unwrap(), NonZeroUsize::new(4), false)?)
+///    .build();
+/// let mut token_stream = tmp.token_stream("Quick");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 /// assert_eq!(token.text, "Qu".to_string());

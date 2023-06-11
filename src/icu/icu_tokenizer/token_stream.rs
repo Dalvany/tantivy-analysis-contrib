@@ -10,8 +10,8 @@ struct ICUBreakingWord<'a> {
 impl<'a> std::fmt::Debug for ICUBreakingWord<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ICUBreakingWord")
-         .field("text", &self.text)
-         .finish()
+            .field("text", &self.text)
+            .finish()
     }
 }
 

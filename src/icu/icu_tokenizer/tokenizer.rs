@@ -18,7 +18,8 @@ use tantivy::tokenizer::Tokenizer;
 /// use tantivy::tokenizer::{TextAnalyzer, Token};
 /// use tantivy_analysis_contrib::icu::ICUTokenizer;
 ///
-/// let mut token_stream = TextAnalyzer::from(ICUTokenizer).token_stream("我是中国人。 １２３４ Ｔｅｓｔｓ ");
+/// let mut tmp = TextAnalyzer::builder(ICUTokenizer::default()).build();
+/// let mut token_stream = tmp.token_stream("我是中国人。 １２３４ Ｔｅｓｔｓ ");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 /// assert_eq!(token.text, "我".to_string());
@@ -44,7 +45,7 @@ use tantivy::tokenizer::Tokenizer;
 /// assert_eq!(None, token_stream.next());
 /// #     Ok(())
 /// # }
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct ICUTokenizer;
 
 impl Tokenizer for ICUTokenizer {

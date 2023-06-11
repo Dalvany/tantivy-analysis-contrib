@@ -17,12 +17,13 @@ use super::{ICUNormalizer2FilterWrapper, Mode};
 ///
 /// Building an [ICUNormalizer2TokenFilter] is straightforward :
 /// ```rust
+/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// use tantivy_analysis_contrib::icu::ICUNormalizer2TokenFilter;
 /// use tantivy_analysis_contrib::icu::Mode;
 ///
-/// let normalizer = ICUNormalizer2TokenFilter {
-///     mode: Mode::NFD,
-/// };
+/// let normalizer = ICUNormalizer2TokenFilter::new(Mode::NFD)?;
+/// #     Ok(())
+/// # }
 /// ```
 ///
 /// # Example
@@ -34,9 +35,10 @@ use super::{ICUNormalizer2FilterWrapper, Mode};
 /// use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token};
 /// use tantivy_analysis_contrib::icu::{ICUNormalizer2TokenFilter, Mode};
 ///
-/// let mut token_stream = TextAnalyzer::from(RawTokenizer)
-///             .filter(ICUNormalizer2TokenFilter::new(Mode::NFKCCasefold))
-///             .token_stream("Ruß");
+/// let mut tmp = TextAnalyzer::builder(RawTokenizer::default())
+///    .filter(ICUNormalizer2TokenFilter::new(Mode::NFKCCasefold)?)
+///    .build();
+/// let mut token_stream = tmp.token_stream("Ruß");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 ///

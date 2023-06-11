@@ -12,7 +12,13 @@ pub(crate) struct BeiderMorseTokenStream<'a, T> {
 }
 
 impl<'a, T> BeiderMorseTokenStream<'a, T> {
-    pub(crate) fn new(tail: T, encoder: BeiderMorse<'a>,  max_phonemes:usize, languages: Option<LanguageSet>, inject:bool )-> Self {
+    pub(crate) fn new(
+        tail: T,
+        encoder: BeiderMorse<'a>,
+        max_phonemes: usize,
+        languages: Option<LanguageSet>,
+        inject: bool,
+    ) -> Self {
         Self {
             tail,
             encoder,

@@ -9,7 +9,7 @@ pub(crate) struct DoubleMetaphoneTokenStream<T> {
 }
 
 impl<T> DoubleMetaphoneTokenStream<T> {
-    pub(crate) fn new(tail: T, encoder:DoubleMetaphone, inject:bool) -> Self {
+    pub(crate) fn new(tail: T, encoder: DoubleMetaphone, inject: bool) -> Self {
         Self {
             tail,
             encoder,

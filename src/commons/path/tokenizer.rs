@@ -33,12 +33,12 @@ use tantivy::tokenizer::Tokenizer;
 /// use tantivy_analysis_contrib::commons::{PathTokenizer, PathTokenizerBuilder};
 ///
 /// let path_tokenizer = PathTokenizerBuilder::default()
-///                             .skip(1_usize)
-///                             .delimiter('\\')
-///                             .build()?;
+///    .skip(1_usize)
+///    .delimiter('\\')
+///    .build()?;
 ///
-/// let mut token_stream = TextAnalyzer::from(path_tokenizer)
-///             .token_stream("c:\\a\\b\\c");
+/// let mut tmp = TextAnalyzer::builder(path_tokenizer).build();
+/// let mut token_stream = tmp.token_stream("c:\\a\\b\\c");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 /// assert_eq!(token.text, "\\a".to_string());
@@ -62,13 +62,13 @@ use tantivy::tokenizer::Tokenizer;
 /// use tantivy_analysis_contrib::commons::{PathTokenizer, PathTokenizerBuilder};
 ///
 /// let path_tokenizer = PathTokenizerBuilder::default()
-///                             .delimiter('\\')
-///                             .replacement('/')
-///                             .reverse(true)
-///                             .build()?;
+///    .delimiter('\\')
+///    .replacement('/')
+///    .reverse(true)
+///    .build()?;
 ///
-/// let mut token_stream = TextAnalyzer::from(path_tokenizer)
-///             .token_stream("c:\\a\\b\\c");
+/// let mut tmp = TextAnalyzer::builder(path_tokenizer).build();
+/// let mut token_stream = tmp.token_stream("c:\\a\\b\\c");
 ///
 /// let token = token_stream.next().expect("A token should be present.");
 /// assert_eq!(token.text, "c".to_string());
