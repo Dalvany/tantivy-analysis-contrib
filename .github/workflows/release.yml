@@ -29,7 +29,7 @@ jobs:
         run: cargo set-version --bump ${{ github.event.inputs.release_type }}
       - name: Save version to be reuse in subsequent runs
         run: |
-          export VERSION=`cargo tree --depth 0 | grep rphonetic | awk '{print $2}'`
+          export VERSION=`cargo tree --depth 0 | grep tantivy-analysis-contrib | awk '{print $2}'`
           echo "VERSION=$VERSION"  >> $GITHUB_ENV
       - name: Commit new version
         run: |
