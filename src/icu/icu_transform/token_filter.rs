@@ -76,11 +76,6 @@ impl TokenFilter for ICUTransformTokenFilter {
     type Tokenizer<T: Tokenizer> = ICUTransformFilterWrapper<T>;
 
     fn transform<T: Tokenizer>(self, token_stream: T) -> Self::Tokenizer<T> {
-        ICUTransformFilterWrapper {
-            compound_id: self.compound_id,
-            rules: self.rules,
-            direction: self.direction,
-            inner: token_stream,
-        }
+        ICUTransformFilterWrapper::new(token_stream, self.compound_id, self.rules, self.direction)
     }
 }

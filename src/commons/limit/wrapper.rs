@@ -7,18 +7,21 @@ use tantivy::tokenizer::Tokenizer;
 use super::LimitTokenCountStream;
 
 #[derive(Clone, Debug)]
-pub(crate) struct LimitTokenCountFilterWrapper<T> {
+pub struct LimitTokenCountFilterWrapper<T> {
     count: usize,
     inner: T,
+}
+
+impl<T> LimitTokenCountFilterWrapper<T> {
+    pub(crate) fn new(inner: T, count: usize) -> Self {
+        Self { count, inner }
+    }
 }
 
 impl<T: Tokenizer> Tokenizer for LimitTokenCountFilterWrapper<T> {
     type TokenStream<'a> = LimitTokenCountStream<T::TokenStream<'a>>;
 
     fn token_stream<'a>(&'a mut self, text: &'a str) -> Self::TokenStream<'a> {
-        LimitTokenCountStream {
-            count: self.count,
-            tail: self.inner.token_stream(text),
-        }
+        LimitTokenCountStream::new(self.inner.token_stream(text), self.count)
     }
 }

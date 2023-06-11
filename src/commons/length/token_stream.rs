@@ -4,10 +4,20 @@
 use tantivy::tokenizer::{Token, TokenStream};
 
 #[derive(Clone, Debug)]
-pub(crate) struct LengthTokenStream<T> {
+pub struct LengthTokenStream<T> {
     tail: T,
     min: Option<usize>,
     max: Option<usize>,
+}
+
+impl<T> LengthTokenStream<T> {
+    pub(crate) fn new(tail: T, min: Option<usize>, max: Option<usize>) -> Self {
+        Self {
+            tail,
+            min,
+            max,
+        }
+    }
 }
 
 impl<T: TokenStream> TokenStream for LengthTokenStream<T> {

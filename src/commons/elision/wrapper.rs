@@ -10,20 +10,30 @@ use tantivy::tokenizer::Tokenizer;
 use super::ElisionTokenStream;
 
 #[derive(Clone, Debug)]
-pub(crate) struct ElisionFilterWrapper<T> {
+pub struct ElisionFilterWrapper<T> {
     elisions: Arc<FxHashSet<String>>,
     ignore_case: bool,
     inner: T,
+}
+
+impl<T> ElisionFilterWrapper<T> {
+    pub(crate) fn new(inner: T, elisions: Arc<FxHashSet<String>>, ignore_case: bool) -> Self {
+        Self {
+            elisions,
+            ignore_case,
+            inner,
+        }
+    }
 }
 
 impl<T: Tokenizer> Tokenizer for ElisionFilterWrapper<T> {
     type TokenStream<'a> = ElisionTokenStream<T::TokenStream<'a>>;
 
     fn token_stream<'a>(&'a mut self, text: &'a str) -> Self::TokenStream<'a> {
-        ElisionTokenStream {
-            tail: self.inner.token_stream(text),
-            elisions: self.elisions.clone(),
-            ignore_case: self.ignore_case,
-        }
+        ElisionTokenStream::new(
+            self.inner.token_stream(text),
+            self.elisions.clone(),
+            self.ignore_case,
+        )
     }
 }

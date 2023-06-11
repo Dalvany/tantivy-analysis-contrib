@@ -1,12 +1,26 @@
+//! Module that contains the [TokenStream] implementation. It's this that
+//! do the real job.
+
 use std::mem;
 
 use rust_icu_utrans as utrans;
 use tantivy::tokenizer::{Token, TokenStream};
 
-pub(crate) struct ICUTransformTokenStream<T> {
+#[derive(Debug)]
+pub struct ICUTransformTokenStream<T> {
     transform: utrans::UTransliterator,
     tail: T,
     temp: String,
+}
+
+impl<T> ICUTransformTokenStream<T> {
+    pub(crate) fn new(tail: T, transform: utrans::UTransliterator) -> Self {
+        Self {
+            transform,
+            tail,
+            temp: String::with_capacity(100),
+        }
+    }
 }
 
 impl<T: TokenStream> TokenStream for ICUTransformTokenStream<T> {

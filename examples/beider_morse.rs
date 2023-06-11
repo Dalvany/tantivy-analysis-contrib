@@ -42,7 +42,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     let phonetic_filter: PhoneticTokenFilter = algorithm.try_into()?;
-    let beider_morse = TextAnalyzer::from(WhitespaceTokenizer).filter(phonetic_filter);
+    let beider_morse =
+        TextAnalyzer::builder(WhitespaceTokenizer::default()).filter(phonetic_filter).build();
 
     let field = schema.get_field("field").expect("Can't get field.");
 

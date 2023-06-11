@@ -32,52 +32,36 @@
 //!
 //! Every parameter of [PhoneticAlgorithm]'s variant is typed to try to make it clear what is their purpose.
 //! Most of them are [Option] allowing to use default values.
-use std::collections::VecDeque;
-use std::fmt::{Display, Formatter};
 
 pub use rphonetic::{BMError, LanguageSet, NameType, PhoneticError, RuleType};
 use rphonetic::{
-    BeiderMorseBuilder, Caverphone1, Caverphone2, Cologne, ConfigFiles, DaitchMokotoffSoundex,
-    DaitchMokotoffSoundexBuilder, DoubleMetaphone, Encoder, MatchRatingApproach, Metaphone, Nysiis,
-    Phonex, RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
+    Caverphone1, Caverphone2, Cologne, ConfigFiles, DaitchMokotoffSoundex,
+    DaitchMokotoffSoundexBuilder, DoubleMetaphone, MatchRatingApproach, Metaphone, Nysiis, Phonex,
+    RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
 };
-use tantivy::tokenizer::{BoxTokenStream, TokenFilter};
+use thiserror::Error;
 
 pub use types::*;
 
-use crate::phonetic::beider_morse::BeiderMorseTokenStream;
-use crate::phonetic::daitch_mokotoff::DaitchMokotoffTokenStream;
-use crate::phonetic::double_metaphone::DoubleMetaphoneTokenStream;
-use crate::phonetic::generic::GenericPhoneticTokenStream;
+pub use token_filter::PhoneticTokenFilter;
+use token_stream::BeiderMorseTokenStream;
+use token_stream::DaitchMokotoffTokenStream;
+use token_stream::DoubleMetaphoneTokenStream;
+use token_stream::GenericPhoneticTokenStream;
+use wrapper::PhoneticFilterWrapper;
 
-mod beider_morse;
-mod daitch_mokotoff;
-mod double_metaphone;
-mod generic;
+mod token_filter;
+mod token_stream;
 mod types;
+mod wrapper;
 
 /// Errors from encoder.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Error, Debug, Clone, PartialEq)]
 pub enum Error {
     /// Fail to create the encoder. It contains the rphonetic error.
-    AlgorithmError(PhoneticError),
+    #[error("{0}")]
+    AlgorithmError(#[from] PhoneticError),
 }
-
-impl From<PhoneticError> for Error {
-    fn from(error: PhoneticError) -> Self {
-        Self::AlgorithmError(error)
-    }
-}
-
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Error::AlgorithmError(error) => write!(f, "{error}"),
-        }
-    }
-}
-
-impl std::error::Error for Error {}
 
 /// These are different algorithms from [rphonetic crate](https://docs.rs/rphonetic/1.0.0/rphonetic/).
 ///
@@ -151,7 +135,7 @@ pub enum PhoneticAlgorithm {
 // proper encoder implem, avoiding unwrapping
 // when calling build() on DaitchMokotoffSoundexBuilder.
 #[derive(Clone, Debug)]
-enum EncoderAlgorithm {
+pub(crate) enum EncoderAlgorithm {
     // We will recreate the BeiderMorse as it has a lifetime, and it could be in the phonetic token filter...
     BeiderMorse(
         &'static ConfigFiles,
@@ -293,256 +277,6 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
     }
 }
 
-/// Phonex wrapper to handle the case only '0'.
-/// This structure implements rphonetic's trait
-/// [Encoder] that delegates call to phonex encoder
-/// and then handle the specific case.
-struct PhonexWrapper(Phonex);
-
-impl Encoder for PhonexWrapper {
-    fn encode(&self, s: &str) -> String {
-        let result = self.0.encode(s);
-        // If only '0' then treat as empty string.
-        if result.bytes().any(|b| b != b'0') {
-            result
-        } else {
-            "".to_owned()
-        }
-    }
-}
-
-/// This the phonetic token filter.
-/// It generates a token according
-/// to the algorithm provided.
-///
-/// You should use [PhoneticAlgorithm] to construct a new [PhoneticTokenFilter].
-///
-/// ```rust
-/// # fn main() -> Result<(), tantivy_analysis_contrib::phonetic::Error> {
-/// use tantivy_analysis_contrib::phonetic::{Alternate, MaxCodeLength, PhoneticAlgorithm, PhoneticTokenFilter, Strict};
-///
-/// // Example with Double Metaphone.
-/// let algorithm = PhoneticAlgorithm::DoubleMetaphone(MaxCodeLength(None), Alternate(false));
-/// let token_filter = PhoneticTokenFilter::try_from(algorithm)?;
-///
-/// // Another example with Nysiis
-/// let algorithm = PhoneticAlgorithm::Nysiis(Strict(None));
-/// let token_filter = PhoneticTokenFilter::try_from(algorithm)?;
-///
-/// #    Ok(())
-/// # }
-/// ```
-#[derive(Clone, Debug)]
-pub struct PhoneticTokenFilter {
-    algorithm: EncoderAlgorithm,
-    inject: bool,
-}
-
-impl TokenFilter for PhoneticTokenFilter {
-    fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
-        match &self.algorithm {
-            // Beider Morse
-            EncoderAlgorithm::BeiderMorse(
-                config_files,
-                name_type,
-                rule_type,
-                concat,
-                max_phonemes,
-                languages_set,
-            ) => {
-                let mut builder = BeiderMorseBuilder::new(config_files);
-                if let Some(name_type) = name_type {
-                    builder = builder.name_type(*name_type);
-                }
-                if let Some(rule_type) = rule_type {
-                    builder = builder.rule_type(*rule_type);
-                }
-                if let Some(concat) = concat {
-                    builder = builder.concat(*concat);
-                }
-                if let Some(max_phonemes) = max_phonemes {
-                    builder = builder.max_phonemes(*max_phonemes);
-                }
-
-                let max_phonemes = match max_phonemes {
-                    Some(max_phonemes) => *max_phonemes,
-                    None => 20,
-                };
-                let encoder = builder.build();
-                BoxTokenStream::from(BeiderMorseTokenStream {
-                    tail: token_stream,
-                    encoder,
-                    codes: VecDeque::with_capacity(max_phonemes),
-                    languages: languages_set.clone(),
-                    inject: self.inject,
-                })
-            }
-            // Caverphone1
-            EncoderAlgorithm::Caverphone1(encoder) => {
-                BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    backup: None,
-                    inject: self.inject,
-                })
-            }
-            // Caverphone2
-            EncoderAlgorithm::Caverphone2(encoder) => {
-                BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    backup: None,
-                    inject: self.inject,
-                })
-            }
-            // Cologne
-            EncoderAlgorithm::Cologne(encoder) => {
-                BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    backup: None,
-                    inject: self.inject,
-                })
-            }
-            // Daitch Mokotoff
-            EncoderAlgorithm::DaitchMokotoffSoundex(encoder, branching) => {
-                BoxTokenStream::from(DaitchMokotoffTokenStream {
-                    tail: token_stream,
-                    encoder: encoder.clone(),
-                    branching: *branching,
-                    codes: VecDeque::new(),
-                    inject: self.inject,
-                })
-            }
-            // Double Metaphone
-            EncoderAlgorithm::DoubleMetaphone(encoder, use_alternate) => match use_alternate {
-                // Alternate: if true, use specific token filter, otherwise, use generic
-                true => BoxTokenStream::from(DoubleMetaphoneTokenStream {
-                    tail: token_stream,
-                    encoder: *encoder,
-                    codes: vec![],
-                    inject: self.inject,
-                }),
-                false => BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    inject: self.inject,
-                    backup: None,
-                }),
-            },
-            // Match Rating Approach
-            EncoderAlgorithm::MatchRatingApproach(encoder) => {
-                BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    backup: None,
-                    inject: self.inject,
-                })
-            }
-            // Metaphone
-            EncoderAlgorithm::Metaphone(encoder) => {
-                BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    backup: None,
-                    inject: self.inject,
-                })
-            }
-            // Nysiis
-            EncoderAlgorithm::Nysiis(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
-                tail: token_stream,
-                encoder: Box::new(*encoder),
-                backup: None,
-                inject: self.inject,
-            }),
-            // Phonex
-            EncoderAlgorithm::Phonex(encoder) => BoxTokenStream::from(GenericPhoneticTokenStream {
-                tail: token_stream,
-                encoder: Box::new(PhonexWrapper(*encoder)),
-                backup: None,
-                inject: self.inject,
-            }),
-            // Refined Soundex
-            EncoderAlgorithm::RefinedSoundex(encoder) => {
-                BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    backup: None,
-                    inject: self.inject,
-                })
-            }
-            // Soundex
-            EncoderAlgorithm::Soundex(encoder) => {
-                BoxTokenStream::from(GenericPhoneticTokenStream {
-                    tail: token_stream,
-                    encoder: Box::new(*encoder),
-                    backup: None,
-                    inject: self.inject,
-                })
-            }
-        }
-    }
-}
-
-/// Get the token filter from a [PhoneticAlgorithm]. This will
-/// take care of all the boilerplate.
-///
-/// The boolean indicates if encoded values should be treated as synonyms (`true`), in
-/// this case the original token will be present, or if it should replace (`false`) the
-/// original token.
-impl TryFrom<(PhoneticAlgorithm, bool)> for PhoneticTokenFilter {
-    type Error = Error;
-
-    fn try_from((value, inject): (PhoneticAlgorithm, bool)) -> Result<Self, Self::Error> {
-        (&value, inject).try_into()
-    }
-}
-
-/// Get the token filter from a [PhoneticAlgorithm]. This will
-/// take care of all the boilerplate.
-///
-/// The boolean indicates if encoded values should be treated as synonyms (`true`), in
-/// this case the original token will be present, or if it should replace (`false`) the
-/// original token.
-impl TryFrom<(&PhoneticAlgorithm, bool)> for PhoneticTokenFilter {
-    type Error = Error;
-
-    fn try_from((value, inject): (&PhoneticAlgorithm, bool)) -> Result<Self, Self::Error> {
-        let algorithm: EncoderAlgorithm = value.try_into()?;
-        Ok(Self { algorithm, inject })
-    }
-}
-
-/// Get the token filter from a [PhoneticAlgorithm]. This will
-/// take care of all the boilerplate.
-///
-/// Encoded values will be added as synonyms; that means the original
-/// token will be present.
-impl TryFrom<PhoneticAlgorithm> for PhoneticTokenFilter {
-    type Error = Error;
-
-    fn try_from(value: PhoneticAlgorithm) -> Result<Self, Self::Error> {
-        (&value).try_into()
-    }
-}
-
-/// Get the token filter from a [PhoneticAlgorithm]. This will
-/// take care of all the boilerplate.
-///
-/// Encoded values will be added as synonyms; that means the original
-/// token will be present.
-impl TryFrom<&PhoneticAlgorithm> for PhoneticTokenFilter {
-    type Error = Error;
-
-    fn try_from(value: &PhoneticAlgorithm) -> Result<Self, Self::Error> {
-        let algorithm: EncoderAlgorithm = value.try_into()?;
-        Ok(Self {
-            algorithm,
-            inject: true,
-        })
-    }
-}
-
 // Tests are in the respective token stream tested
 // It contains the helper method...
 #[cfg(test)]
@@ -552,9 +286,12 @@ pub(crate) mod tests {
     use crate::phonetic::PhoneticTokenFilter;
 
     pub fn token_stream_helper(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
+        let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())
             .filter(token_filter)
-            .token_stream(text);
+            .build();
+
+        let mut token_stream = a.token_stream(text);
+
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
             tokens.push(token.clone());
@@ -564,9 +301,12 @@ pub(crate) mod tests {
     }
 
     pub fn token_stream_helper_raw(text: &str, token_filter: PhoneticTokenFilter) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(RawTokenizer)
+        let mut a = TextAnalyzer::builder(RawTokenizer::default())
             .filter(token_filter)
-            .token_stream(text);
+            .build();
+
+        let mut token_stream = a.token_stream(text);
+
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
             tokens.push(token.clone());

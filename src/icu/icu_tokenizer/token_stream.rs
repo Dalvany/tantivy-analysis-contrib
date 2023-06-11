@@ -7,6 +7,14 @@ struct ICUBreakingWord<'a> {
     default_breaking_iterator: UBreakIterator,
 }
 
+impl<'a> std::fmt::Debug for ICUBreakingWord<'a> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ICUBreakingWord")
+         .field("text", &self.text)
+         .finish()
+    }
+}
+
 impl<'a> From<&'a str> for ICUBreakingWord<'a> {
     fn from(text: &'a str) -> Self {
         ICUBreakingWord {
@@ -55,7 +63,8 @@ impl<'a> Iterator for ICUBreakingWord<'a> {
     }
 }
 
-pub(crate) struct ICUTokenizerTokenStream<'a> {
+#[derive(Debug)]
+pub struct ICUTokenizerTokenStream<'a> {
     breaking_word: ICUBreakingWord<'a>,
     token: Token,
 }

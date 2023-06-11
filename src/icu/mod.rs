@@ -1,12 +1,12 @@
 //! This module contains all ICU-related components.
-mod normalizer;
-mod tokenizer;
-mod transform;
+mod icu_normalizer;
+mod icu_tokenizer;
+mod icu_transform;
 
-pub use crate::icu::normalizer::ICUNormalizer2TokenFilter;
-pub use crate::icu::normalizer::Mode;
-pub use crate::icu::tokenizer::ICUTokenizer;
-pub use crate::icu::transform::Direction;
-pub use crate::icu::transform::ICUTransformTokenFilter;
+pub use crate::icu::icu_normalizer::ICUNormalizer2TokenFilter;
+pub use crate::icu::icu_normalizer::Mode;
+pub use crate::icu::icu_tokenizer::ICUTokenizer;
+pub use crate::icu::icu_transform::Direction;
+pub use crate::icu::icu_transform::ICUTransformTokenFilter;
 
 pub use rust_icu_common::Error;

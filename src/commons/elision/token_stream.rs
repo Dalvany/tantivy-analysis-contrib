@@ -7,11 +7,21 @@ use rustc_hash::FxHashSet;
 use tantivy::tokenizer::{Token, TokenStream};
 
 #[derive(Clone, Debug)]
-pub(crate) struct ElisionTokenStream<T> {
+pub struct ElisionTokenStream<T> {
     tail: T,
     // Use a BTreeSet as this set should be small otherwise use HashSet.
     elisions: Arc<FxHashSet<String>>,
     ignore_case: bool,
+}
+
+impl<T> ElisionTokenStream<T> {
+    pub(crate) fn new(tail: T, elisions: Arc<FxHashSet<String>>, ignore_case: bool) -> Self {
+        Self {
+            tail,
+            elisions,
+            ignore_case,
+        }
+    }
 }
 
 impl<T: TokenStream> TokenStream for ElisionTokenStream<T> {

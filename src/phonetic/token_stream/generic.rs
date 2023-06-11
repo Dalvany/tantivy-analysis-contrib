@@ -1,14 +1,25 @@
 use rphonetic::Encoder;
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream};
+use tantivy::tokenizer::{Token, TokenStream};
 
-pub struct GenericPhoneticTokenStream<'a> {
-    pub tail: BoxTokenStream<'a>,
-    pub encoder: Box<dyn Encoder>,
-    pub inject: bool,
-    pub backup: Option<String>,
+pub(crate) struct GenericPhoneticTokenStream<T> {
+    tail: T,
+    encoder: Box<dyn Encoder>,
+    inject: bool,
+    backup: Option<String>,
 }
 
-impl<'a> TokenStream for GenericPhoneticTokenStream<'a> {
+impl<T> GenericPhoneticTokenStream<T> {
+    pub(crate) fn new(tail: T, encoder: Box<dyn Encoder>, inject: bool) -> Self {
+        Self {
+            tail,
+            encoder,
+            inject,
+            backup: None,
+        }
+    }
+}
+
+impl<T: TokenStream> TokenStream for GenericPhoneticTokenStream<T> {
     fn advance(&mut self) -> bool {
         if let Some(backup) = &self.backup {
             self.tail.token_mut().text = backup.clone();

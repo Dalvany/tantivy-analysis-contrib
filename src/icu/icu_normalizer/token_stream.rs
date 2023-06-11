@@ -1,13 +1,26 @@
+//! Module that contains the [TokenStream] implementation. It's this that
+//! do the real job.
+
 use std::mem;
 
 use rust_icu_unorm2::UNormalizer;
 use tantivy::tokenizer::{Token, TokenStream};
 
 #[derive(Debug)]
-pub(crate) struct ICUNormalizer2TokenStream<T> {
+pub struct ICUNormalizer2TokenStream<T> {
     normalizer: UNormalizer,
     tail: T,
     temp: String,
+}
+
+impl<T> ICUNormalizer2TokenStream<T> {
+    pub(crate) fn new(tail:T, normalizer:UNormalizer) -> Self {
+        Self {
+            normalizer,
+            tail,
+            temp: String::with_capacity(100),
+        }
+    }
 }
 
 impl<T: TokenStream> TokenStream for ICUNormalizer2TokenStream<T> {

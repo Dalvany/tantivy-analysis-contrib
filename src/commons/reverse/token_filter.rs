@@ -29,8 +29,6 @@ impl TokenFilter for ReverseTokenFilter {
     type Tokenizer<T: Tokenizer> = ReverseFilterWrapper<T>;
 
     fn transform<T: Tokenizer>(self, token_stream: T) -> Self::Tokenizer<T> {
-        ReverseFilterWrapper {
-            inner: token_stream,
-        }
+        ReverseFilterWrapper::new(token_stream)
     }
 }

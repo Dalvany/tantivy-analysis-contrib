@@ -58,9 +58,6 @@ impl TokenFilter for LimitTokenCountFilter {
     type Tokenizer<T: Tokenizer> = LimitTokenCountFilterWrapper<T>;
 
     fn transform<T: Tokenizer>(self, token_stream: T) -> Self::Tokenizer<T> {
-        LimitTokenCountFilterWrapper {
-            inner: token_stream,
-            count: self.max_tokens,
-        }
+        LimitTokenCountFilterWrapper::new(token_stream, self.max_tokens)
     }
 }

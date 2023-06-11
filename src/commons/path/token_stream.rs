@@ -5,14 +5,14 @@ use either::Either;
 use tantivy::tokenizer::{Token, TokenStream};
 
 #[derive(Debug, Clone)]
-pub(crate) struct PathTokenStream<'a> {
-    text: Skip<Either<Split<'a, char>, Rev<Split<'a, char>>>>,
-    buffer: String,
-    token: Token,
-    separator: char,
-    offset: usize,
-    starts_with: bool,
-    reverse: bool,
+pub struct PathTokenStream<'a> {
+    pub(crate) text: Skip<Either<Split<'a, char>, Rev<Split<'a, char>>>>,
+    pub(crate) buffer: String,
+    pub(crate) token: Token,
+    pub(crate) separator: char,
+    pub(crate) offset: usize,
+    pub(crate) starts_with: bool,
+    pub(crate) reverse: bool,
 }
 
 impl<'a> TokenStream for PathTokenStream<'a> {

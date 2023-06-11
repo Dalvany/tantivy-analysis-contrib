@@ -103,11 +103,6 @@ impl TokenFilter for EdgeNgramTokenFilter {
     type Tokenizer<T: Tokenizer> = EdgeNgramFilterWrapper<T>;
 
     fn transform<T: Tokenizer>(self, tokenizer: T) -> Self::Tokenizer<T> {
-        EdgeNgramFilterWrapper {
-            min: self.min,
-            max: self.max,
-            keep_original_token: self.keep_original_token,
-            inner: tokenizer,
-        }
+        EdgeNgramFilterWrapper::new(tokenizer, self.min, self.max, self.keep_original_token)
     }
 }

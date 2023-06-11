@@ -4,9 +4,15 @@
 use tantivy::tokenizer::{Token, TokenStream};
 
 #[derive(Debug, Clone)]
-pub(crate) struct LimitTokenCountStream<T> {
+pub struct LimitTokenCountStream<T> {
     tail: T,
     count: usize,
+}
+
+impl<T> LimitTokenCountStream<T> {
+    pub(crate) fn new(tail: T, count: usize) -> Self {
+        Self { tail, count }
+    }
 }
 
 impl<T: TokenStream> TokenStream for LimitTokenCountStream<T> {

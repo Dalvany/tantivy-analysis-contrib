@@ -110,10 +110,6 @@ impl TokenFilter for ElisionTokenFilter {
     type Tokenizer<T: Tokenizer> = ElisionFilterWrapper<T>;
 
     fn transform<T: Tokenizer>(self, token_stream: T) -> Self::Tokenizer<T> {
-        ElisionFilterWrapper {
-            elisions: Arc::new(self.elisions),
-            ignore_case: self.ignore_case,
-            inner: token_stream,
-        }
+        ElisionFilterWrapper::new(token_stream, Arc::new(self.elisions), self.ignore_case)
     }
 }

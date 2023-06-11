@@ -73,9 +73,6 @@ impl TokenFilter for ICUNormalizer2TokenFilter {
     type Tokenizer<T: Tokenizer> = ICUNormalizer2FilterWrapper<T>;
 
     fn transform<T: Tokenizer>(self, token_stream: T) -> Self::Tokenizer<T> {
-        ICUNormalizer2FilterWrapper {
-            mode: self.mode,
-            inner: token_stream,
-        }
+        ICUNormalizer2FilterWrapper::new(token_stream, self.mode)
     }
 }

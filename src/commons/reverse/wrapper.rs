@@ -7,16 +7,20 @@ use tantivy::tokenizer::Tokenizer;
 use super::ReverseTokenStream;
 
 #[derive(Clone, Debug)]
-pub(crate) struct ReverseFilterWrapper<T> {
+pub struct ReverseFilterWrapper<T> {
     inner: T,
+}
+
+impl<T> ReverseFilterWrapper<T> {
+    pub(crate) fn new(inner: T) -> Self {
+        Self { inner }
+    }
 }
 
 impl<T: Tokenizer> Tokenizer for ReverseFilterWrapper<T> {
     type TokenStream<'a> = ReverseTokenStream<T::TokenStream<'a>>;
 
     fn token_stream<'a>(&'a mut self, text: &'a str) -> Self::TokenStream<'a> {
-        ReverseTokenStream {
-            tail: self.inner.token_stream(text),
-        }
+        ReverseTokenStream::new(self.inner.token_stream(text))
     }
 }

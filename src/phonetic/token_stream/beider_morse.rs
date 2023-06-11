@@ -1,17 +1,29 @@
 use std::collections::VecDeque;
 
 use rphonetic::{BeiderMorse, Encoder, LanguageSet};
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream};
+use tantivy::tokenizer::{Token, TokenStream};
 
-pub struct BeiderMorseTokenStream<'a> {
-    pub tail: BoxTokenStream<'a>,
-    pub encoder: BeiderMorse<'a>,
-    pub codes: VecDeque<String>,
-    pub languages: Option<LanguageSet>,
-    pub inject: bool,
+pub(crate) struct BeiderMorseTokenStream<'a, T> {
+    tail: T,
+    encoder: BeiderMorse<'a>,
+    codes: VecDeque<String>,
+    languages: Option<LanguageSet>,
+    inject: bool,
 }
 
-impl<'a> TokenStream for BeiderMorseTokenStream<'a> {
+impl<'a, T> BeiderMorseTokenStream<'a, T> {
+    pub(crate) fn new(tail: T, encoder: BeiderMorse<'a>,  max_phonemes:usize, languages: Option<LanguageSet>, inject:bool )-> Self {
+        Self {
+            tail,
+            encoder,
+            codes: VecDeque::with_capacity(max_phonemes),
+            languages,
+            inject,
+        }
+    }
+}
+
+impl<'a, T: TokenStream> TokenStream for BeiderMorseTokenStream<'a, T> {
     fn advance(&mut self) -> bool {
         while self.codes.is_empty() {
             if !self.tail.advance() {

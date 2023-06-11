@@ -4,22 +4,22 @@
 use tantivy::tokenizer::{Token, TokenStream};
 
 #[derive(Clone, Debug)]
-pub(crate) struct EdgeNgramFilterStream<T> {
-    tail: T,
+pub struct EdgeNgramFilterStream<T> {
+    pub(crate) tail: T,
     /// Current token to emit
-    token: Token,
+    pub(crate) token: Token,
     /// Minimum ngram must be greater than 0
-    min: usize,
+    pub(crate) min: usize,
     /// Maximum ngram, None means no limit
-    max: Option<usize>,
+    pub(crate) max: Option<usize>,
     /// Which ngram we should emit
-    count: usize,
+    pub(crate) count: usize,
     /// Do we have to keep the original token?
-    keep_original_token: bool,
+    pub(crate) keep_original_token: bool,
     /// Avoid doing multiple time self.tail.token().chars().count()
-    current_len: usize,
+    pub(crate) current_len: usize,
     /// Stop at
-    stop_length: usize,
+    pub(crate) stop_length: usize,
 }
 
 impl<T: TokenStream> TokenStream for EdgeNgramFilterStream<T> {

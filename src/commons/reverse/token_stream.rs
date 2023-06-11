@@ -7,8 +7,17 @@ use std::mem;
 
 use tantivy::tokenizer::{Token, TokenStream};
 
-pub(crate) struct ReverseTokenStream<T> {
+#[derive(Debug, Clone)]
+pub struct ReverseTokenStream<T> {
     tail: T,
+}
+
+impl<T> ReverseTokenStream<T> {
+    pub(crate) fn new(tail: T) -> Self {
+        Self {
+            tail,
+        }
+    }
 }
 
 impl<T: TokenStream> TokenStream for ReverseTokenStream<T> {
