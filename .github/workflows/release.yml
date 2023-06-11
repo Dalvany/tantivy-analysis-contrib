@@ -3,9 +3,15 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      release_version:
-        description: 'Version released (only version number)'
+      release_type:
+        description: 'Release type'
         required: true
+        default: 'minor'
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
 
 jobs:
   release:
@@ -19,18 +25,22 @@ jobs:
         run: cargo hack check --all --each-feature --clean-per-run --no-dev-deps
       - name: Install
         run: cargo install cargo-edit
-      - name: Set version
-        run: cargo set-version ${{ github.event.inputs.release_version }}
+      - name: Bump new version
+        run: cargo set-version --bump ${{ github.event.inputs.release_type }}
+      - name: Save version to be reuse in subsequent runs
+        run: |
+          export VERSION=`cargo tree --depth 0 | grep rphonetic | awk '{print $2}'`
+          echo "VERSION=$VERSION"  >> $GITHUB_ENV
       - name: Commit new version
         run: |
           git config user.name "$env.GITHUB_ACTOR"
           git config user.email "$env.GITHUB_ACTOR@users.noreply.github.com"
           git add .
-          git commit --allow-empty -m "Prepare v${{ github.event.inputs.release_version }}"
+          git commit -m "Prepare ${{ env.VERSION }}"
           git push
       - uses: rickstaa/action-create-tag@v1
         with:
-          tag: ${{ github.event.inputs.release_version }}
+          tag: ${{ env.VERSION }}
       - name: Publish
         shell: bash
         env:
