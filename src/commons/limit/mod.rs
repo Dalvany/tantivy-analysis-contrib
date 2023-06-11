@@ -1,106 +1,24 @@
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
+pub use token_filter::LimitTokenCountFilter;
+use token_stream::LimitTokenCountStream;
+use wrapper::LimitTokenCountFilterWrapper;
 
-struct LimitTokenCountStream<'a> {
-    tail: BoxTokenStream<'a>,
-    count: usize,
-}
-
-impl<'a> TokenStream for LimitTokenCountStream<'a> {
-    fn advance(&mut self) -> bool {
-        if self.count == 0 {
-            return false;
-        }
-
-        if !self.tail.advance() {
-            return false;
-        }
-
-        self.count -= 1;
-
-        true
-    }
-
-    fn token(&self) -> &Token {
-        self.tail.token()
-    }
-
-    fn token_mut(&mut self) -> &mut Token {
-        self.tail.token_mut()
-    }
-}
-
-/// [TokenFilter] that limit the number of tokens
-///
-/// ```rust
-/// use tantivy_analysis_contrib::commons::LimitTokenCountFilter;
-///
-/// let filter:LimitTokenCountFilter = LimitTokenCountFilter::new(5);
-/// ```
-///
-/// # Example
-///
-/// ```rust
-/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// use tantivy::tokenizer::{WhitespaceTokenizer, TextAnalyzer, Token};
-/// use tantivy_analysis_contrib::commons::LimitTokenCountFilter;
-///
-/// let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
-///             .filter(LimitTokenCountFilter::from(3))
-///             .token_stream("There will be 3 tokens in the end");
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "There".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "will".to_string());
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "be".to_string());
-///
-/// assert_eq!(None, token_stream.next());
-/// #     Ok(())
-/// # }
-/// ```
-#[derive(Clone, Copy, Debug)]
-pub struct LimitTokenCountFilter {
-    max_tokens: usize,
-}
-
-impl LimitTokenCountFilter {
-    /// Create a new [LimitTokenCountFilter].
-    ///
-    /// # Parameters :
-    /// * max_tokens : maximum number of tokens that will be indexed
-    pub fn new(max_tokens: usize) -> Self {
-        Self { max_tokens }
-    }
-}
-
-impl From<usize> for LimitTokenCountFilter {
-    fn from(max_tokens: usize) -> Self {
-        Self { max_tokens }
-    }
-}
-
-impl TokenFilter for LimitTokenCountFilter {
-    fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
-        From::from(LimitTokenCountStream {
-            tail: token_stream,
-            count: self.max_tokens,
-        })
-    }
-}
+mod token_filter;
+mod token_stream;
+mod wrapper;
 
 #[cfg(test)]
 mod tests {
-    use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer};
+    use tantivy::tokenizer::{TextAnalyzer, Token, WhitespaceTokenizer};
 
     use super::*;
 
     fn token_stream_helper(text: &str, max_token: usize) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
+        let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())
             .filter(LimitTokenCountFilter::new(max_token))
-            .token_stream(text);
+            .build();
+
+        let mut token_stream = a.token_stream(text);
+
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
             tokens.push(token.clone());

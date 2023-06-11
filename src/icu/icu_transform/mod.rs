@@ -1,36 +1,11 @@
-use std::mem;
-
 use rust_icu_sys as sys;
-use rust_icu_utrans as utrans;
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
+pub use token_filter::ICUTransformTokenFilter;
+use token_stream::ICUTransformTokenStream;
+use wrapper::ICUTransformFilterWrapper;
 
-struct ICUTransformTokenStream<'a> {
-    transform: utrans::UTransliterator,
-    tail: BoxTokenStream<'a>,
-    temp: String,
-}
-
-impl<'a> TokenStream for ICUTransformTokenStream<'a> {
-    fn advance(&mut self) -> bool {
-        let result = self.tail.advance();
-        if !result {
-            return false;
-        }
-        if let Ok(t) = self.transform.transliterate(&self.tail.token().text) {
-            self.temp = t;
-            mem::swap(&mut self.tail.token_mut().text, &mut self.temp);
-        }
-        result
-    }
-
-    fn token(&self) -> &Token {
-        self.tail.token()
-    }
-
-    fn token_mut(&mut self) -> &mut Token {
-        self.tail.token_mut()
-    }
-}
+mod token_filter;
+mod token_stream;
+mod wrapper;
 
 /// Direction
 #[derive(Clone, Copy, Debug)]
@@ -50,70 +25,9 @@ impl From<Direction> for sys::UTransDirection {
     }
 }
 
-/// This [TokenFilter] allow to transform text into another,
-/// for example, to performe transliteration.
-/// See [ICU documentation](https://unicode-org.github.io/icu/userguide/transforms/general/)
-/// ```rust
-/// use tantivy_analysis_contrib::icu::{Direction, ICUTransformTokenFilter};
-/// let token_filter = ICUTransformTokenFilter {
-///     compound_id: "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
-///     rules: None,
-///     direction: Direction::Forward
-/// };
-/// ```
-///
-/// # Example
-///
-/// Here is an example of transform that converts greek letters into latin letters
-///
-/// ```rust
-/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token};
-/// use tantivy_analysis_contrib::icu::{Direction, ICUTransformTokenFilter};
-///
-/// let mut token_stream = TextAnalyzer::from(RawTokenizer)
-///             .filter(ICUTransformTokenFilter {
-///                 compound_id: "Greek-Latin".to_string(),
-///                 rules: None,
-///                 direction: Direction::Forward
-///             })
-///             .token_stream("Αλφαβητικός Κατάλογος");
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "Alphabētikós Katálogos".to_string());
-///
-/// assert_eq!(None, token_stream.next());
-/// #     Ok(())
-/// # }
-#[derive(Clone, Debug)]
-pub struct ICUTransformTokenFilter {
-    /// [Compound transform](https://unicode-org.github.io/icu/userguide/transforms/general/#compound-ids)
-    pub compound_id: String,
-    /// Custom transform [rules](https://unicode-org.github.io/icu/userguide/transforms/general/rules.html)
-    pub rules: Option<String>,
-    /// Direction
-    pub direction: Direction,
-}
-
-impl TokenFilter for ICUTransformTokenFilter {
-    fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
-        From::from(ICUTransformTokenStream {
-            // unwrap work, we checked in new method.
-            transform: utrans::UTransliterator::new(
-                self.compound_id.as_str(),
-                self.rules.as_deref(),
-                self.direction.into(),
-            )
-            .unwrap(),
-            tail: token_stream,
-            temp: String::with_capacity(100),
-        })
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer};
+    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token};
 
     use super::*;
 
@@ -123,13 +37,14 @@ mod tests {
         rules: Option<String>,
         direction: Direction,
     ) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(RawTokenizer)
-            .filter(ICUTransformTokenFilter {
-                compound_id: compound_id.to_string(),
-                rules,
-                direction,
-            })
-            .token_stream(text);
+        let mut a = TextAnalyzer::builder(RawTokenizer::default())
+            .filter(
+                ICUTransformTokenFilter::new(compound_id.to_string(), rules, direction).unwrap(),
+            )
+            .build();
+
+        let mut token_stream = a.token_stream(text);
+
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
             tokens.push(token.clone());

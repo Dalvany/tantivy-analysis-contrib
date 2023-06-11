@@ -2,7 +2,6 @@
 //!
 //! Currently :
 //! * [LengthTokenFilter]: keep tokens that match length criteria.
-//! * [TrimTokenFilter]: trim leading and trailing space.
 //! * [LimitTokenCountFilter]: limit the number of token.
 //! * [PathTokenizer]: tokenize a path hierarchy.
 //! * [ReverseTokenFilter]: a filter that reverse the string.
@@ -14,11 +13,6 @@ pub use crate::commons::length::LengthTokenFilter;
 pub use crate::commons::limit::LimitTokenCountFilter;
 pub use crate::commons::path::{PathTokenizer, PathTokenizerBuilder};
 pub use crate::commons::reverse::ReverseTokenFilter;
-#[deprecated(
-    since = "0.6.0",
-    note = "Tantivy already provide one. Users should use it instead"
-)]
-pub use crate::commons::trim::TrimTokenFilter;
 pub use fst::Set;
 
 mod edge_ngram;
@@ -27,4 +21,3 @@ mod length;
 mod limit;
 mod path;
 mod reverse;
-mod trim;

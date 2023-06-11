@@ -15,8 +15,6 @@
 //! [ReversePathHierarchyTokenizer](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/path/ReversePathHierarchyTokenizer.html))
 //!     * [LengthTokenFilter](crate::commons::LengthTokenFilter) that remove tokens which doesn't are above or below certain limits (see
 //! [LengthFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LengthFilter.html))
-//!     * [TrimTokenFilter](crate::commons::TrimTokenFilter) that trims leading and trailing whitespace, this is an equivalent of Lucene's
-//! [TrimFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/TrimFilter.html)
 //!     * [LimitTokenCountFilter](crate::commons::LimitTokenCountFilter) that limits the number of token, see
 //! [LimitTokenCountFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LimitTokenCountFilter.html)
 //!     * [ReverseTokenFilter](crate::commons::ReverseTokenFilter) that reverse a string see
@@ -43,22 +41,22 @@
 //! const ANALYSIS_NAME :&str= "test";
 //!
 //! let options = TextOptions::default()
-//!             .set_indexing_options(
-//!                 TextFieldIndexing::default()
-//!                     .set_tokenizer(ANALYSIS_NAME)
-//!                     .set_index_option(IndexRecordOption::WithFreqsAndPositions),
-//!             )
-//!            .set_stored();
+//!    .set_indexing_options(
+//!        TextFieldIndexing::default()
+//!        .set_tokenizer(ANALYSIS_NAME)
+//!        .set_index_option(IndexRecordOption::WithFreqsAndPositions),
+//!    )
+//!    .set_stored();
 //! let mut schema = SchemaBuilder::new();
 //! schema.add_text_field("field", options);
 //! let schema = schema.build();
 //!
-//! let transform = ICUTransformTokenFilter {
-//!     compound_id: "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
-//!     rules: None,
-//!     direction: Direction::Forward
-//! };
-//! let icu_analyzer = TextAnalyzer::from(ICUTokenizer).filter(transform);
+//! let transform = ICUTransformTokenFilter::new(
+//!     "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
+//!     None,
+//!     Direction::Forward
+//! )?;
+//! let icu_analyzer = TextAnalyzer::builder(ICUTokenizer::default()).filter(transform).build();
 //!
 //! let field = schema.get_field("field").expect("Can't get field.");
 //!
@@ -145,7 +143,7 @@ extern crate derive_builder;
 
 #[cfg(feature = "commons")]
 pub mod commons;
-#[cfg(any(feature = "normalizer", feature = "tokenizer", feature = "transform"))]
+#[cfg(feature = "icu")]
 pub mod icu;
 #[cfg(feature = "phonetic")]
 pub mod phonetic;

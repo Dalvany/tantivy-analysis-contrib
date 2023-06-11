@@ -1,14 +1,25 @@
 use rphonetic::DoubleMetaphone;
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream};
+use tantivy::tokenizer::{Token, TokenStream};
 
-pub struct DoubleMetaphoneTokenStream<'a> {
-    pub tail: BoxTokenStream<'a>,
-    pub encoder: DoubleMetaphone,
-    pub codes: Vec<String>,
-    pub inject: bool,
+pub(crate) struct DoubleMetaphoneTokenStream<T> {
+    tail: T,
+    encoder: DoubleMetaphone,
+    codes: Vec<String>,
+    inject: bool,
 }
 
-impl<'a> TokenStream for DoubleMetaphoneTokenStream<'a> {
+impl<T> DoubleMetaphoneTokenStream<T> {
+    pub(crate) fn new(tail: T, encoder: DoubleMetaphone, inject: bool) -> Self {
+        Self {
+            tail,
+            encoder,
+            codes: Vec::with_capacity(10),
+            inject,
+        }
+    }
+}
+
+impl<T: TokenStream> TokenStream for DoubleMetaphoneTokenStream<T> {
     fn advance(&mut self) -> bool {
         if self.codes.is_empty() {
             let mut result = false;

@@ -1,17 +1,34 @@
 use std::collections::VecDeque;
 
 use rphonetic::DaitchMokotoffSoundex;
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenStream};
+use tantivy::tokenizer::{Token, TokenStream};
 
-pub struct DaitchMokotoffTokenStream<'a> {
-    pub tail: BoxTokenStream<'a>,
-    pub encoder: DaitchMokotoffSoundex,
-    pub branching: bool,
-    pub codes: VecDeque<String>,
-    pub inject: bool,
+pub(crate) struct DaitchMokotoffTokenStream<T> {
+    tail: T,
+    encoder: DaitchMokotoffSoundex,
+    branching: bool,
+    codes: VecDeque<String>,
+    inject: bool,
 }
 
-impl<'a> TokenStream for DaitchMokotoffTokenStream<'a> {
+impl<T> DaitchMokotoffTokenStream<T> {
+    pub(crate) fn new(
+        tail: T,
+        encoder: DaitchMokotoffSoundex,
+        branching: bool,
+        inject: bool,
+    ) -> Self {
+        Self {
+            tail,
+            encoder,
+            branching,
+            codes: VecDeque::with_capacity(10),
+            inject,
+        }
+    }
+}
+
+impl<T: TokenStream> TokenStream for DaitchMokotoffTokenStream<T> {
     fn advance(&mut self) -> bool {
         while self.codes.is_empty() {
             let result = self.tail.advance();
@@ -63,7 +80,7 @@ mod tests {
         Branching, DMRule, Error, Folding, PhoneticAlgorithm, PhoneticTokenFilter,
     };
 
-    const RULES: &str = include_str!("../../test_assets/dm-cc-rules/dmrules.txt");
+    const RULES: &str = include_str!("../../../test_assets/dm-cc-rules/dmrules.txt");
 
     #[test]
     fn test_algorithms_inject() -> Result<(), Error> {

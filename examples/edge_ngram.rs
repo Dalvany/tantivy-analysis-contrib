@@ -49,9 +49,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Simple analysis pipeline that tokenize on whitespace, lowercase tokens then apply
     // edge ngram filter.
     let edge_ngram = EdgeNgramTokenFilter::new(NonZeroUsize::new(1).unwrap(), None, false)?;
-    let analysis = TextAnalyzer::from(WhitespaceTokenizer)
+    let analysis = TextAnalyzer::builder(WhitespaceTokenizer::default())
         .filter(LowerCaser)
-        .filter(edge_ngram);
+        .filter(edge_ngram)
+        .build();
 
     let field = schema.get_field("field").expect("Can't get field.");
 
@@ -82,7 +83,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // We will build a new pipeline and registry it in a separate TokenizerManger we will use for search
     // because we do not want to apply the edge ngram at search time (not efficient and irrelevant results
     // will match).
-    let search_analysis = TextAnalyzer::from(WhitespaceTokenizer).filter(LowerCaser);
+    let search_analysis = TextAnalyzer::builder(WhitespaceTokenizer::default())
+        .filter(LowerCaser)
+        .build();
     // You should also register other analysis pipelines for other fields if any.
     let search_tokenizer_manager = TokenizerManager::new();
     search_tokenizer_manager.register(ANALYSIS_NAME, search_analysis);

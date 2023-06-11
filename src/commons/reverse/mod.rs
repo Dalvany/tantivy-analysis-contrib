@@ -1,73 +1,25 @@
-use std::mem;
+pub use token_filter::ReverseTokenFilter;
+use token_stream::ReverseTokenStream;
+use wrapper::ReverseFilterWrapper;
 
-use tantivy::tokenizer::{BoxTokenStream, Token, TokenFilter, TokenStream};
-
-/// TODO Allow marker ?
-
-struct ReverseTokenStream<'a> {
-    tail: BoxTokenStream<'a>,
-}
-
-impl<'a> TokenStream for ReverseTokenStream<'a> {
-    fn advance(&mut self) -> bool {
-        if !self.tail.advance() {
-            return false;
-        }
-        let mut buffer = self.tail.token().text.clone().chars().rev().collect();
-        mem::swap(&mut self.tail.token_mut().text, &mut buffer);
-
-        true
-    }
-
-    fn token(&self) -> &Token {
-        self.tail.token()
-    }
-
-    fn token_mut(&mut self) -> &mut Token {
-        self.tail.token_mut()
-    }
-}
-
-/// This is a [TokenFilter] that reverse a string.
-///
-/// # Example
-///
-/// ```rust
-/// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-/// use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token};
-/// use tantivy_analysis_contrib::commons::ReverseTokenFilter;
-///
-/// let mut token_stream = TextAnalyzer::from(RawTokenizer)
-///             .filter(ReverseTokenFilter)
-///             .token_stream("ReverseTokenFilter");
-///
-/// let token = token_stream.next().expect("A token should be present.");
-/// assert_eq!(token.text, "retliFnekoTesreveR".to_string());
-///
-/// assert_eq!(None, token_stream.next());
-/// #     Ok(())
-/// # }
-/// ```
-#[derive(Clone, Copy, Debug)]
-pub struct ReverseTokenFilter;
-
-impl TokenFilter for ReverseTokenFilter {
-    fn transform<'a>(&self, token_stream: BoxTokenStream<'a>) -> BoxTokenStream<'a> {
-        From::from(ReverseTokenStream { tail: token_stream })
-    }
-}
+mod token_filter;
+mod token_stream;
+mod wrapper;
 
 #[cfg(test)]
 mod tests {
-    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, WhitespaceTokenizer};
+    use tantivy::tokenizer::{RawTokenizer, TextAnalyzer, Token, WhitespaceTokenizer};
 
     use super::*;
 
     fn token_stream_helper_whitespace(text: &str) -> Vec<Token> {
         let filter = ReverseTokenFilter;
-        let mut token_stream = TextAnalyzer::from(WhitespaceTokenizer)
+        let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())
             .filter(filter)
-            .token_stream(text);
+            .build();
+
+        let mut token_stream = a.token_stream(text);
+
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
             tokens.push(token.clone());
@@ -77,9 +29,12 @@ mod tests {
     }
 
     fn token_stream_helper_raw(text: &str) -> Vec<Token> {
-        let mut token_stream = TextAnalyzer::from(RawTokenizer)
+        let mut a = TextAnalyzer::builder(RawTokenizer::default())
             .filter(ReverseTokenFilter)
-            .token_stream(text);
+            .build();
+
+        let mut token_stream = a.token_stream(text);
+
         let mut tokens = vec![];
         let mut add_token = |token: &Token| {
             tokens.push(token.clone());
