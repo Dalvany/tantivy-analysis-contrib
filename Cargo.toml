@@ -46,9 +46,6 @@ rustc-hash = "1.1"
 derive_builder = { version = "0.12", optional = true }
 either = {version = "1.7", optional = true}
 
-[patch.crates-io]
-rphonetic = { version = "2.1.0", git = "https://github.com/Dalvany/rphonetic.git", branch = "main", optional = true }
-
 [dev-dependencies]
 lazy_static = "1.4"
 tempdir = "0.3"
