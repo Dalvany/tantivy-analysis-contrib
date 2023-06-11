@@ -9,7 +9,7 @@ use tantivy::tokenizer::{TokenFilter, Tokenizer};
 /// ```rust
 /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// use tantivy_analysis_contrib::icu::{Direction, ICUTransformTokenFilter};
-/// 
+///
 /// let token_filter = ICUTransformTokenFilter::new(
 ///     "Any-Latin; NFD; [:Nonspacing Mark:] Remove; Lower;  NFC".to_string(),
 ///     None,
