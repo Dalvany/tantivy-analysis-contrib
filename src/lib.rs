@@ -1,4 +1,4 @@
-//! This library tries to bring the same ICU support to Tantivy as [Lucene's ICU](https://lucene.apache.org/core/9_0_0/analysis/icu/index.html).
+//! This library aims to bring some [Lucene](https://lucene.apache.org/core/) components into [Tantivy](https://github.com/quickwit-oss/tantivy)
 //!
 //! Currently it contains
 //! * ICU related components :
