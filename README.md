@@ -75,7 +75,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let index = Index::create_in_ram(schema);
     index.tokenizers().register(ANALYSIS_NAME, icu_analyzer);
 
-    let mut index_writer = index.writer(3_000_000)?;
+    let mut index_writer = index.writer(15_000_000)?;
 
     index_writer.add_document(doc!(
         field => "中国"
