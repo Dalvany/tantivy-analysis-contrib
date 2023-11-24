@@ -156,11 +156,9 @@ impl Tokenizer for PathTokenizer {
             Either::Left(split)
         };
 
-        let mut split = if starts_with {
-            split.skip(1)
-        } else {
-            split.skip(0)
-        };
+        let skip = if starts_with { 1 } else { 0 };
+
+        let mut split = split.skip(skip);
         let mut i = self.skip;
         while i > 0 {
             if let Some(token) = split.next() {
