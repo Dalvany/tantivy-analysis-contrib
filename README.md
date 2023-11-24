@@ -11,7 +11,7 @@
 This a collection of `Tokenizer` and `TokenFilters` for [Tantivy](https://github.com/quickwit-oss/tantivy) that aims to
 replicate features available in [Lucene](https://lucene.apache.org/).
 
-It relies on Google's [Rust ICU](https://crates.io/crates/rust_icu).
+It relies on Google's [Rust ICU](https://crates.io/crates/rust_icu). `libicu-dev` and clang needs to be installed in order to compile.
 
 Breaking word rules are from [Lucene](https://github.com/apache/lucene/tree/main/lucene/analysis/icu/src/data/uax29).
 
