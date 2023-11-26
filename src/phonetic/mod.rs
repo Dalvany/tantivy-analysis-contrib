@@ -65,7 +65,7 @@ pub enum Error {
 
 /// These are different algorithms from [rphonetic crate](https://docs.rs/rphonetic/1.0.0/rphonetic/).
 ///
-/// It tries to remove most of the boilerplate of getting an [Encoder](Encoder).
+/// It tries to remove most of the boilerplate of getting an [Encoder](rphonetic::Encoder).
 ///
 /// Parameters are mostly wrapper to make clearer what they mean.
 #[derive(Clone, Debug)]

@@ -136,6 +136,7 @@
     unused_import_braces,
     unused_qualifications
 )]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 #[cfg(feature = "commons")]
 #[macro_use]

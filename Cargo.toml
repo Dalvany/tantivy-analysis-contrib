@@ -55,3 +55,7 @@ either = { version = "1.7", optional = true }
 [dev-dependencies]
 lazy_static = "1.4"
 tempdir = "0.3"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

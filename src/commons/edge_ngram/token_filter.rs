@@ -45,7 +45,7 @@ use super::{EdgeNgramError, EdgeNgramFilterWrapper};
 ///
 /// This token filter is useful to do a "starts with" therefor a "search as you type".
 ///
-/// It is also easy to have an efficient "ends with" by adding the [ReverseTokenFilter](tantivy_analysis_contrib::commons::ReverseTokenFilter)
+/// It is also easy to have an efficient "ends with" by adding the [ReverseTokenFilter](crate::commons::reverse::ReverseTokenFilter)
 /// before the edge ngram filter.
 ///
 /// # How to use it
