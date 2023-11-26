@@ -125,6 +125,9 @@
 //! #    Ok(())
 //! # }
 //! ```
+//!
+//! ## Feature flags
+#![doc = document_features::document_features!()]
 #![cfg_attr(test, deny(warnings))]
 #![warn(
     missing_copy_implementations,
