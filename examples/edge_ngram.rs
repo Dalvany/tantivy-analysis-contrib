@@ -6,9 +6,8 @@ use tantivy::query::QueryParser;
 use tantivy::schema::{Field, IndexRecordOption, SchemaBuilder, TextFieldIndexing, TextOptions};
 use tantivy::tokenizer::{LowerCaser, TextAnalyzer, TokenizerManager, WhitespaceTokenizer};
 use tantivy::{doc, DocAddress, Index, ReloadPolicy, Score, Searcher, TantivyError};
-use tempdir::TempDir;
-
 use tantivy_analysis_contrib::commons::EdgeNgramTokenFilter;
+use tempdir::TempDir;
 
 const ANALYSIS_NAME: &str = "test";
 
@@ -61,7 +60,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Index few documents.
     let mut index_writer = index.writer(3_000_000)?;
-    let data = vec![
+    let data = [
         "The quick brown fox jumps over the lazy dog",
         "Another test",
         "Things are done quickly",

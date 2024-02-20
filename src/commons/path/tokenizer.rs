@@ -1,9 +1,10 @@
-use super::PathTokenStream;
-use super::DEFAULT_SEPARATOR;
-use either::Either;
 use std::iter::Rev;
 use std::str::Split;
+
+use either::Either;
 use tantivy_tokenizer_api::Tokenizer;
+
+use super::{PathTokenStream, DEFAULT_SEPARATOR};
 
 /// Path tokenizer. It will tokenize this :
 /// ```norust

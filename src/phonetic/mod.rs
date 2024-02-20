@@ -40,14 +40,12 @@ use rphonetic::{
     RefinedSoundex, Soundex, DEFAULT_US_ENGLISH_MAPPING_SOUNDEX,
 };
 use thiserror::Error;
-
-pub use types::*;
-
 pub use token_filter::PhoneticTokenFilter;
-use token_stream::BeiderMorseTokenStream;
-use token_stream::DaitchMokotoffTokenStream;
-use token_stream::DoubleMetaphoneTokenStream;
-use token_stream::GenericPhoneticTokenStream;
+use token_stream::{
+    BeiderMorseTokenStream, DaitchMokotoffTokenStream, DoubleMetaphoneTokenStream,
+    GenericPhoneticTokenStream,
+};
+pub use types::*;
 use wrapper::PhoneticFilterWrapper;
 
 mod token_filter;

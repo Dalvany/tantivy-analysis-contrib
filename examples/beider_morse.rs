@@ -5,11 +5,10 @@ use rphonetic::ConfigFiles;
 use tantivy::schema::{IndexRecordOption, SchemaBuilder, TextFieldIndexing, TextOptions};
 use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer};
 use tantivy::{doc, Index};
-use tempdir::TempDir;
-
 use tantivy_analysis_contrib::phonetic::{
     Concat, MaxPhonemeNumber, PhoneticAlgorithm, PhoneticTokenFilter,
 };
+use tempdir::TempDir;
 
 const ANALYSIS_NAME: &str = "test";
 lazy_static! {

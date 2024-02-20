@@ -1,4 +1,5 @@
 use std::num::NonZeroUsize;
+
 use thiserror::Error;
 pub use token_filter::EdgeNgramTokenFilter;
 use token_stream::EdgeNgramFilterStream;
@@ -24,8 +25,9 @@ pub enum EdgeNgramError {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use tantivy::tokenizer::{TextAnalyzer, Token, WhitespaceTokenizer};
+
+    use super::*;
 
     fn token_stream_helper(
         text: &str,

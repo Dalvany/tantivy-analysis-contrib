@@ -8,8 +8,9 @@ mod wrapper;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use tantivy::tokenizer::{TextAnalyzer, Token, WhitespaceTokenizer};
+
+    use super::*;
 
     fn tokenize_all(text: &str, elision: Vec<&str>, ignore_case: bool) -> Vec<Token> {
         let mut a = TextAnalyzer::builder(WhitespaceTokenizer::default())

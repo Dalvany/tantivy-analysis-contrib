@@ -1,5 +1,6 @@
-use super::LimitTokenCountFilterWrapper;
 use tantivy_tokenizer_api::{TokenFilter, Tokenizer};
+
+use super::LimitTokenCountFilterWrapper;
 
 /// [TokenFilter] that limit the number of tokens
 ///

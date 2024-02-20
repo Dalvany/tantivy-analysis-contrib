@@ -103,10 +103,9 @@ mod tests {
     use lazy_static::lazy_static;
     use rphonetic::{ConfigFiles, RuleType};
 
+    use super::*;
     use crate::phonetic::tests::token_stream_helper;
     use crate::phonetic::{Concat, Error, MaxPhonemeNumber, PhoneticAlgorithm};
-
-    use super::*;
 
     lazy_static! {
         static ref CONFIG_FILES: ConfigFiles =

@@ -1,9 +1,9 @@
 use rust_icu_unorm2::UNormalizer;
-
-use super::Error;
 pub use token_filter::ICUNormalizer2TokenFilter;
 use token_stream::ICUNormalizer2TokenStream;
 use wrapper::ICUNormalizer2FilterWrapper;
+
+use super::Error;
 
 mod token_filter;
 mod token_stream;
