@@ -82,6 +82,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Install nightly
+        run: |
+          rustup toolchain install nightly --profile minimal
+          rustup component add rustfmt --toolchain nightly-x86_64-unknown-linux-gnu
       - name: Cache
         uses: Swatinem/rust-cache@v2
       - name: Check code style
