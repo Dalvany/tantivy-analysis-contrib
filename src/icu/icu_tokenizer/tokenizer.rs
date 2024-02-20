@@ -1,5 +1,5 @@
 use super::ICUTokenizerTokenStream;
-use tantivy::tokenizer::Tokenizer;
+use tantivy_tokenizer_api::Tokenizer;
 
 /// ICU [Tokenizer]. It does not (yet ?) work as Lucene's counterpart.
 /// Getting a tokenizer is simple :

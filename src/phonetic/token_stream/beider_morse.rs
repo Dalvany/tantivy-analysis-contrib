@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use rphonetic::{BeiderMorse, Encoder, LanguageSet};
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 pub(crate) struct BeiderMorseTokenStream<'a, T> {
     tail: T,

@@ -4,7 +4,7 @@
 use std::sync::Arc;
 
 use rustc_hash::FxHashSet;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 #[derive(Clone, Debug)]
 pub struct ElisionTokenStream<T> {

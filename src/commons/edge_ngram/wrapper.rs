@@ -4,7 +4,7 @@
 
 use std::num::NonZeroUsize;
 
-use tantivy::tokenizer::Tokenizer;
+use tantivy_tokenizer_api::Tokenizer;
 
 use super::EdgeNgramFilterStream;
 

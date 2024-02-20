@@ -2,7 +2,7 @@
 //! it's mostly here to give to the bottom component of the analysis
 //! stack (which is a [Tokenizer]) the text to parse.
 
-use tantivy::tokenizer::Tokenizer;
+use tantivy_tokenizer_api::Tokenizer;
 
 use super::LimitTokenCountStream;
 

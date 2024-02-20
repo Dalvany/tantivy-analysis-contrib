@@ -4,7 +4,7 @@
 use std::mem;
 
 use rust_icu_unorm2::UNormalizer;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 #[derive(Debug)]
 pub struct ICUNormalizer2TokenStream<T> {

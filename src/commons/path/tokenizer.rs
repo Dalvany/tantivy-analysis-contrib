@@ -3,7 +3,7 @@ use super::DEFAULT_SEPARATOR;
 use either::Either;
 use std::iter::Rev;
 use std::str::Split;
-use tantivy::tokenizer::Tokenizer;
+use tantivy_tokenizer_api::Tokenizer;
 
 /// Path tokenizer. It will tokenize this :
 /// ```norust

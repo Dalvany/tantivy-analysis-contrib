@@ -5,7 +5,7 @@
 
 use std::mem;
 
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 #[derive(Debug, Clone)]
 pub struct ReverseTokenStream<T> {

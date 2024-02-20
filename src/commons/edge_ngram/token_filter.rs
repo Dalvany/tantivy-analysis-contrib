@@ -1,6 +1,6 @@
 use std::num::NonZeroUsize;
 
-use tantivy::tokenizer::{TokenFilter, Tokenizer};
+use tantivy_tokenizer_api::{TokenFilter, Tokenizer};
 
 use super::{EdgeNgramError, EdgeNgramFilterWrapper};
 

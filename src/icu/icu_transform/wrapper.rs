@@ -3,7 +3,7 @@
 //! stack (which is a [Tokenizer]) the text to parse.
 
 use rust_icu_utrans as utrans;
-use tantivy::tokenizer::Tokenizer;
+use tantivy_tokenizer_api::Tokenizer;
 
 use super::{Direction, ICUTransformTokenStream};
 

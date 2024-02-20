@@ -1,6 +1,6 @@
 use rust_icu_ubrk::UBreakIterator;
 use std::str::Chars;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 struct ICUBreakingWord<'a> {
     text: Chars<'a>,

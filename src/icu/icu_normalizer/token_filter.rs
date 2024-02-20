@@ -1,5 +1,5 @@
 use rust_icu_unorm2::UNormalizer;
-use tantivy::tokenizer::{TokenFilter, Tokenizer};
+use tantivy_tokenizer_api::{TokenFilter, Tokenizer};
 
 use super::super::Error;
 use super::{ICUNormalizer2FilterWrapper, Mode};

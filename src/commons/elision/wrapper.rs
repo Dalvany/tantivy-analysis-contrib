@@ -5,7 +5,7 @@
 use std::sync::Arc;
 
 use rustc_hash::FxHashSet;
-use tantivy::tokenizer::Tokenizer;
+use tantivy_tokenizer_api::Tokenizer;
 
 use super::ElisionTokenStream;
 

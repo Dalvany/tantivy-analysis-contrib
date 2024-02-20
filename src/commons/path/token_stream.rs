@@ -2,7 +2,7 @@ use std::iter::{Rev, Skip};
 use std::str::Split;
 
 use either::Either;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 #[derive(Debug, Clone)]
 pub struct PathTokenStream<'a> {

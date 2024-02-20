@@ -1,7 +1,7 @@
 use super::super::Error;
 use super::{Direction, ICUTransformFilterWrapper};
 use rust_icu_utrans as utrans;
-use tantivy::tokenizer::{TokenFilter, Tokenizer};
+use tantivy_tokenizer_api::{TokenFilter, Tokenizer};
 
 /// This [TokenFilter] allow to transform text into another,
 /// for example, to performe transliteration.

@@ -3,7 +3,7 @@
 //! stack (which is a [Tokenizer]) the text to parse.
 
 use rphonetic::{BeiderMorseBuilder, Encoder, Phonex};
-use tantivy::tokenizer::{TokenStream, Tokenizer};
+use tantivy_tokenizer_api::{TokenStream, Tokenizer};
 
 use super::{
     BeiderMorseTokenStream, DaitchMokotoffTokenStream, DoubleMetaphoneTokenStream,

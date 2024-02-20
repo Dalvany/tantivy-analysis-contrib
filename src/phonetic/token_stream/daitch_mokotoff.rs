@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 
 use rphonetic::DaitchMokotoffSoundex;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 pub(crate) struct DaitchMokotoffTokenStream<T> {
     tail: T,

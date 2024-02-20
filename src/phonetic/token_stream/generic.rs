@@ -1,5 +1,5 @@
 use rphonetic::Encoder;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 pub(crate) struct GenericPhoneticTokenStream<T> {
     tail: T,

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use rustc_hash::FxHashSet;
-use tantivy::tokenizer::{TokenFilter, Tokenizer};
+use tantivy_tokenizer_api::{TokenFilter, Tokenizer};
 
 use super::ElisionFilterWrapper;
 

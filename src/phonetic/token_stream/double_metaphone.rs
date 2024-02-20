@@ -1,5 +1,5 @@
 use rphonetic::DoubleMetaphone;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 pub(crate) struct DoubleMetaphoneTokenStream<T> {
     tail: T,

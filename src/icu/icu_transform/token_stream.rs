@@ -4,7 +4,7 @@
 use std::mem;
 
 use rust_icu_utrans as utrans;
-use tantivy::tokenizer::{Token, TokenStream};
+use tantivy_tokenizer_api::{Token, TokenStream};
 
 #[derive(Debug)]
 pub struct ICUTransformTokenStream<T> {
