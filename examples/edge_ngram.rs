@@ -3,9 +3,13 @@ use std::num::NonZeroUsize;
 
 use tantivy::collector::TopDocs;
 use tantivy::query::QueryParser;
-use tantivy::schema::{Field, IndexRecordOption, SchemaBuilder, TextFieldIndexing, TextOptions};
+use tantivy::schema::{
+    Field, IndexRecordOption, SchemaBuilder, TextFieldIndexing, TextOptions, Value,
+};
 use tantivy::tokenizer::{LowerCaser, TextAnalyzer, TokenizerManager, WhitespaceTokenizer};
-use tantivy::{doc, DocAddress, Index, ReloadPolicy, Score, Searcher, TantivyError};
+use tantivy::{
+    doc, DocAddress, Index, ReloadPolicy, Score, Searcher, TantivyDocument, TantivyError,
+};
 use tantivy_analysis_contrib::commons::EdgeNgramTokenFilter;
 use tempdir::TempDir;
 
@@ -19,9 +23,9 @@ fn get_values(
     let mut result: BTreeSet<String> = BTreeSet::new();
 
     for (_, doc_address) in &top_docs {
-        let doc = searcher.doc(*doc_address)?;
+        let doc = searcher.doc::<TantivyDocument>(*doc_address)?;
         if let Some(data) = doc.get_first(field) {
-            result.insert(data.as_text().unwrap().to_string());
+            result.insert(data.as_str().unwrap().to_string());
         }
     }
 
@@ -75,7 +79,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Setup thing to search
     let reader = index
         .reader_builder()
-        .reload_policy(ReloadPolicy::OnCommit)
+        .reload_policy(ReloadPolicy::Manual)
         .try_into()?;
     let searcher = reader.searcher();
 
