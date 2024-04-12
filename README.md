@@ -1,3 +1,5 @@
+# Tantivy analysis
+
 [![Crate](https://img.shields.io/crates/v/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
 [![Build Status](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/quality.yml/badge.svg)](https://github.com/Dalvany/tantivy-analysis-contrib/actions/workflows/quality.yml)
 [![codecov](https://codecov.io/gh/Dalvany/tantivy-analysis-contrib/branch/main/graph/badge.svg)](https://codecov.io/gh/Dalvany/tantivy-analysis-contrib)
@@ -5,8 +7,6 @@
 [![Documentation](https://docs.rs/tantivy-analysis-contrib/badge.svg)](https://docs.rs/tantivy-analysis-contrib/)
 [![Crate](https://img.shields.io/crates/d/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
 [![Crate](https://img.shields.io/crates/l/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
-
-# Tantivy analysis
 
 This a collection of `Tokenizer` and `TokenFilters` for [Tantivy](https://github.com/quickwit-oss/tantivy) that aims to
 replicate features available in [Lucene](https://lucene.apache.org/).

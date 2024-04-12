@@ -13,7 +13,7 @@
 //!     * [PathTokenizer](crate::commons::PathTokenizer) which tokenize a hierarchical path (equivalent of
 //! [PathHierarchyTokenizer](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/path/PathHierarchyTokenizer.html) and
 //! [ReversePathHierarchyTokenizer](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/path/ReversePathHierarchyTokenizer.html))
-//!     * [LengthTokenFilter](crate::commons::LengthTokenFilter) that remove tokens which doesn't are above or below certain limits (see
+//!     * [LengthTokenFilter](crate::commons::LengthTokenFilter) that remove tokens that have length above or below certain limits (see
 //! [LengthFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LengthFilter.html))
 //!     * [LimitTokenCountFilter](crate::commons::LimitTokenCountFilter) that limits the number of token, see
 //! [LimitTokenCountFilter](https://lucene.apache.org/core/9_1_0/analysis/common/org/apache/lucene/analysis/miscellaneous/LimitTokenCountFilter.html)
@@ -28,7 +28,7 @@
 //!
 //! # Example
 //!
-//! Here is a full example of how tokenize using [icu::ICUTokenizer] and do transliteration and lowercase each tokens using [icu::ICUTransformTokenFilter]:
+//! Here is a full example of how tokenize using [icu::ICUTokenizer] and doing transliteration and lowercasing on each tokens using [icu::ICUTransformTokenFilter]:
 //! ```rust
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     use tantivy::collector::TopDocs;
