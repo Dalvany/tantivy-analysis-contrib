@@ -2,6 +2,7 @@
 name = "tantivy-analysis-contrib"
 version = "0.12.0"
 edition = "2021"
+rust-version = "1.70.0"
 authors = ["dalvany"]
 description = "A set of analysis components for Tantivy"
 repository = "https://github.com/Dalvany/tantivy-analysis-contrib"
