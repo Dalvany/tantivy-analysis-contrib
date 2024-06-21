@@ -73,7 +73,7 @@ impl<T: TokenStream> TokenStream for EdgeNgramFilterStream<T> {
             } else {
                 self.count = self.min;
                 if self.keep_original_token {
-                    self.token.text = self.tail.token().text.clone();
+                    self.token.text.clone_from(&self.tail.token().text);
                     return true;
                 }
             }
