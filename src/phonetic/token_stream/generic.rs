@@ -22,7 +22,7 @@ impl<T> GenericPhoneticTokenStream<T> {
 impl<T: TokenStream> TokenStream for GenericPhoneticTokenStream<T> {
     fn advance(&mut self) -> bool {
         if let Some(backup) = &self.backup {
-            self.tail.token_mut().text = backup.clone();
+            self.tail.token_mut().text.clone_from(backup);
             self.backup = None;
             return true;
         }
