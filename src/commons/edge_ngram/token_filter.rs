@@ -11,12 +11,12 @@ use super::{EdgeNgramError, EdgeNgramFilterWrapper};
 ///
 /// It is configure with two parameters:
 /// * min edge-ngram: the number of maximum characters (e.g. with min=3, `Quick`
-/// will generate `Qui`, `Quic` and `Quick`).
-/// It must be greater than 0.
+///   will generate `Qui`, `Quic` and `Quick`).
+///   It must be greater than 0.
 /// * max edge-ngram: the number of maximum characters (e.g. with max=3, `Quick`
-/// will generate `Q`, `Qu` and `Qui`.
-/// It is optional, and there is no maximum then
-/// it will generate up to the end of the token.
+///   will generate `Q`, `Qu` and `Qui`.
+///   It is optional, and there is no maximum then
+///   it will generate up to the end of the token.
 ///
 /// # Example
 ///
@@ -70,9 +70,9 @@ impl EdgeNgramTokenFilter {
     ///
     /// * `min` : minimum edge-ngram.
     /// * `max` : maximum edge-ngram. It must be greater or equals to `min`.
-    /// Provide [None](None) for unlimited.
+    ///   Provide [None](None) for unlimited.
     /// * `keep_original_token`: the complete token will also be output if
-    /// the length is greater than `max`.
+    ///   the length is greater than `max`.
     pub fn new(
         min: NonZeroUsize,
         max: Option<NonZeroUsize>,
