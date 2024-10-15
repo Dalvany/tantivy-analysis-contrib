@@ -8,7 +8,7 @@
 [![Crate](https://img.shields.io/crates/d/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
 [![Crate](https://img.shields.io/crates/l/tantivy-analysis-contrib.svg)](https://crates.io/crates/tantivy-analysis-contrib)
 
-This a collection of `Tokenizer` and `TokenFilters` for [Tantivy](https://github.com/quickwit-oss/tantivy) that aims to
+This is a collection of `Tokenizer` and `TokenFilters` for [Tantivy](https://github.com/quickwit-oss/tantivy) that aims to
 replicate features available in [Lucene](https://lucene.apache.org/).
 
 It relies on Google's [Rust ICU](https://crates.io/crates/rust_icu). `libicu-dev` and clang needs to be installed in order to compile.

@@ -28,7 +28,7 @@
 //!
 //! # Example
 //!
-//! Here is a full example of how tokenize using [icu::ICUTokenizer] and doing transliteration and lowercasing on each tokens using [icu::ICUTransformTokenFilter]:
+//! Here is a full example of how tokenize using [icu::ICUTokenizer], doing transliteration and lowercasing each tokens using [icu::ICUTransformTokenFilter]:
 //! ```rust
 //! # fn main() -> Result<(), Box<dyn std::error::Error>> {
 //!     use tantivy::collector::TopDocs;
