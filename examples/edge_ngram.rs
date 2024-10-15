@@ -11,7 +11,7 @@ use tantivy::{
     doc, DocAddress, Index, ReloadPolicy, Score, Searcher, TantivyDocument, TantivyError,
 };
 use tantivy_analysis_contrib::commons::EdgeNgramTokenFilter;
-use tempdir::TempDir;
+use tempfile::TempDir;
 
 const ANALYSIS_NAME: &str = "test";
 
@@ -34,7 +34,7 @@ fn get_values(
 
 #[allow(clippy::disallowed_macros)]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let index_path = TempDir::new("index")?;
+    let index_path = TempDir::new_in("target")?;
     println!("Temp dir : {index_path:?}");
 
     // Setup everything to index
@@ -63,7 +63,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     index.tokenizers().register(ANALYSIS_NAME, analysis);
 
     // Index few documents.
-    let mut index_writer = index.writer(3_000_000)?;
+    let mut index_writer = index.writer(15_000_000)?;
     let data = [
         "The quick brown fox jumps over the lazy dog",
         "Another test",

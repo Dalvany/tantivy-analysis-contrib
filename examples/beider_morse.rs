@@ -8,7 +8,7 @@ use tantivy::{doc, Index};
 use tantivy_analysis_contrib::phonetic::{
     Concat, MaxPhonemeNumber, PhoneticAlgorithm, PhoneticTokenFilter,
 };
-use tempdir::TempDir;
+use tempfile::TempDir;
 
 const ANALYSIS_NAME: &str = "test";
 lazy_static! {
@@ -18,7 +18,7 @@ lazy_static! {
 
 #[allow(clippy::disallowed_macros)]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let index_path = TempDir::new("index")?;
+    let index_path = TempDir::new_in("target")?;
     println!("Temp dir : {index_path:?}");
 
     let options = TextOptions::default()
@@ -50,7 +50,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let index = Index::create_in_dir(&index_path, schema)?;
     index.tokenizers().register(ANALYSIS_NAME, beider_morse);
 
-    let mut index_writer = index.writer(3_000_000)?;
+    let mut index_writer = index.writer(15_000_000)?;
     let data = vec![
         "Angelo",
         "GOLDEN",

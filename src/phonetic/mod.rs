@@ -232,7 +232,7 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
                         use_alternate.0,
                     )),
                     Some(max_code_length) => Ok(EncoderAlgorithm::DoubleMetaphone(
-                        DoubleMetaphone::new(max_code_length),
+                        DoubleMetaphone::new(Some(max_code_length)),
                         use_alternate.0,
                     )),
                 }
@@ -242,9 +242,9 @@ impl TryFrom<&PhoneticAlgorithm> for EncoderAlgorithm {
             }
             PhoneticAlgorithm::Metaphone(max_code_length) => match max_code_length.0 {
                 None => Ok(EncoderAlgorithm::Metaphone(Metaphone::default())),
-                Some(max_code_length) => {
-                    Ok(EncoderAlgorithm::Metaphone(Metaphone::new(max_code_length)))
-                }
+                Some(max_code_length) => Ok(EncoderAlgorithm::Metaphone(Metaphone::new(Some(
+                    max_code_length,
+                )))),
             },
             PhoneticAlgorithm::Nysiis(strict) => match strict.0 {
                 None => Ok(EncoderAlgorithm::Nysiis(Nysiis::default())),
