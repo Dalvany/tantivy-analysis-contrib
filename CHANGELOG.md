@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.3](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.2...v0.12.3) - 2024-10-15
+
+### Other
+
+- bump dependencies
+- update release
+
 ## 0.9.0
 
 * Add phonex algorithm
