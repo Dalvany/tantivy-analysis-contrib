@@ -8,7 +8,7 @@ struct ICUBreakingWord<'a> {
     default_breaking_iterator: UBreakIterator,
 }
 
-impl<'a> std::fmt::Debug for ICUBreakingWord<'a> {
+impl std::fmt::Debug for ICUBreakingWord<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ICUBreakingWord")
             .field("text", &self.text)
@@ -26,7 +26,7 @@ impl<'a> From<&'a str> for ICUBreakingWord<'a> {
     }
 }
 
-impl<'a> Iterator for ICUBreakingWord<'a> {
+impl Iterator for ICUBreakingWord<'_> {
     type Item = (String, usize, usize);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -79,7 +79,7 @@ impl<'a> ICUTokenizerTokenStream<'a> {
     }
 }
 
-impl<'a> TokenStream for ICUTokenizerTokenStream<'a> {
+impl TokenStream for ICUTokenizerTokenStream<'_> {
     fn advance(&mut self) -> bool {
         let token = self.breaking_word.next();
         match token {

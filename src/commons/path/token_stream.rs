@@ -15,7 +15,7 @@ pub struct PathTokenStream<'a> {
     pub(crate) reverse: bool,
 }
 
-impl<'a> TokenStream for PathTokenStream<'a> {
+impl TokenStream for PathTokenStream<'_> {
     fn advance(&mut self) -> bool {
         if let Some(part) = self.text.next() {
             if !self.starts_with {
