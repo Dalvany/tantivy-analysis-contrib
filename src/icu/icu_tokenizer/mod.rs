@@ -20,7 +20,7 @@ mod tests {
     /// Same tests as Lucene ICU tokenizer might be enough
     use super::*;
 
-    impl<'a> Iterator for ICUTokenizerTokenStream<'a> {
+    impl Iterator for ICUTokenizerTokenStream<'_> {
         type Item = Token;
 
         fn next(&mut self) -> Option<Self::Item> {

@@ -29,7 +29,7 @@ impl<'a, T> BeiderMorseTokenStream<'a, T> {
     }
 }
 
-impl<'a, T: TokenStream> TokenStream for BeiderMorseTokenStream<'a, T> {
+impl<T: TokenStream> TokenStream for BeiderMorseTokenStream<'_, T> {
     fn advance(&mut self) -> bool {
         while self.codes.is_empty() {
             if !self.tail.advance() {
