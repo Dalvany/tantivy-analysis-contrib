@@ -40,7 +40,7 @@ embedded_bm = ["rphonetic/embedded_bm"]
 embedded_dm = ["rphonetic/embedded_dm"]
 
 [dependencies]
-tantivy-tokenizer-api = "0.3"
+tantivy-tokenizer-api = "0.5"
 
 # Switch to full icu lib when possible
 rust_icu_sys = { version = "5.0", optional = true }
@@ -60,13 +60,13 @@ thiserror = "2.0"
 
 rustc-hash = "2.1"
 derive_builder = { version = "0.20", optional = true }
-either = { version = "1.13", optional = true }
+either = { version = "1.15", optional = true }
 document-features = "0.2"
 
 [dev-dependencies]
 lazy_static = "1.4"
-tempfile = "3.14"
-tantivy = "0.22"
+tempfile = "3.19"
+tantivy = "0.24"
 
 [package.metadata.docs.rs]
 all-features = true
