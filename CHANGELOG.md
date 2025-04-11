@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.6](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.5...v0.12.6) - 2025-04-11
+
+### Other
+
+- bump dependencies
+
 ## [0.12.5](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.4...v0.12.5) - 2024-12-04
 
 ### Other
