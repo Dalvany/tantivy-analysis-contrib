@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.8](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.7...v0.12.8) - 2025-08-23
+
+### Other
+
+- bump dependencies
+
 ## [0.12.7](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.6...v0.12.7) - 2025-08-02
 
 ### Other
