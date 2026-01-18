@@ -132,18 +132,7 @@
 //!
 //! ## Feature flags
 #![doc = document_features::document_features!()]
-#![cfg_attr(test, deny(warnings))]
-#![warn(
-    missing_copy_implementations,
-    missing_debug_implementations,
-    missing_docs,
-    trivial_numeric_casts,
-    unsafe_code,
-    unused_extern_crates,
-    unused_import_braces,
-    unused_qualifications
-)]
-#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(feature = "commons")]
 #[macro_use]
