@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.9](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.8...v0.12.9) - 2026-04-03
+
+### Fixed
+
+- fix documentation generation
+
+### Other
+
+- bump dependencies
+- Bump codecov/codecov-action from 5 to 6
+
 ## [0.12.8](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.7...v0.12.8) - 2025-08-23
 
 ### Other
