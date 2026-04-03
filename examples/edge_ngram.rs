@@ -97,7 +97,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Try start with "qui"
     let query = parser.parse_query("qui")?;
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10).order_by_score())?;
     let result = get_values(&searcher, field, top_docs)?;
 
     let mut expected: BTreeSet<String> = BTreeSet::new();
@@ -107,7 +107,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Try start with "quickly"
     let query = parser.parse_query("quickly")?;
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10).order_by_score())?;
     let result = get_values(&searcher, field, top_docs)?;
 
     let mut expected: BTreeSet<String> = BTreeSet::new();
@@ -116,7 +116,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Try start with "quicker"
     let query = parser.parse_query("quicker")?;
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10).order_by_score())?;
     let result = get_values(&searcher, field, top_docs)?;
 
     let expected: BTreeSet<String> = BTreeSet::new();

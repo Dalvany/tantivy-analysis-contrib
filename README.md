@@ -98,7 +98,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let query_parser = QueryParser::for_index(&index, vec![field]);
 
     let query = query_parser.parse_query("zhong")?;
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10).order_by_score())?;
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc::<TantivyDocument>(doc_address)?;
@@ -111,7 +111,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(expected, result);
 
     let query = query_parser.parse_query("国")?;
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10).order_by_score())?;
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc::<TantivyDocument>(doc_address)?;
@@ -123,7 +123,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let expected: Vec<String> = vec!["中国".to_string()];
     assert_eq!(expected, result);
     let query = query_parser.parse_query("document")?;
-    let top_docs = searcher.search(&query, &TopDocs::with_limit(10))?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(10).order_by_score())?;
     let mut result: Vec<String> = Vec::new();
     for (_, doc_address) in top_docs {
         let retrieved_doc = searcher.doc::<TantivyDocument>(doc_address)?;
