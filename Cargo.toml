@@ -72,3 +72,11 @@ tantivy = "0.26"
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 lazy_static = "1.4"
+
+[lints.clippy]
+pedentic = "warn"
+print_stderr = "deny"
+print_stdout = "deny"
+indexing_slicing = "warn"
+unwrap_used = "warn"
+expect_used = "warn"

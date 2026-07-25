@@ -1,3 +1,4 @@
+#![allow(clippy::print_stdout, clippy::unwrap_used)]
 use std::path::PathBuf;
 
 use lazy_static::lazy_static;
@@ -45,7 +46,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .filter(phonetic_filter)
         .build();
 
-    let field = schema.get_field("field").expect("Can't get field.");
+    let field = schema.get_field("field")?;
 
     let index = Index::create_in_dir(&index_path, schema)?;
     index.tokenizers().register(ANALYSIS_NAME, beider_morse);

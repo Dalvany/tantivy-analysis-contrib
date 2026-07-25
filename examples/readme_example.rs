@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .filter(transform)
         .build();
 
-    let field = schema.get_field("field").expect("Can't get field.");
+    let field = schema.get_field("field")?;
 
     let index = Index::create_in_ram(schema);
     index.tokenizers().register(ANALYSIS_NAME, icu_analyzer);

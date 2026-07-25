@@ -1,3 +1,4 @@
+#![allow(clippy::print_stdout)]
 use std::collections::BTreeSet;
 use std::num::NonZeroUsize;
 
@@ -25,7 +26,9 @@ fn get_values(
     for (_, doc_address) in &top_docs {
         let doc = searcher.doc::<TantivyDocument>(*doc_address)?;
         if let Some(data) = doc.get_first(field) {
-            result.insert(data.as_str().unwrap().to_string());
+            if let Some(data) = data.as_str() {
+                result.insert(data.to_string());
+            }
         }
     }
 
