@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.10](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.9...v0.12.10) - 2026-08-21
+
+### Fixed
+
+- *(ci)* fix release workflow
+
+### Other
+
+- Merge pull request #58 from Dalvany/dependabot/github_actions/github/codeql-action-4.37.7
+- update workflow
+- bump rphonetic
+- Bump github/codeql-action from 4.37.4 to 4.37.6
+- Bump github/codeql-action from 4 to 4.37.4
+- stricter clippy
+
 ## [0.12.9](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.8...v0.12.9) - 2026-04-03
 
 ### Fixed
