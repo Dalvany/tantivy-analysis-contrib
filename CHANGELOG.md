@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.10...v0.13.0) - 2026-08-27
+
+### Added
+
+- [**breaking**] use LazyLock instead of lazy_static
+
+### Fixed
+
+- fix relase workflow
+
+### Other
+
+- Merge pull request #63 from Dalvany/feat/remove_lazy_static
+
 ## [0.12.10](https://github.com/Dalvany/tantivy-analysis-contrib/compare/v0.12.9...v0.12.10) - 2026-08-21
 
 ### Fixed
