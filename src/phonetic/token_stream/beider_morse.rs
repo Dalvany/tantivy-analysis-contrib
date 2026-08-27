@@ -99,18 +99,16 @@ impl<T: TokenStream> TokenStream for BeiderMorseTokenStream<'_, T> {
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
+    use std::sync::LazyLock;
 
-    use lazy_static::lazy_static;
     use rphonetic::{ConfigFiles, RuleType};
 
     use super::*;
     use crate::phonetic::tests::token_stream_helper;
     use crate::phonetic::{Concat, Error, MaxPhonemeNumber, PhoneticAlgorithm};
 
-    lazy_static! {
-        static ref CONFIG_FILES: ConfigFiles =
-            ConfigFiles::new(&PathBuf::from("./test_assets/bm-cc-rules")).unwrap();
-    }
+    static CONFIG_FILES: LazyLock<ConfigFiles> =
+        LazyLock::new(|| ConfigFiles::new(&PathBuf::from("./test_assets/bm-cc-rules")).unwrap());
 
     #[test]
     fn test_basic_usage_inject() -> Result<(), Error> {
