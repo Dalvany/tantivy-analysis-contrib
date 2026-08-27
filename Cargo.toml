@@ -2,7 +2,7 @@
 name = "tantivy-analysis-contrib"
 version = "0.12.10"
 edition = "2021"
-rust-version = "1.70.0"
+rust-version = "1.80.0"
 authors = ["dalvany"]
 description = "A set of analysis components for Tantivy"
 repository = "https://github.com/Dalvany/tantivy-analysis-contrib"
@@ -64,14 +64,12 @@ either = { version = "1.15", optional = true }
 document-features = "0.2"
 
 [dev-dependencies]
-lazy_static = "1.4"
 tempfile = "3.21"
 tantivy = "0.26"
 
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
-lazy_static = "1.4"
 
 [lints.clippy]
 pedentic = "warn"

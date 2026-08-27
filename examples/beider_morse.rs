@@ -1,7 +1,7 @@
 #![allow(clippy::print_stdout, clippy::unwrap_used)]
 use std::path::PathBuf;
+use std::sync::LazyLock;
 
-use lazy_static::lazy_static;
 use rphonetic::ConfigFiles;
 use tantivy::schema::{IndexRecordOption, SchemaBuilder, TextFieldIndexing, TextOptions};
 use tantivy::tokenizer::{TextAnalyzer, WhitespaceTokenizer};
@@ -12,10 +12,9 @@ use tantivy_analysis_contrib::phonetic::{
 use tempfile::TempDir;
 
 const ANALYSIS_NAME: &str = "test";
-lazy_static! {
-    static ref CONFIG_FILES: ConfigFiles =
-        ConfigFiles::new(&PathBuf::from("./test_assets/bm-cc-rules/")).unwrap();
-}
+
+static CONFIG_FILES: LazyLock<ConfigFiles> =
+    LazyLock::new(|| ConfigFiles::new(&PathBuf::from("./test_assets/bm-cc-rules/")).unwrap());
 
 #[allow(clippy::disallowed_macros)]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
