@@ -6,7 +6,6 @@ rust-version = "1.80.0"
 authors = ["dalvany"]
 description = "A set of analysis components for Tantivy"
 repository = "https://github.com/Dalvany/tantivy-analysis-contrib"
-homepage = "https://github.com/Dalvany/tantivy-analysis-contrib"
 documentation = "https://docs.rs/tantivy-analysis-contrib"
 readme = "README.md"
 license = "MIT OR Apache-2.0"
@@ -65,7 +64,7 @@ document-features = "0.2"
 
 [dev-dependencies]
 tempfile = "3.21"
-tantivy = "0.26"
+tantivy = "0.27"
 
 [package.metadata.docs.rs]
 all-features = true
